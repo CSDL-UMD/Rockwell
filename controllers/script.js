@@ -135,7 +135,21 @@ exports.getScript = (req, res, next) => {
        } 
     })
       .exec(function (err, script_feed) {
-        console.log("Script Feed : "+script_feed);
+
+        function makeGetRequest(path) { 
+          axx.get(path).then( 
+            (response) => { 
+              var result = response.data; 
+              console.log("script feed : "+JSON.parse(result)); 
+            }, 
+            (error) => { 
+              console.log(error); 
+            } 
+          ); 
+        }
+
+        makeGetRequest('http://127.0.0.1:5051/getfeed/');
+
         if (err) { return next(err); }
         //Successful, so render
 
