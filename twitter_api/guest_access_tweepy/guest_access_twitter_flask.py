@@ -1,5 +1,7 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
+import random
+import string
 import glob
 import tweepy
 import pandas as pd
@@ -53,8 +55,8 @@ def get_feed():
 	post_photo = []
 	"""
 
-	fileList = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/card_image_*.jpg")
-	fileList_actor = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/profile_pic_*.jpg")
+	fileList = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/*.jpg")
+	fileList_actor = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/*.jpg")
 
 	for file in fileList:
 		os.remove(file)
@@ -66,11 +68,11 @@ def get_feed():
 
 	for tweet in public_tweets:
 		print(i)
-		i = i + 1
 		actor_profile_pic = rq.get(tweet.user.profile_image_url)
-		actor_test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/profile_pic_"+str(i)+".jpg","wb")
+		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+		actor_test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/"+random_string_actor_pic+".jpg","wb")
 		actor_test.write(actor_profile_pic.content)
-		actor_picture = 'profile_pic_'+str(i)+'.jpg'
+		actor_picture = random_string_actor_pic+'.jpg'
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
 		tweet_id = str(tweet.id)
@@ -95,9 +97,10 @@ def get_feed():
 			card_data = Cardinfo.getCardData(card_url)
 			if "image" in card_data.keys():
 				image_raw = card_data['image']
-				test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/card_image_"+str(i)+".jpg","wb")
+				random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+				test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/"+random_string_card_pic+".jpg","wb")
 				test.write(image_raw.content)
-				picture = "card_image_"+str(i)+".jpg"
+				picture = random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
 		full_text = tweet.full_text
@@ -140,18 +143,13 @@ def get_feed():
 			'picture':picture,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
-			'actor':
-				{
-					'profile':
-					{
-						'name':actor_name,
-						'picture':actor_picture
-					},
-					'username':actor_handle
-				},
+			'actor_name':actor_name,
+			'actor_picture':actor_picture,
+			'actor_username':actor_handle,
 			'time':time
 		}
 		feed_json.append(feed)
+		i = i + 1
 	"""
 	tweet_collections = []
 	for i in range(len(idd)):
@@ -163,8 +161,9 @@ def get_feed():
 	"""
 	#out = json.dumps([ob.__dict__ for ob in tweet_collections], indent = 1)
 	#out = '###'.join([jsonify(ob.__dict__) for ob in tweet_collections])
-	print(feed_json)
-	return jsonify({'feed':feed_json})
+	#print(feed_json)
+	return jsonify(feed_json)
+	#return jsonify({'feed':feed_json})
 	#print("Saumya Bhadani : "+out)
 	#sys.stdout.flush()
 

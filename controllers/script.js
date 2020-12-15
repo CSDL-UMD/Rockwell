@@ -136,21 +136,75 @@ exports.getScript = (req, res, next) => {
     })
       .exec(function (err, script_feed) {
 
-        function makeGetRequest(path) { 
-          axx.get(path).then( 
-            (response) => { 
-              var result = response.data; 
-              console.log("script feed : "+JSON.parse(result)); 
+          function makeGetRequest(path) { 
+            axx.get(path).then( 
+              (response) => { 
+                var result = response.data;
+                feed = JSON.parse(JSON.stringify(result));
+                script_feed = []
+                for(var i=0;i<feed.length-1;i++){
+                  var feed_json = 
+                  { 
+                      body: feed[i].body,
+                      _id: '5fd46dd1050d402e5a3bb986',
+                      likes: feed[i].likes,
+                      urls: feed[i].urls,
+                      expanded_urls: feed[i].expanded_urls,
+                      experiment_group: feed[i].experiment_group,
+                      post_id: feed[i].post_id,
+                      tweet_id: feed[i].tweet_id,
+                      class: feed[i].class,
+                      picture: feed[i].picture,
+                      picture_heading: feed[i].picture_heading,
+                      picture_description: feed[i].picture_description,
+                      lowread: 9,
+                      highread: 148,
+                      actor: 
+                      { 
+                        profile: 
+                        { 
+                          name: feed[i].actor_name,
+                          location: 'Ithaca, NY',
+                          picture: feed[i].actor_picture,
+                          bio: 'Sample Bio',
+                          age: 37 
+                        },
+                        _id: '5fd46dd0050d402e5a3bb97f',
+                        class: 'normal',
+                        username: feed[i].actor_username,
+                        createdAt: '2020-12-12T07:14:24.816Z',
+                        updatedAt: '2020-12-12T07:14:24.816Z',
+                        __v: 0 
+                      },
+                      time: timeStringToNum(feed[i].time),
+                      comments: []
+                  }
+                  script_feed.push(feed_json);
+              }
+              //console.log("Script_Feed : "+script_feed);
+              //console.log("Script Size is now: "+finalfeed.length);
+              console.log("URL : "+script_feed[0].urls);
+              res.render('script', { script: script_feed});
             }, 
             (error) => { 
               console.log(error); 
             } 
           ); 
         }
-
+        function timeStringToNum(v) {
+          var timeParts = v.split(":");
+          if (timeParts[0] == "-0")
+            return -1 * parseInt(((timeParts[0] * (60000 * 60)) + (timeParts[1] * 60000)), 10);
+          else if (timeParts[0].startsWith('-'))
+            return parseInt(((timeParts[0] * (60000 * 60)) + (-1 * (timeParts[1] * 60000))), 10);
+          else
+            return parseInt(((timeParts[0] * (60000 * 60)) + (timeParts[1] * 60000)), 10);
+          };
+        
         makeGetRequest('http://127.0.0.1:5051/getfeed/');
 
-        if (err) { return next(err); }
+        
+        /*if (err) { return next(err); }
         //Successful, so render
 
         //update script feed to see if reading and posts has already happened
@@ -331,24 +385,11 @@ exports.getScript = (req, res, next) => {
         }
         //req.flash('success', { msg: 'Profile information has been updated.' });
       });
-/*
-      function makePostRequest(path) { 
-        axx.get(path).then( 
-          (response) => { 
-            var result = response.data;
-            console.log('Saumya'); 
-            console.log(result); 
-          }, 
-          (error) => { 
-            console.log(error); 
-          } 
-        ); 
-      }
-
-      makePostRequest('http://localhost:5051/getfeed/'); */
 
       console.log("Script Size is now: "+finalfeed.length);
-      res.render('script', { script: finalfeed});
+      console.log("finalfeed : "+finalfeed);
+      console.log("URLS : "+finalfeed[0].urls);
+      res.render('script', { script: finalfeed});*/
 
       });//end of Script.find()
 
