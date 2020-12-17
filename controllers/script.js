@@ -142,7 +142,7 @@ exports.getScript = (req, res, next) => {
                 var result = response.data;
                 feed = JSON.parse(JSON.stringify(result));
                 script_feed = []
-                for(var i=0;i<feed.length-1;i++){
+                for(var i=0;i<feed.length;i++){
                   var feed_json = 
                   { 
                       body: feed[i].body,

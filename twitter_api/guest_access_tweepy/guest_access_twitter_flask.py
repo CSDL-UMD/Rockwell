@@ -34,27 +34,6 @@ def get_feed():
 	countt = 20
 
 	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
-
-	i = 1
-	"""
-	idd = []
-	tweet_id = []
-	body = []
-	picture = []
-	picture_heading = []
-	picture_description = []
-	actor = []
-	likes = []
-	expanded_urls = []
-	urls = []
-	time = []
-	classs = ["cohort"]*countt
-	experiment_group = ["var1"]*countt
-	post_name = []
-	post_handle = []
-	post_photo = []
-	"""
-
 	fileList = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/*.jpg")
 	fileList_actor = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/*.jpg")
 
@@ -67,10 +46,20 @@ def get_feed():
 	feed_json = []
 
 	for tweet in public_tweets:
-		print(i)
+		# Checking for an image in the tweet.
+		eimage = []
+		try:
+			i = 0
+			while(True):
+				eimage[i] = rq.get(tweet.entities["media"][0]["media_url"])
+				i = i + 1 # In an attempt to get more than one link or image. If something is an "other" type of media with images following it will fail.
+		except:
+			eimage[0] = False
+		# End of experimental embeded image code
+
 		actor_profile_pic = rq.get(tweet.user.profile_image_url)
 		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-		actor_test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/"+random_string_actor_pic+".jpg","wb")
+		actor_test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
 		actor_test.write(actor_profile_pic.content)
 		actor_picture = random_string_actor_pic+'.jpg'
 		actor_name = tweet.user.name
@@ -146,7 +135,8 @@ def get_feed():
 			'actor_name':actor_name,
 			'actor_picture':actor_picture,
 			'actor_username':actor_handle,
-			'time':time
+			'time':time,
+			'embeded_image':eimage # Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory...
 		}
 		feed_json.append(feed)
 		i = i + 1
@@ -162,7 +152,11 @@ def get_feed():
 	#out = json.dumps([ob.__dict__ for ob in tweet_collections], indent = 1)
 	#out = '###'.join([jsonify(ob.__dict__) for ob in tweet_collections])
 	#print(feed_json)
-	return jsonify(feed_json)
+
+
+	return jsonify(feed_json) # What is this doing?? Is this where we are sending the json of our feed_json to the other script?
+
+
 	#return jsonify({'feed':feed_json})
 	#print("Saumya Bhadani : "+out)
 	#sys.stdout.flush()
