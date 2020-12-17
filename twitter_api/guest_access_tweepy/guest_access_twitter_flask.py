@@ -111,7 +111,7 @@ def get_feed():
 		#print(full_text)
 		body = full_text
 		td = (datetime.datetime.now() - tweet.created_at)
-		hours, remainder = divmod(td.seconds, 3600)
+		hours, remainder = divmod(td.seconds, 3600) # can we scrap this and the line below ______-------________-----________---------______--------
 		minutes, seconds = divmod(remainder, 60)
 		time = ""
 		if minutes < 10:
@@ -137,7 +137,7 @@ def get_feed():
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with like and retweet counts
-			'embeded_image':eimage, 
+			'embeded_image': eimage, 
 			'favorite_count': tweet.favorite_count,
 			'retweet_count': tweet.retweet_count
 		}
