@@ -57,12 +57,7 @@ def get_feed():
 			eimage[0] = False
 		# End of experimental embeded image code
 
-		# Experimental block to get the posters information
-		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down?
-		favorite_count = tweet.favorite_count #This and the one below could be hard coded and not put in a "middle man"
-		retweet_count = tweet.retweet_count   #This may speed up execution time a bit.
-		# End of experimental posters information
-
+		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
 		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
 		actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
 		actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
@@ -141,7 +136,10 @@ def get_feed():
 			'actor_picture':actor_picture,
 			'actor_username':actor_handle,
 			'time':time,
-			'embeded_image':eimage # Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory...
+			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with like and retweet counts
+			'embeded_image':eimage, 
+			'favorite_count': tweet.favorite_count,
+			'retweet_count': tweet.retweet_count
 		}
 		feed_json.append(feed)
 		i = i + 1
