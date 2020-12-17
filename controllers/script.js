@@ -133,7 +133,7 @@ exports.getScript = (req, res, next) => {
          path: 'actor',
          model: 'Actor'
        } 
-    })
+    }) // POPULATION OF THE FEED IS DONE HERE.
       .exec(function (err, script_feed) {
 
           function makeGetRequest(path) { 
@@ -159,9 +159,11 @@ exports.getScript = (req, res, next) => {
                       picture_description: feed[i].picture_description,
                       lowread: 9,
                       highread: 148,
+                      // Need to add eimage in here somehow with its own loop, or if this handles arrays...
+                      // embededimage:(whatever its called in this case) feed[i].eimage[iterator also in for loop perhaps]
                       actor: 
                       { 
-                        profile: 
+                        profile: // Is this where we need the users information as well? I can grab the user name, handle and image for this part.
                         { 
                           name: feed[i].actor_name,
                           location: 'Ithaca, NY',

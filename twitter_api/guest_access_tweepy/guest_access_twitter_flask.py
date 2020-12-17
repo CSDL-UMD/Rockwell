@@ -8,7 +8,7 @@ import pandas as pd
 import datetime
 import json
 import Cardinfo
-import TweetObject
+import TweetObject # We may no longer need this. Not sure how the pipeline is working, Seems like the object has been bypassed.
 from flask import Flask, render_template, request, url_for, jsonify
 import requests as rq
 
@@ -57,11 +57,16 @@ def get_feed():
 			eimage[0] = False
 		# End of experimental embeded image code
 
-		actor_profile_pic = rq.get(tweet.user.profile_image_url)
-		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+		# Experimental block to get the posters information
+		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down?
+		favorite_count = tweet.favorite_count #This and the one below could be hard coded and not put in a "middle man"
+		retweet_count = tweet.retweet_count   #This may speed up execution time a bit.
+		# End of experimental posters information
+
+		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
 		actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
-		actor_test.write(actor_profile_pic.content)
-		actor_picture = random_string_actor_pic+'.jpg'
+		actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
+		actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
 		tweet_id = str(tweet.id)
@@ -88,7 +93,7 @@ def get_feed():
 				image_raw = card_data['image']
 				random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
 				test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
-				test.write(image_raw.content)
+				test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
 				picture = random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
