@@ -31,13 +31,17 @@ def getCardData(link) -> dict:
         articleDescription = searchMe[openQuote + 1: closeQuote]
         articleDescriptionFiltered = articleDescription.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
         #End block
+
+        #Creating the return dictonary if all actions worked.
         out = {
             "image": imageRaw,
             "imageLink": imageLink,
             "title": articleTitleFiltered,
             "description": articleDescriptionFiltered
         }
+
         return out # Returning a dictonary with all neccessary information
+        
     except:
         return {}
     #test = open("test.jpg","wb") This is the code to write out the image if desired.
