@@ -34,8 +34,8 @@ def get_feed():
 	countt = 20
 
 	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
-	fileList = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/*.jpg")
-	fileList_actor = glob.glob("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/*.jpg")
+	fileList = glob.glob("../post_pictures/*.jpg")
+	fileList_actor = glob.glob("../profile_pictures/*.jpg")
 
 	for file in fileList:
 		os.remove(file)
@@ -46,7 +46,7 @@ def get_feed():
 	feed_json = []
 
 	for tweet in public_tweets:
-		# Checking for an image in the tweet.
+		# Checking for an image in the tweet. Needs to check for possible media types and whether or not it is an array
 		eimage = []
 		try:
 			i = 0
@@ -59,7 +59,7 @@ def get_feed():
 
 		actor_profile_pic = rq.get(tweet.user.profile_image_url)
 		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-		actor_test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
+		actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
 		actor_test.write(actor_profile_pic.content)
 		actor_picture = random_string_actor_pic+'.jpg'
 		actor_name = tweet.user.name
@@ -87,7 +87,7 @@ def get_feed():
 			if "image" in card_data.keys():
 				image_raw = card_data['image']
 				random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-				test = open("/home/saumya/Documents/USF/Project/ASD/truman/truman_infodiversity/post_pictures/"+random_string_card_pic+".jpg","wb")
+				test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
 				test.write(image_raw.content)
 				picture = random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
