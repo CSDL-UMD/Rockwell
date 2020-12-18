@@ -11,12 +11,12 @@ const chalk = require('chalk');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
 const dotenv = require('dotenv');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo')(session); // This can go??????
 const flash = require('express-flash');
 const path = require('path');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const expressValidator = require('express-validator');
+const expressValidator = require('express-validator'); // Can this go?
 const expressStatusMonitor = require('express-status-monitor');
 var schedule = require('node-schedule');
 
@@ -154,7 +154,7 @@ var j3 = schedule.scheduleJob(rule3, function(){
 
 
 /**
- * Express configuration.
+ * Express configuration. Can we remove the mongo parts from this? _________-----------_________---------__________-------________---------_______------
  */
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -165,7 +165,7 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressValidator());
+app.use(expressValidator()); // IT IS USED HERE, WHAT DOES IT DO? I HAD TO FORCE AN OLDER VERSION TO MAKE THIS WORK
 app.use(session({
   resave: true,
   saveUninitialized: true,
@@ -177,7 +177,7 @@ app.use(session({
     maxAge: 7200000
   },
   secret: process.env.SESSION_SECRET,
-  store: new MongoStore({
+  store: new MongoStore({  // THE MONGO PROCESS IS ALSO HERE, CAN THIS ALL GO?
     url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
     autoReconnect: true,
     clear_interval: 3600
