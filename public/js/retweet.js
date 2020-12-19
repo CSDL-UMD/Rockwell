@@ -1,3 +1,5 @@
+const { sum } = require("lodash");
+
 function retweet_clicked(tweet_id) {
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
@@ -50,9 +52,44 @@ function viewCountScrollBased(sizeList,curPos,furthestSeen,topPadding) {
   // sizeLIst is the array of all the "tweet" container sizes
   // curPos is the current position of the users screen given by the event listener, position of the top of the screen in pixels everytime they scroll
   // furthestSeen is the last tweet we have made it too and only count new reads if it is past this point. [index]
-  //topPadding is the fixed size of the top bar and the first box that isnt a tweet.
+  // topPadding is the fixed size of the top bar and the first box that isnt a tweet.
   // Event listner on scroll, then call the screen postition function and pass me the current postition
   // Access the database and update how many tweets have been seen. We also need to figure out how to activate the main loop to load more tweets.
-  
 
+  // Main loop Ideally there will be no break, only return statements that end the function.
+  while(True){
+    if(curPos < topPadding)
+      return 0 // Set furthestSeen as zero if the screen top hasnt made it beyond the padding.
+    adjustedCurrPos = curPos - topPadding // This adjusts the current position to the tweet level.
+    // Check if we have passed current before adding on to the next loop
+    var sumOfSeenTweets = 0
+    for(let i = 0; i < furthestSeen; i++)
+      sumOfSeenTweets += sizeList[i]
+    if (adjustedCurrPos <= sumOfSeenTweets) // If we are at or before the sum of tweets before furthest seen keep the same furthest seen.
+      return furthestSeen
+    //Loop to check how many tweets we have gone through, starting from furthest seen, assuming we have already checked all previous possibilities i.e. scrolled back up and now going down again
+    sumOfSeenTweets += sizeList[i] // updated to current max now, if in this range we push up seen by one, subtract and remainder is greater than zero
+    if(adjustedCurrPos - sumOfSeenTweets < 0)
+      return furthestSeen + 1 // We are now in the middle of the tweet that was furthest seen prior to this
+    else{
+      for(let i = furthestSeen + 1; i < sizeList.length; i++) { // we now need to see how far our furthestSeen needs to be, adjusted +1
+        sumOfSeenTweets += sizeList[i]
+        if (adjustedCurrPos - sumOfSeenTweets < 0)
+          return i + 1 // We have found our new furthest seen, we choose the one after the current to be the arbitrary next tweet.
+      }
+      // At this point we are past the given 20 tweets and can be unsure of what we have seen. I will put the position as 21 
+      // however we need a better solution.
+      return sizeList.length + 1
+    }
+
+
+
+
+
+
+
+  }
+// Also must consider whether or not we must update the data base. I propose another function here below
+// That is called prior to valid return statements where read status must be updated. This function may need an array with the 
+// appropriate data like tweet id to find the right row in the data tables.
 }
