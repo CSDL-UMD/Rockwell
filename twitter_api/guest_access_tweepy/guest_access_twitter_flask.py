@@ -124,7 +124,7 @@ def get_feed():
 		tempLikes = tweet.favorite_count
 		if (tempLikes <= 999):
 			finalLikes = str(tempLikes)
-		elif (tempLikes > 1000):
+		elif (tempLikes >= 1000):
 			counterVar = 1
 			while(True):
 				if (tempLikes - 1000 > 0):
