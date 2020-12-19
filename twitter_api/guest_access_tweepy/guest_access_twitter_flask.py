@@ -119,8 +119,8 @@ def get_feed():
 		else:
 			time = "-00:"+str(minutes)
 		#time.append(td.seconds)
-
 		# Fixing the like system
+		finalLikes = ""
 		tempLikes = tweet.favorite_count
 		if (tempLikes <= 999):
 			finalLikes = str(tempLikes)
@@ -132,6 +132,7 @@ def get_feed():
 					counterVar = counterVar + 1
 				else:
 					finalLikes = str(counterVar) + "." + str(tempLikes)[0] + "k"
+					break
 
 		feed = {
 			'body':body,
