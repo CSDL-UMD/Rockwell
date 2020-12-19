@@ -54,5 +54,7 @@ RUN npm install npm -g && \
     npm install passport-local && \  
     npm install async && \ 
     npm install fs && \ 
-    npm install csvtojson
+    npm install csvtojson && \ 
+    npm install pug
 #service mongodb start needs to be ran (Shell script to start it all up probably) We need to get rid of mongo stuff entirely from the app.js
+EXPOSE 3000
