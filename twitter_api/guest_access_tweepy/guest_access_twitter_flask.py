@@ -47,15 +47,16 @@ def get_feed():
 
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Needs to check for possible media types and whether or not it is an array
-		eimage = []
+	"""	eimage = []
 		try:
 			i = 0
 			while(True):
 				eimage[i] = rq.get(tweet.entities["media"][0]["media_url"])
 				i = i + 1 # In an attempt to get more than one link or image. If something is an "other" type of media with images following it will fail.
 		except:
-			eimage[0] = False
-		# End of experimental embeded image code
+			eimage[0] = False                          For use in the future when going back to making embeded media work. This may change with the API 2.0 as well
+		# End of experimental embeded image code 
+		"""
 
 		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
 		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
@@ -65,7 +66,6 @@ def get_feed():
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
 		tweet_id = str(tweet.id)
-		likes = tweet.favorite_count
 		entities_keys = tweet.entities.keys()
 		urls_list = []
 		expanded_urls_list = []
@@ -120,9 +120,22 @@ def get_feed():
 			time = "-00:"+str(minutes)
 		#time.append(td.seconds)
 
+		# Fixing the like system
+		tempLikes = tweet.favorite_count
+		if (tempLikes <= 999):
+			finalLikes = str(tempLikes)
+		elif (tempLikes > 1000):
+			counterVar = 1
+			while(True):
+				if (tempLikes - 1000 > 0):
+					tempLikes = tempLikes - 1000
+					counterVar = counterVar + 1
+				else:
+					finalLikes = str(counterVar) + "." + str(tempLikes)[0] + "k"
+
 		feed = {
 			'body':body,
-			'likes':likes,
+			'likes': finalLikes,
 			'urls':urls,
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
@@ -137,8 +150,7 @@ def get_feed():
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with like and retweet counts
-			'embeded_image': eimage, 
-			'favorite_count': tweet.favorite_count,
+		#	'embeded_image': eimage, In the future to add embeded images and videos, was not completed.
 			'retweet_count': tweet.retweet_count
 		}
 		feed_json.append(feed)

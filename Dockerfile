@@ -22,8 +22,7 @@ RUN echo yes | pip3 install tweepy && \
     echo yes | pip3 install flask && \ 
     echo yes | pip3 install pandas && \
     echo yes | pip3 install requests
-# Need to know what npm packages have to be installed to finish the proper installation. Python is confirmed working.
-#Installation of all Node packages
+# Installation of all Node packages
 RUN npm install npm -g && \ 
     npm install axios && \
     npm install lodash && \
