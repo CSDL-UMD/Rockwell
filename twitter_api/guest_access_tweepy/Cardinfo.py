@@ -2,6 +2,8 @@
 #Requires full tweet links in order to work as anticipated.
 import html # This may not be needed and can be removed if you take out line 18. Im not sure it actually does anything.
 import requests as rq
+
+# no longer fetches the actual image this should increase the speed of execution by alot. !!
 def getCardData(link) -> dict: 
     try:
         content = rq.get(link)
@@ -12,7 +14,7 @@ def getCardData(link) -> dict:
         openQuote = searchMe.find("\"",tagLocation + 10) # Plus 10 so we dont count our own mark.
         closeQuote = searchMe.find("\"",openQuote + 1)
         imageLink = searchMe[int(openQuote) + 1:int(closeQuote)]
-        imageRaw = rq.get(imageLink) # This is the image.
+        #imageRaw = rq.get(imageLink) # This is the image.
         #End block
 
         #Block to find the Title
@@ -34,8 +36,7 @@ def getCardData(link) -> dict:
 
         #Creating the return dictonary if all actions worked.
         out = {
-            "image": imageRaw,
-            "imageLink": imageLink,
+            "image": imageLink,
             "title": articleTitleFiltered,
             "description": articleDescriptionFiltered
         }

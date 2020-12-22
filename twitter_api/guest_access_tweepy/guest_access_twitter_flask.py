@@ -46,17 +46,14 @@ def get_feed():
 	feed_json = []
 
 	for tweet in public_tweets:
-		# Checking for an image in the tweet. Needs to check for possible media types and whether or not it is an array
-	"""	eimage = []
-		try:
-			i = 0
-			while(True):
-				eimage[i] = rq.get(tweet.entities["media"][0]["media_url"])
-				i = i + 1 # In an attempt to get more than one link or image. If something is an "other" type of media with images following it will fail.
-		except:
-			eimage[0] = False                          For use in the future when going back to making embeded media work. This may change with the API 2.0 as well
+		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
+		eimage = []
+		try:       
+			mediaArr = tweet.entities.get('media',[])       
+			for media in mediaArr:
+				eimage.append(media['media_url'])    
 		# End of experimental embeded image code 
-		"""
+		
 
 		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
 		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
@@ -86,10 +83,10 @@ def get_feed():
 			card_data = Cardinfo.getCardData(card_url)
 			if "image" in card_data.keys():
 				image_raw = card_data['image']
-				random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-				test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
-				test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
-				picture = random_string_card_pic+".jpg"
+				#random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+				#test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
+				#test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
+				picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
 		full_text = tweet.full_text
@@ -150,8 +147,8 @@ def get_feed():
 			'actor_picture':actor_picture,
 			'actor_username':actor_handle,
 			'time':time,
-			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with like and retweet counts
-		#	'embeded_image': eimage, In the future to add embeded images and videos, was not completed.
+			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
+			'embeded_image': eimage,
 			'retweet_count': tweet.retweet_count
 		}
 		feed_json.append(feed)
