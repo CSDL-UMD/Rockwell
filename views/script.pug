@@ -166,7 +166,8 @@ block content
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
             a(href='/user/'+val.actor.username)     
-              img.ui.avatar.image.lazyload(data-src=cdn+"/profile_pictures/"+val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+              //Change the line above to val.actor.profile.picture since it is a link now ?????????????? ______-----______-----_____------______----
+              img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
           //-div(style="position: relative; z-index: 1;")
@@ -178,6 +179,7 @@ block content
                 a(href=val.urls)=" "+val.urls
           if val.picture.length > 0
             if val.picture_heading.length > 3
+              //Place the loop going through embeded images here presumably above the buttons and any articles.
               .img.post
                 a(href=val.urls)
                   //img.post(src="/"+val.picture)

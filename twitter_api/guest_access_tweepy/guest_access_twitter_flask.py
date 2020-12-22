@@ -55,11 +55,11 @@ def get_feed():
 		# End of experimental embeded image code 
 		
 
-		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
-		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
-		actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
-		actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
-		actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
+		#actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
+		#random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
+		#actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
+		#actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
+		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
 		tweet_id = str(tweet.id)
@@ -159,7 +159,7 @@ def get_feed():
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture':actor_picture,
+			'actor_picture':tweet.user.profile_image_url, # Changed the profile picture to a link also
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
