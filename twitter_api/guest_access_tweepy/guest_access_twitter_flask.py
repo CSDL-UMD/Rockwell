@@ -163,7 +163,7 @@ def get_feed():
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
-			'embeded_image': eimage,
+			'embedded_image': eimage,
 			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)

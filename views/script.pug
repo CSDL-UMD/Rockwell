@@ -62,6 +62,10 @@ block content
             img(src='/user_post/'+val.picture)
           .content
             .description=val.body
+            // Inserting loop for media here --------______----------________---------_______--------______--------
+          each mediaLink in val.embedded_images
+            .image
+              img(src=mediaLink)
           .two.ui.bottom.attached.icon.buttons
             .ui.reply.button(tabindex='0')
               i.reply.icon

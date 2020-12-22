@@ -159,7 +159,7 @@ exports.getScript = (req, res, next) => {
                       picture_heading: feed[i].picture_heading,
                       picture_description: feed[i].picture_description,
                       //image: feed[i].image, I think I added this by mistake
-                      embeded_images: feed[i].embeded_images,
+                      embedded_images: feed[i].embedded_images,
                       lowread: 9,
                       highread: 148,
                       // Need to add eimage in here somehow with its own loop, or if this handles arrays...
