@@ -131,6 +131,21 @@ def get_feed():
 					finalLikes = str(counterVar) + "." + str(tempLikes)[0] + "k"
 					break
 
+		# Fixing the retweet system
+		finalRetweets = ""
+		tempRetweets = tweet.retweet_count
+		if (tempRetweets <= 999):
+			finalRetweets = str(tempRetweets)
+		elif (tempRetweets >= 1000):
+			counterVar = 1
+			while(True):
+				if (tempRetweets - 1000 > 0):
+					tempRetweets = tempRetweets - 1000
+					counterVar = counterVar + 1
+				else:
+					finalRetweets = str(counterVar) + "." + str(tempRetweets)[0] + "k"
+					break
+
 		feed = {
 			'body':body,
 			'likes': finalLikes,
@@ -149,7 +164,7 @@ def get_feed():
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
 			'embeded_image': eimage,
-			'retweet_count': tweet.retweet_count
+			'retweet_count': tweet.finalRetweets
 		}
 		feed_json.append(feed)
 		i = i + 1

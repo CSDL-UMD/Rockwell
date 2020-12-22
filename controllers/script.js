@@ -148,6 +148,7 @@ exports.getScript = (req, res, next) => {
                       body: feed[i].body,
                       _id: '5fd46dd1050d402e5a3bb986',
                       likes: feed[i].likes,
+                      retweets: feed[i].retweet_count,
                       urls: feed[i].urls,
                       expanded_urls: feed[i].expanded_urls,
                       experiment_group: feed[i].experiment_group,

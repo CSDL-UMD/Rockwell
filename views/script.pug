@@ -182,7 +182,8 @@ block content
                 a(href=val.urls)
                   //img.post(src="/"+val.picture)
                   //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
-                  img.lazyload(data-src=cdn+"/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
+                  //img.lazyload(data-src=cdn+"/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
+                  img(src=val.picture_raw)
               if val.picture_heading.length > 0
                 .content
                   .description(style="font-weight: 1000; text-align: center")=val.picture_heading
@@ -193,6 +194,7 @@ block content
             .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + '\')')
               i.reply.icon
               |  Retweet
+            a.ui.basic.red.left.pointing.label.count=val.retweets
             //if val.like
             //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
             //    .ui.red.like.button
