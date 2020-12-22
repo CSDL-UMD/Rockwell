@@ -86,7 +86,7 @@ def get_feed():
 				#random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
 				#test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
 				#test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
-				picture = image_raw #random_string_card_pic+".jpg"
+				#picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
 		full_text = tweet.full_text
@@ -131,6 +131,21 @@ def get_feed():
 					finalLikes = str(counterVar) + "." + str(tempLikes)[0] + "k"
 					break
 
+		# Fixing the retweet system
+		finalRetweets = ""
+		tempRetweets = tweet.retweet_count
+		if (tempRetweets <= 999):
+			finalRetweets = str(tempRetweets)
+		elif (tempRetweets >= 1000):
+			counterVar = 1
+			while(True):
+				if (tempRetweets - 1000 > 0):
+					tempRetweets = tempRetweets - 1000
+					counterVar = counterVar + 1
+				else:
+					finalRetweets = str(counterVar) + "." + str(tempRetweets)[0] + "k"
+					break
+
 		feed = {
 			'body':body,
 			'likes': finalLikes,
@@ -140,7 +155,7 @@ def get_feed():
 			'post_id':i,
 			'tweet_id':tweet_id,
 			'class':'cohort',
-			'picture':picture,
+			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
@@ -149,7 +164,7 @@ def get_feed():
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
 			'embeded_image': eimage,
-			'retweet_count': tweet.retweet_count
+			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)
 		i = i + 1

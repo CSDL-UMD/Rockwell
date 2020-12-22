@@ -148,6 +148,7 @@ exports.getScript = (req, res, next) => {
                       body: feed[i].body,
                       _id: '5fd46dd1050d402e5a3bb986',
                       likes: feed[i].likes,
+                      retweets: feed[i].retweet_count,
                       urls: feed[i].urls,
                       expanded_urls: feed[i].expanded_urls,
                       experiment_group: feed[i].experiment_group,
@@ -157,6 +158,8 @@ exports.getScript = (req, res, next) => {
                       picture: feed[i].picture,
                       picture_heading: feed[i].picture_heading,
                       picture_description: feed[i].picture_description,
+                      //image: feed[i].image, I think I added this by mistake
+                      embeded_images: feed[i].embeded_images,
                       lowread: 9,
                       highread: 148,
                       // Need to add eimage in here somehow with its own loop, or if this handles arrays...
