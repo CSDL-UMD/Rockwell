@@ -44,14 +44,16 @@ def get_feed():
 		os.remove(file)
 
 	feed_json = []
-
+	i = 1
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
-		eimage = []
-		try:       
-			mediaArr = tweet.entities.get('media',[])       
-			for media in mediaArr:
-				eimage.append(media['media_url'])    
+		eimage = []  
+		mediaArr = tweet.entities.get('media',[])   
+		if len(mediaArr) > 0:    
+			for i in range(len(mediaArr)):
+				eimage.append(mediaArr[i]['media_url'])   
+		else:
+			eimage.append("") 
 		# End of experimental embeded image code 
 		
 
@@ -68,7 +70,7 @@ def get_feed():
 		expanded_urls_list = []
 		urls = ""
 		expanded_urls = ""
-		picture = ""
+		#picture = ""
 		picture_heading = ""
 		picture_description = ""
 		if "urls" in entities_keys:
@@ -163,7 +165,7 @@ def get_feed():
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
-			'embedded_image': eimage,
+			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)
