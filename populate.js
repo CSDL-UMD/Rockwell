@@ -185,7 +185,8 @@ async function doPopulate() {
                         postdetail.highread = getReads(145, 203);
                         postdetail.actor = act;
                         postdetail.time = timeStringToNum(new_post.time);
-
+                        //postdetail.image = new_post.image; // THIS IS MY NEW CODE TO GET THE IMAGES
+                       // postdetail.embeded = new_post.embeded_image; // ALSO NEW
                         var script = new Script(postdetail);
                         script.save(function (err) {
                             if (err) {

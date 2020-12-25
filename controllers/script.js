@@ -154,10 +154,12 @@ exports.getScript = (req, res, next) => {
                       experiment_group: feed[i].experiment_group,
                       post_id: feed[i].post_id,
                       tweet_id: feed[i].tweet_id,
-                      class: feed[i].class,
+                      class: feed[i].class, // Hard code this to "cohort" and save on json size?
                       picture: feed[i].picture,
                       picture_heading: feed[i].picture_heading,
                       picture_description: feed[i].picture_description,
+                      //image: feed[i].image, I think I added this by mistake
+                      embedded_images: feed[i].embedded_image,
                       lowread: 9,
                       highread: 148,
                       // Need to add eimage in here somehow with its own loop, or if this handles arrays...

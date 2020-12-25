@@ -7,7 +7,7 @@ block content
     .ui.card
       .image
         if user.profile.picture
-          img(src='/user_post/'+user.profile.picture)
+          img(src=user.profile.picture)
         else
           img(src=user.gravatar(60))
       .content
@@ -165,8 +165,9 @@ block content
               img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
-            a(href='/user/'+val.actor.username)     
-              img.ui.avatar.image.lazyload(data-src=cdn+"/profile_pictures/"+val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+            a(href=val.actor.username)     
+              //Change the line above to val.actor.profile.picture since it is a link now ?????????????? ______-----______-----_____------______----
+              img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
               span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
           //-div(style="position: relative; z-index: 1;")
@@ -176,14 +177,20 @@ block content
             .description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
               if val.urls.length > 0
                 a(href=val.urls)=" "+val.urls
+          // Inserting loop for media here --------______----------________---------_______--------______--------##########
+          //each mediaLink in val.embedded_images
+          .img.post
+            img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
           if val.picture.length > 0
             if val.picture_heading.length > 3
+              //Place the loop going through embeded images here presumably above the buttons and any articles.
               .img.post
                 a(href=val.urls)
                   //img.post(src="/"+val.picture)
                   //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
-                  //img.lazyload(data-src=cdn+"/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
-                  img(src=val.picture_raw)
+                  img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;")
+                  //img(src=val.picture) 
+                  // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
               if val.picture_heading.length > 0
                 .content
                   .description(style="font-weight: 1000; text-align: center")=val.picture_heading
@@ -216,6 +223,20 @@ block content
       .content
         .description
         |  End of Posts for the last 48 hours.
+
+    script.
+      topPadding = 0;
+      sizeList = [];
+      var all_elements = document.getElementsByClassName("fluid");
+      topPadding = all_elements[0].clientHeight + all_elements[1].clientHeight;
+      var i = 2;
+      for(i = 2;i<all_elements.length-1;i++)
+        sizeList.push(all_elements[i].clientHeight);
+      var win = $(window);
+      curPos = win.scrollTop();
+    script.
+      window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,curPos,topPadding)});
+
     br
     br
     br

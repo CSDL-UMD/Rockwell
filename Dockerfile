@@ -1,6 +1,4 @@
 FROM ubuntu:18.04
-RUN mkdir /home/Client
-copy . /home/Client
 RUN apt-get -y update && \ 
     apt-get install -y curl && \ 
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
@@ -55,5 +53,9 @@ RUN npm install npm -g && \
     npm install fs && \ 
     npm install csvtojson && \ 
     npm install pug
+RUN echo yes | apt-get install tmux
 #service mongodb start needs to be ran (Shell script to start it all up probably) We need to get rid of mongo stuff entirely from the app.js
+RUN mkdir /home/Client
+copy . /home/Client
+
 EXPOSE 3000

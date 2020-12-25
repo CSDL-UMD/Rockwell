@@ -44,22 +44,24 @@ def get_feed():
 		os.remove(file)
 
 	feed_json = []
-
+	i = 1
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
-		eimage = []
-		try:       
-			mediaArr = tweet.entities.get('media',[])       
-			for media in mediaArr:
-				eimage.append(media['media_url'])    
+		eimage = []  
+		mediaArr = tweet.entities.get('media',[])   
+		if len(mediaArr) > 0:    
+			for i in range(len(mediaArr)):
+				eimage.append(mediaArr[i]['media_url'])   
+		else:
+			eimage.append("") 
 		# End of experimental embeded image code 
 		
 
-		actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
-		random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
-		actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
-		actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
-		actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
+		#actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
+		#random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
+		#actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
+		#actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
+		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
 		tweet_id = str(tweet.id)
@@ -68,7 +70,7 @@ def get_feed():
 		expanded_urls_list = []
 		urls = ""
 		expanded_urls = ""
-		picture = ""
+		#picture = ""
 		picture_heading = ""
 		picture_description = ""
 		if "urls" in entities_keys:
@@ -86,7 +88,7 @@ def get_feed():
 				#random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
 				#test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
 				#test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
-				picture = image_raw #random_string_card_pic+".jpg"
+				#picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
 		full_text = tweet.full_text
@@ -155,16 +157,16 @@ def get_feed():
 			'post_id':i,
 			'tweet_id':tweet_id,
 			'class':'cohort',
-			'picture':picture,
+			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture':actor_picture,
+			'actor_picture':tweet.user.profile_image_url, # Changed the profile picture to a link also
 			'actor_username':actor_handle,
 			'time':time,
 			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
-			'embeded_image': eimage,
-			'retweet_count': tweet.finalRetweets
+			'embedded_image': eimage[0],
+			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)
 		i = i + 1
