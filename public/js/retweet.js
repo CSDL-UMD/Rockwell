@@ -58,52 +58,52 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
 
   // Main loop Ideally there will be no break, only return statements that end the function.
   console.log("CALLED SCROLL FUNCTION");
+  console.log("sizeList : "+sizeList);
+  console.log("curPos : "+curPos);
+  console.log("topPadding : "+topPadding);
+  
   var countScrollBased = 0;
-  while(1){
-    if(curPos < topPadding){
-      countScrollBased = 0; // Set furthestSeen as zero if the screen top hasnt made it beyond the padding.
-      break;
-    }
-    adjustedCurrPos = curPos - topPadding; // This adjusts the current position to the tweet level.
-    // Check if we have passed current before adding on to the next loop
-    var sumOfSeenTweets = 0;
-    for(let i = 0; i < furthestSeen; i++)
-      sumOfSeenTweets += sizeList[i];
-    if (adjustedCurrPos <= sumOfSeenTweets){ // If we are at or before the sum of tweets before furthest seen keep the same furthest seen.
-      countScrollBased = furthestSeen;
-      break;
-    }
-    //Loop to check how many tweets we have gone through, starting from furthest seen, assuming we have already checked all previous possibilities i.e. scrolled back up and now going down again
-    sumOfSeenTweets += sizeList[i]; // updated to current max now, if in this range we push up seen by one, subtract and remainder is greater than zero
-    if(adjustedCurrPos - sumOfSeenTweets < 0){
-      countScrollBased = furthestSeen + 1; // We are now in the middle of the tweet that was furthest seen prior to this
-      break;
-    }
-    else{
-      var found = 0;
-      for(let i = furthestSeen + 1; i < sizeList.length; i++) { // we now need to see how far our furthestSeen needs to be, adjusted +1
-        sumOfSeenTweets += sizeList[i];
-        if (adjustedCurrPos - sumOfSeenTweets < 0)
-          countScrollBased = i + 1; // We have found our new furthest seen, we choose the one after the current to be the arbitrary next tweet.
-          found = 1;
-          break;
-      }
-      // At this point we are past the given 20 tweets and can be unsure of what we have seen. I will put the position as 21 
-      // however we need a better solution.
-      if (found == 0){
-        countScrollBased = sizeList.length + 1;
-        break;
-      }
-    }
-    furthestSeen = countScrollBased;
-    console.log("COUNT SCROLL BASED : "+countScrollBased);
-
-
-
-
-
-
-  }
+  // while(1){
+  //   if(curPos < topPadding){
+  //     countScrollBased = 0; // Set furthestSeen as zero if the screen top hasnt made it beyond the padding.
+  //     break;
+  //   }
+  //   adjustedCurrPos = curPos - topPadding; // This adjusts the current position to the tweet level.
+  //   // Check if we have passed current before adding on to the next loop
+  //   var sumOfSeenTweets = 0;
+  //   for(let i = 0; i < furthestSeen; i++)
+  //     sumOfSeenTweets += sizeList[i];
+  //   if (adjustedCurrPos <= sumOfSeenTweets){ // If we are at or before the sum of tweets before furthest seen keep the same furthest seen.
+  //     countScrollBased = furthestSeen;
+  //     break;
+  //   }
+  //   //Loop to check how many tweets we have gone through, starting from furthest seen, assuming we have already checked all previous possibilities i.e. scrolled back up and now going down again
+  //   sumOfSeenTweets += sizeList[i]; // updated to current max now, if in this range we push up seen by one, subtract and remainder is greater than zero
+  //   if(adjustedCurrPos - sumOfSeenTweets < 0){
+  //     countScrollBased = furthestSeen + 1; // We are now in the middle of the tweet that was furthest seen prior to this
+  //     break;
+  //   }
+  //   else{
+  //     var found = 0;
+  //     for(let i = furthestSeen + 1; i < sizeList.length; i++) { // we now need to see how far our furthestSeen needs to be, adjusted +1
+  //       sumOfSeenTweets += sizeList[i];
+  //       if (adjustedCurrPos - sumOfSeenTweets < 0)
+  //         countScrollBased = i + 1; // We have found our new furthest seen, we choose the one after the current to be the arbitrary next tweet.
+  //         found = 1;
+  //         break;
+  //     }
+  //     // At this point we are past the given 20 tweets and can be unsure of what we have seen. I will put the position as 21 
+  //     // however we need a better solution.
+  //     if (found == 0){
+  //       countScrollBased = sizeList.length + 1;
+  //       break;
+  //     }
+  //   }
+  //   break;
+  // }
+  
+  furthestSeen = countScrollBased;
+  console.log("COUNT SCROLL BASED : "+countScrollBased);
 // Also must consider whether or not we must update the data base. I propose another function here below
 // That is called prior to valid return statements where read status must be updated. This function may need an array with the 
 // appropriate data like tweet id to find the right row in the data tables.

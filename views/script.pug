@@ -24,19 +24,19 @@ block content
 
   #loading.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column
     img.ui.centered.small.image(src='/public/heart.svg')
-  #content.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column(style='display: none;')
+  #content.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column
     //-.ui.active.dimmer.feed
       .ui.large.text.loader Loading
     //- Input for creating new post at top of feed
-    #newpost.ui.fluid.left.labeled.right.icon.input
-      .ui.label
-        if user.profile.picture
-          img.ui.avatar.image(src='/user_post/'+user.profile.picture)
-        else
-          img.ui.avatar.image(src=user.gravatar(60))
-      input(type='text', placeholder='Share your meal')
-      i.big.photo.link.icon
-  
+    //#newpost.ui.fluid.left.labeled.right.icon.input
+    //  .ui.label
+    //    if user.profile.picture
+    //      img.ui.avatar.image(src='/user_post/'+user.profile.picture)
+    //    else
+    //      img.ui.avatar.image(src=user.gravatar(60))
+    //  input(type='text', placeholder='Share your meal')
+    //  i.big.photo.link.icon
+    
     each val in script
       //- create a card for each post in val (if by user make the card a little different)
       //- if val.relativeTime - then post came from user_post (so user post, user reply to actor reply to user post)
@@ -147,7 +147,7 @@ block content
 
       //-THIS is for posts by Actors, not the USER
       else
-        .ui.fluid.card.dim(postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
+        .ui.fluid.card.dim(style="display:block;",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
           //- dimmer DIV for flagging
           .ui.dimmer.flag
                 .content
@@ -228,14 +228,13 @@ block content
       topPadding = 0;
       sizeList = [];
       var all_elements = document.getElementsByClassName("fluid");
-      topPadding = all_elements[0].clientHeight + all_elements[1].clientHeight;
-      var i = 2;
-      for(i = 2;i<all_elements.length-1;i++)
+      topPadding = all_elements[0].clientHeight;
+      var i = 1;
+      for(i = 1;i<all_elements.length-1;i++)
         sizeList.push(all_elements[i].clientHeight);
-      var win = $(window);
-      curPos = win.scrollTop();
     script.
-      window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,curPos,topPadding)});
+      var win = $(window);
+      window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,win.scrollTop(),topPadding)});
 
     br
     br
