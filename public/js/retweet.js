@@ -61,7 +61,7 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
   console.log("sizeList : "+sizeList);
   console.log("curPos : "+curPos);
   console.log("topPadding : "+topPadding);
-  
+  var furthestSeen = 0; // This needs to be set from the database, its at 0 for now always. THIS HAS TO BE PASSED BACK TO THE FUNCTION AND WRITTEN BACK TO THE DATABASE.
   var countScrollBased = 0;
    while(1){
      if(curPos < topPadding){
