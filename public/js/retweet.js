@@ -87,7 +87,7 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
       for(let i = furthestSeen; i < sizeList.length; i++) { // we now need to see how far our furthestSeen needs to be, adjusted +1, removed +1 since loop above was removed.
         sumOfSeenTweets += sizeList[i];
         if (adjustedCurrPos - sumOfSeenTweets < 0){
-          countScrollBased = i + 1; // We have found our new furthest seen, we choose the one after the current to be the arbitrary next tweet.
+          countScrollBased = i; // We have found our new furthest seen, we choose the one after the current to be the arbitrary next tweet.
           found = 1; // If found never becomes one we went to all of the tweets and all have been seen.
           break;
         }
