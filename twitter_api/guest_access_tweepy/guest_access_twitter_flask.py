@@ -4,13 +4,13 @@ import random
 import string
 import glob
 import tweepy
-import pandas as pd
+import pandas as pd # No longer needed?
 import datetime
 import json
 import Cardinfo
-import TweetObject # We may no longer need this. Not sure how the pipeline is working, Seems like the object has been bypassed.
+#import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
-import requests as rq
+#import requests as rq
 
 app = Flask(__name__)
 
@@ -34,14 +34,14 @@ def get_feed():
 	countt = 20
 
 	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
-	fileList = glob.glob("../post_pictures/*.jpg")
-	fileList_actor = glob.glob("../profile_pictures/*.jpg")
+#	fileList = glob.glob("../post_pictures/*.jpg")
+#	fileList_actor = glob.glob("../profile_pictures/*.jpg")
 
-	for file in fileList:
-		os.remove(file)
+#	for file in fileList:
+#		os.remove(file)
 
-	for file in fileList_actor:
-		os.remove(file)
+#	for file in fileList_actor:
+#		os.remove(file)
 
 	feed_json = []
 	i = 1
@@ -54,7 +54,7 @@ def get_feed():
 				eimage.append(mediaArr[i]['media_url'])   
 		else:
 			eimage.append("") 
-		# End of experimental embeded image code 
+		# End of embeded image code. Working however there has not been a way to send an array down the pipeline yet. To be solved by Saumya
 		
 
 		#actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
@@ -64,7 +64,7 @@ def get_feed():
 		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet.user.name
 		actor_handle = tweet.user.screen_name
-		tweet_id = str(tweet.id)
+		#tweet_id = str(tweet.id)
 		entities_keys = tweet.entities.keys()
 		urls_list = []
 		expanded_urls_list = []
@@ -155,16 +155,15 @@ def get_feed():
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
 			'post_id':i,
-			'tweet_id':tweet_id,
-			'class':'cohort',
+			'tweet_id':str(tweet.id),
+			'class':'cohort', # Can we remove this from the pipeline to save the amount of data transferred slightly?
 			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture':tweet.user.profile_image_url, # Changed the profile picture to a link also
+			'actor_picture':tweet.user.profile_image_url,
 			'actor_username':actor_handle,
 			'time':time,
-			# Added by me, needs to be added to pipeline. It is a list of photos. Ordered in theory... Along with retweet counts
 			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets
 		}
