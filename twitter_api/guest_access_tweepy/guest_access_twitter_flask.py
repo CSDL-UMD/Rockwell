@@ -1,10 +1,10 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
-import os
-import random
-import string
-import glob
+#import os
+#import random
+#import string
+#import glob
 import tweepy
-import pandas as pd # No longer needed?
+#import pandas as pd # No longer needed?
 import datetime
 import json
 import Cardinfo

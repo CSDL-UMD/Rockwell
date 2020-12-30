@@ -37,187 +37,85 @@ block content
     //  input(type='text', placeholder='Share your meal')
     //  i.big.photo.link.icon
     
+    -var ii = 0;
     each val in script
+      -ii = ii + 1
+      -console.log(ii)
       //- create a card for each post in val (if by user make the card a little different)
       //- if val.relativeTime - then post came from user_post (so user post, user reply to actor reply to user post)
-      if val.relativeTime
-        -var u_class;
-        -if (val.actorAuthor) {u_class = "actorReply"}
-        -else if (val.reply) {u_class = "userReply"}
-        -else {u_class = "userPost"}
-        .ui.fluid.card(u_postID=val.id, type=u_class, postID=val.postID)
-          
-          //- This is a User made post
-          .content
-            .right.floated.time.meta= (user.createdAt.getTime() + val.relativeTime)
-            |  
-            a.ui.avatar.image(href='/me')
-              if user.profile.picture
-                img(src='/user_post/'+user.profile.picture)
-              else
-                img(src=user.gravatar(60))
-            a(href='/me')
-              span=user.profile.name || user.username || user.id
-          .image
-            img(src='/user_post/'+val.picture)
-          .content
-            .description=val.body
-          .two.ui.bottom.attached.icon.buttons
-            .ui.reply.button(tabindex='0')
-              i.reply.icon
-              |  Reply
-            if val.liked
-              .ui.red.like.button
-                i.heart.icon
-                |  Like
-            else
-              .ui.like.button
-                i.heart.icon
-                |  Like
-          if val.comments.length > 0
-            .content
-              .ui.comments
-                each comment in val.comments
-                  //-IF this comment is USER made, do this
-                  if (user.createdAt.getTime() + comment.time) < Date.now()
-                    if !comment.flagged
-                      if comment.new_comment
-                        -console.log("New COMMENT AREA");
-                        .comment(commentID=comment.commentID)
-                          a.avatar.image(href='/me')
-                            if user.profile.picture
-                              img(src='/user_post/'+user.profile.picture)
-                            else
-                              img(src=user.gravatar(60))
-                          .content
-                            a.author(href='/me')=user.profile.name || user.username || user.id
-                            .metadata
-                              span.date=(user.createdAt.getTime() + comment.time)
-                              .rating
-                                if comment.liked
-                                  i.red.heart.icon
-                                  span=comment.likes
-                                  | Likes 
-                                else
-                                  i.heart.icon
-                                  span.num=comment.likes
-                                  |  Likes
-                            .text=comment.body
-                            .actions
-                              if comment.liked
-                                a.red.like.comment Like
-                              else
-                                a.like.comment Like
-                              a.flag.comment Flag
-                      //- Else this is a normal comment from the script
-                      else
-                        .comment(commentID=comment.commentID)
-                          a.avatar(href='/user/'+comment.actor.username)
-                            //-img(src=cdn+'/profile_pictures/'+comment.actor.profile.picture)
-                            img.lazyload(data-src=cdn+"/profile_pictures/"+comment.actor.profile.picture)
-                          .content
-                            a.author(href='/user/'+comment.actor.username)=comment.actor.profile.name
-                            .metadata
-                              span.date=(user.createdAt.getTime() + comment.time)
-                              .rating
-                                if comment.liked
-                                  i.red.heart.icon
-                                  span=comment.likes
-                                  | Likes 
-                                else
-                                  i.heart.icon
-                                  span.num=comment.likes
-                                  |  Likes
-                            .text=comment.body
-                            .actions
-                              if comment.liked
-                                a.red.like.comment Like
-                              else
-                                a.like.comment Like
-                              a.flag.comment Flag
-          .extra.content
-            .ui.fluid.left.labeled.right.icon.input
-              .ui.label
-                if user.profile.picture
-                  img.ui.avatar.image(src='/user_post/'+user.profile.picture, name=user.profile.name || user.username || user.id)
-                else
-                  img.ui.avatar.image(src=user.gravatar(60), name=user.profile.name || user.username || user.id)            
-              input.newcomment(type='text', placeholder='Write a Comment')
-              i.big.send.link.icon
+      .ui.fluid.card.dim(id="tweet_"+val.post_id,style="display:block;",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
+        //- dimmer DIV for flagging
+        .ui.dimmer.flag
+              .content
+                .center
+                  h2.ui.inverted.icon.header
+                    i.red.flag.icon
+                    |  You&apos;ve flagged this!
+                    h3.ui.inverted.header
+                      span="The admins will review this post further. We are sorry you had this experience."
+        //- Normal Base Post
+        .content
+          .right.floated.time.meta= (Date.now() + val.time)
+          |  
+          //-a(href='/user/'+val.actor.username)
+            img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
+            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
+          a(href=val.actor.username)     
+            //Change the line above to val.actor.profile.picture since it is a link now ?????????????? ______-----______-----_____------______----
+            img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
+            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
+        //-div(style="position: relative; z-index: 1;")
+          img(src="image.png" style="position: absolute; z-index: 2;")
+          span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
+        .content
+          .description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
+            if val.urls.length > 0
+              a(href=val.urls)=" "+val.urls
+        // Inserting loop for media here --------______----------________---------_______--------______--------##########
+        //each mediaLink in val.embedded_images
+        .img.post
+          img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
+        if val.picture.length > 0
+          if val.picture_heading.length > 3
+            //Place the loop going through embeded images here presumably above the buttons and any articles.
+            .img.post
+              a(href=val.urls)
+                //img.post(src="/"+val.picture)
+                //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
+                img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;")
+                //img(src=val.picture) 
+                // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
+            if val.picture_heading.length > 0
+              .content
+                .description(style="font-weight: 1000; text-align: center")=val.picture_heading
+            if val.picture_description.length > 0
+              .content
+                .description=val.picture_description
+        .three.ui.bottom.attached.icon.buttons
+          .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + '\')')
+            i.reply.icon
+            |  Retweet
+          a.ui.basic.red.left.pointing.label.count=val.retweets
+          //if val.like
+          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
+          //    .ui.red.like.button
+          //      i.heart.icon
+          //      |  Like
+          //    a.ui.basic.red.left.pointing.label=val.likes
+          //else
+          //  .ui.labeled.button(tabindex='0')
+          //    .ui.like.button
+          //      i.heart.icon
+          //      |  Like
+          //    a.ui.basic.red.left.pointing.label.count=val.likes
+          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
+            i.reply.icon
+            |  Like
+          a.ui.basic.red.left.pointing.label.count=val.likes
 
-      //-THIS is for posts by Actors, not the USER
-      else
-        .ui.fluid.card.dim(style="display:block;",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
-          //- dimmer DIV for flagging
-          .ui.dimmer.flag
-                .content
-                  .center
-                    h2.ui.inverted.icon.header
-                      i.red.flag.icon
-                      |  You&apos;ve flagged this!
-                      h3.ui.inverted.header
-                        span="The admins will review this post further. We are sorry you had this experience."
-          //- Normal Base Post
-          .content
-            .right.floated.time.meta= (Date.now() + val.time)
-            |  
-            //-a(href='/user/'+val.actor.username)
-              img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
-              span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
-              span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
-            a(href=val.actor.username)     
-              //Change the line above to val.actor.profile.picture since it is a link now ?????????????? ______-----______-----_____------______----
-              img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
-              span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
-              span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
-          //-div(style="position: relative; z-index: 1;")
-            img(src="image.png" style="position: absolute; z-index: 2;")
-            span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
-          .content
-            .description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
-              if val.urls.length > 0
-                a(href=val.urls)=" "+val.urls
-          // Inserting loop for media here --------______----------________---------_______--------______--------##########
-          //each mediaLink in val.embedded_images
-          .img.post
-            img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
-          if val.picture.length > 0
-            if val.picture_heading.length > 3
-              //Place the loop going through embeded images here presumably above the buttons and any articles.
-              .img.post
-                a(href=val.urls)
-                  //img.post(src="/"+val.picture)
-                  //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
-                  img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;")
-                  //img(src=val.picture) 
-                  // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
-              if val.picture_heading.length > 0
-                .content
-                  .description(style="font-weight: 1000; text-align: center")=val.picture_heading
-              if val.picture_description.length > 0
-                .content
-                  .description=val.picture_description
-          .three.ui.bottom.attached.icon.buttons
-            .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + '\')')
-              i.reply.icon
-              |  Retweet
-            a.ui.basic.red.left.pointing.label.count=val.retweets
-            //if val.like
-            //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
-            //    .ui.red.like.button
-            //      i.heart.icon
-            //      |  Like
-            //    a.ui.basic.red.left.pointing.label=val.likes
-            //else
-            //  .ui.labeled.button(tabindex='0')
-            //    .ui.like.button
-            //      i.heart.icon
-            //      |  Like
-            //    a.ui.basic.red.left.pointing.label.count=val.likes
-            .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
-              i.reply.icon
-              |  Like
-            a.ui.basic.red.left.pointing.label.count=val.likes
+
 
     .ui.fluid.card
       .content
@@ -228,10 +126,11 @@ block content
       topPadding = 0;
       sizeList = [];
       var all_elements = document.getElementsByClassName("fluid");
-      topPadding = all_elements[0].clientHeight;
+      margin = all_elements[1].offsetTop;
+      topPadding = all_elements[0].clientHeight + 2*margin;
       var i = 1;
       for(i = 1;i<all_elements.length-1;i++)
-        sizeList.push(all_elements[i].clientHeight);
+        sizeList.push(all_elements[i].clientHeight + margin);
     script.
       var win = $(window);
       window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,win.scrollTop(),topPadding)});
