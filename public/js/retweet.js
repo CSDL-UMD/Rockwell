@@ -58,7 +58,10 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
 
   // Main loop Ideally there will be no break, only return statements that end the function.
   console.log("CALLED SCROLL FUNCTION");
-  console.log("sizeList : "+sizeList);
+  for(var i=0;i<sizeList.length;i++){
+    console.log(i + " :::: "+sizeList[i]);
+  }
+  //console.log("sizeList : "+sizeList);
   console.log("curPos : "+curPos);
   console.log("topPadding : "+topPadding);
   var countScrollBased = 0;
