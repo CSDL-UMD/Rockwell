@@ -3,7 +3,7 @@
 #import random
 #import string
 #import glob
-import tweepy
+#import tweepy
 #import pandas as pd # No longer needed?
 import datetime
 import json
@@ -27,13 +27,25 @@ def get_feed():
 	    cred[name] = value.strip()
 	f.close()
 
-	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
+'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
 	auth.set_access_token(cred["token"], cred["token_secret"])
 	api = tweepy.API(auth)
 
 	countt = 20
 
 	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
+	'''
+	oauth = OAuth1Session(consumer_key,
+                       client_secret=cred['key_secret'],
+                       resource_owner_key=cred['token'],
+                       resource_owner_secret=cred['token_secret'])
+	#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
+	params = {"count": "20","tweet_mode": "extended"}
+	response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
+	public_tweets = json.loads(response.text)
+	#print(tweets)
+	if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
+		print("Rate limit exceeded.")
 #	fileList = glob.glob("../post_pictures/*.jpg")
 #	fileList_actor = glob.glob("../profile_pictures/*.jpg")
 
@@ -48,7 +60,7 @@ def get_feed():
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
 		eimage = []  
-		mediaArr = tweet.entities.get('media',[])   
+		mediaArr = tweet['entities'].get('media',[])   
 		if len(mediaArr) > 0:    
 			for i in range(len(mediaArr)):
 				eimage.append(mediaArr[i]['media_url'])   
@@ -62,10 +74,9 @@ def get_feed():
 		#actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
 		#actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
 		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
-		actor_name = tweet.user.name
-		actor_handle = tweet.user.screen_name
+		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
-		entities_keys = tweet.entities.keys()
+		entities_keys = tweet["entities"].keys()
 		urls_list = []
 		expanded_urls_list = []
 		urls = ""
@@ -74,7 +85,7 @@ def get_feed():
 		picture_heading = ""
 		picture_description = ""
 		if "urls" in entities_keys:
-			all_urls = tweet.entities["urls"]
+			all_urls = tweet["entities"]["urls"]
 			for each_url in all_urls:
 				urls_list.append(each_url["url"])
 				expanded_urls_list.append(each_url["expanded_url"])
@@ -91,7 +102,7 @@ def get_feed():
 				#picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
-		full_text = tweet.full_text
+		full_text = tweet["full_text"]
 		#url_idx = full_text.index(urls_list[0])
 		#starting_para = full_text[:url_idx]
 		#url_para = full_text[url_idx:url_idx+len(urls_list[0])]
@@ -120,7 +131,7 @@ def get_feed():
 		#time.append(td.seconds)
 		# Fixing the like system
 		finalLikes = ""
-		tempLikes = tweet.favorite_count
+		tempLikes = tweet["favorite_count"]
 		if (tempLikes <= 999):
 			finalLikes = str(tempLikes)
 		elif (tempLikes >= 1000):
@@ -135,7 +146,7 @@ def get_feed():
 
 		# Fixing the retweet system
 		finalRetweets = ""
-		tempRetweets = tweet.retweet_count
+		tempRetweets = tweet["retweet_count"]
 		if (tempRetweets <= 999):
 			finalRetweets = str(tempRetweets)
 		elif (tempRetweets >= 1000):
@@ -155,14 +166,14 @@ def get_feed():
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
 			'post_id':i,
-			'tweet_id':str(tweet.id),
+			'tweet_id':str(tweet["id"]),
 			'class':'cohort', # Can we remove this from the pipeline to save the amount of data transferred slightly?
 			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture':tweet.user.profile_image_url,
-			'actor_username':actor_handle,
+			'actor_picture':tweet["user"]["profile_image_url"],
+			'actor_username': tweet["user"]["screen_name"],
 			'time':time,
 			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets
