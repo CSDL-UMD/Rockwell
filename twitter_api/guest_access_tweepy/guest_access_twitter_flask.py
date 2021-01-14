@@ -1,5 +1,5 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
-#import os
+import os
 #import random
 #import string
 #import glob
@@ -10,6 +10,7 @@ import json
 import Cardinfo
 #import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
+from requests_oauthlib import OAuth1Session
 #import requests as rq
 
 app = Flask(__name__)
@@ -27,7 +28,7 @@ def get_feed():
 	    cred[name] = value.strip()
 	f.close()
 
-'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
+	'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
 	auth.set_access_token(cred["token"], cred["token_secret"])
 	api = tweepy.API(auth)
 
@@ -35,7 +36,7 @@ def get_feed():
 
 	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
 	'''
-	oauth = OAuth1Session(consumer_key,
+	oauth = OAuth1Session(cred['key'],
                        client_secret=cred['key_secret'],
                        resource_owner_key=cred['token'],
                        resource_owner_secret=cred['token_secret'])
@@ -56,7 +57,7 @@ def get_feed():
 #		os.remove(file)
 
 	feed_json = []
-	i = 1
+	post_id_increment = 1
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
 		eimage = []  
@@ -82,6 +83,7 @@ def get_feed():
 		urls = ""
 		expanded_urls = ""
 		#picture = ""
+		image_raw = ""
 		picture_heading = ""
 		picture_description = ""
 		if "urls" in entities_keys:
@@ -120,7 +122,9 @@ def get_feed():
 		#full_text = "!{t('" + full_text + "')}"
 		#print(full_text)
 		body = full_text
-		td = (datetime.datetime.now() - tweet.created_at)
+		date_string_temp = tweet['created_at'].split()
+		date_string = date_string_temp[1] + " " + date_string_temp[2] + " " + date_string_temp[3] + " " + date_string_temp[5]
+		td = (datetime.datetime.now() - datetime.datetime.strptime(date_string,"%b %d %H:%M:%S %Y"))
 		hours, remainder = divmod(td.seconds, 3600) # can we scrap this and the line below ______-------________-----________---------______--------
 		minutes, seconds = divmod(remainder, 60)
 		time = ""
@@ -165,7 +169,7 @@ def get_feed():
 			'urls':urls,
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
-			'post_id':i,
+			'post_id':post_id_increment,
 			'tweet_id':str(tweet["id"]),
 			'class':'cohort', # Can we remove this from the pipeline to save the amount of data transferred slightly?
 			'picture':image_raw,
@@ -179,7 +183,7 @@ def get_feed():
 			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)
-		i = i + 1
+		post_id_increment = post_id_increment + 1
 	"""
 	tweet_collections = []
 	for i in range(len(idd)):

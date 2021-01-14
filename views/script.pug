@@ -78,7 +78,7 @@ block content
         if val.embedded_images.length > 0
           //.img.post
           //img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
-          img(src=val.embedded_images, style="max-width:100%;width:100%;")
+          img(src=val.embedded_images, style="max-width:100%;width:100%;max-height:100%;height:100%")
         if val.picture.length > 0
           if val.picture_heading.length > 3
             //Place the loop going through embeded images here presumably above the buttons and any articles.
@@ -87,7 +87,7 @@ block content
               //img.post(src="/"+val.picture)
               //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
               //img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;")
-              img(src=val.picture, style="max-width:100%;width:100%;", id="images")
+              img(src=val.picture, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
               //img(src=val.picture) 
               // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
             if val.picture_heading.length > 0
@@ -133,12 +133,9 @@ block content
       console.log("Margin : "+margin);
       topPadding = all_elements[0].clientHeight + 2*margin;
       var i = 1;
-      console.log(document.getElementById("tweet_"+1));
-      img_elements = document.getElementById("tweet_"+1).getElementsByTagName('img');
+      img_elements = document.getElementById("tweet_"+2).getElementsByTagName('img');
       console.log("IMAGE ARRAY SIZE"+img_elements.length);
-      for(i = 0;i<img_elements.length;i++){
-        console.log("IMAGE HEIGHT"+img_elements[i].naturalHeight);
-      }
+      console.log("IMAGE HEIGHT"+img_elements[1].getBoundingClientRect()['height']);
       for(i = 1;i<all_elements.length-1;i++){
         var post_element = document.getElementById("tweet_"+i);
         sizeList.push(post_element.clientHeight + margin);
