@@ -57,15 +57,22 @@ def get_feed():
 #		os.remove(file)
 
 	feed_json = []
-	post_id_increment = 1
+	i = 1
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
 		eimage = []  
-		mediaArr = tweet['entities'].get('media',[])   
+		mediaArr = tweet['entities'].get('media',[])
+		#if 'extended_entities' in tweet.keys():
+		#	extended_entities = tweet['extended_entities'].get('media',[])
+		#	print(extended_entities[0]['variants'])
+		flag_image = False   
 		if len(mediaArr) > 0:    
-			for i in range(len(mediaArr)):
-				eimage.append(mediaArr[i]['media_url'])   
-		else:
+			for x in range(len(mediaArr)):
+				print(tweet["user"]["name"] + " ::: " + mediaArr[x]['media_url'])
+				if mediaArr[x]['type'] == 'photo':
+					eimage.append(mediaArr[x]['media_url'])
+					flag_image = True   
+		if not flag_image:
 			eimage.append("") 
 		# End of embeded image code. Working however there has not been a way to send an array down the pipeline yet. To be solved by Saumya
 		
@@ -169,7 +176,7 @@ def get_feed():
 			'urls':urls,
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
-			'post_id':post_id_increment,
+			'post_id':i,
 			'tweet_id':str(tweet["id"]),
 			'class':'cohort', # Can we remove this from the pipeline to save the amount of data transferred slightly?
 			'picture':image_raw,
@@ -183,7 +190,7 @@ def get_feed():
 			'retweet_count': finalRetweets
 		}
 		feed_json.append(feed)
-		post_id_increment = post_id_increment + 1
+		i = i + 1
 	"""
 	tweet_collections = []
 	for i in range(len(idd)):
