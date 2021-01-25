@@ -68,7 +68,6 @@ def get_feed():
 		flag_image = False   
 		if len(mediaArr) > 0:    
 			for x in range(len(mediaArr)):
-				print(tweet["user"]["name"] + " ::: " + mediaArr[x]['media_url'])
 				if mediaArr[x]['type'] == 'photo':
 					eimage.append(mediaArr[x]['media_url'])
 					flag_image = True   

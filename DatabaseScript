@@ -1,0 +1,53 @@
+sudo -u postgres psql
+CREATE USER platform_manager PASSWORD 'insert_here';
+CREATE DATABASE metrics;
+ALTER DATABASE metrics OWNER TO platform_manager;
+GRANT ALL PRIVILEGES ON DATABASE metrics TO platform_manager;
+// Now the set up of the database is done. Log into it using
+psql -U platform_manager -d Metrics;
+
+CREATE TABLE user_table (
+   worker_id bigint PRIMARY KEY,
+   assignment_id bigint UNIQUE NOT NULL,
+   Hit_id VARCHAR(100) NOT NULL,
+   exp_condition VARCHAR(8) NOT NULL
+);
+
+CREATE TABLE tweet_table (
+   tweet_id bigint PRIMARY KEY
+);
+
+CREATE TABLE session_table (
+   session_id BIGSERIAL PRIMARY KEY,
+   twitter_handle VARCHAR(50) NOT NULL,
+   session_start TIME NOT NULL,
+   session_end TIME NOT NULL,
+   session_timeout boolean NULL,
+   worker_id bigint,
+   FOREIGN KEY (worker_id) REFERENCES user_table (worker_id)
+);
+
+CREATE TABLE tweet_in_session_table (
+   is_favorited_before boolean NOT NULL,
+   session_id bigint,
+   tweet_id bigint,
+   has_retweet_before boolean NOT NULL,
+   tweet_seen boolean NULL,
+   tweet_retweeted boolean NOT NULL,
+   tweet_favorited boolean NULL,
+   rank smallint NOT NULL,
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id),
+   FOREIGN KEY (tweet_id) REFERENCES tweet_table (tweet_id),
+   PRIMARY KEY (session_id,tweet_id)
+);
+
+CREATE TABLE click_table (
+   click_id BIGSERIAL PRIMARY KEY,
+   tweet_id bigint,
+   url VARCHAR(1000) NOT NULL,
+   is_card boolean NOT NULL,
+   click_timestamp TIME NOT NULL,
+   session_id bigint,
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id),
+   FOREIGN KEY (tweet_id) REFERENCES tweet_table (tweet_id)
+);
