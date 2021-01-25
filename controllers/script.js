@@ -188,7 +188,6 @@ exports.getScript = (req, res, next) => {
               }
               //console.log("Script_Feed : "+script_feed);
               //console.log("Script Size is now: "+finalfeed.length);
-              console.log("URL : "+script_feed[0].urls);
               res.render('script', { script: script_feed});
             }, 
             (error) => { 
