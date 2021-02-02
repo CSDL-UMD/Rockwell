@@ -1,5 +1,6 @@
 import psycopg2
 from configparser import ConfigParser
+import access_object
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser
@@ -78,6 +79,9 @@ def insert_user(conn,worker_id,assignment_id,hit_id,exp_condition):
 
 
 if __name__ == '__main__':
-	conn = connect()
-	insert_user(conn,1,23,"ABC","XYZ")
-	close_connection(conn)
+	#conn = connect()
+	#insert_user(conn,2,23,"ABC","XYZ")
+	#close_connection(conn)
+	access_object_session = access_object.access_object(1)
+	access_object_session.insert_user(3,50,"45xysz","EXP_COND")
+	del access_object_session
