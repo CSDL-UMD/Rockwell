@@ -27,7 +27,14 @@ def connect():
 
         # connect to the PostgreSQL server
         print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(**params)
+        #conn = psycopg2.connect(**params)
+        conn = psycopg2.connect(
+        	database="metrics",
+        	user="platform_manager",
+        	password="xZw53AbD",
+        	host="early-database-truman.c8wc9kfclicm.us-east-2.rds.amazonaws.com",
+        	port='5432'
+        )
 		
         # create a cursor
         cur = conn.cursor()
@@ -55,7 +62,7 @@ def close_connection(conn):
 
 def insert_user(conn,worker_id,assignment_id,hit_id,exp_condition):
     """ insert a new vendor into the vendors table """
-    sql = """INSERT INTO user_table(worker_id,assignment_id,Hit_id,exp_condition)
+    sql = """INSERT INTO truman_user(worker_id,assignment_id,Hit_id,exp_condition)
              VALUES(%s,%s,%s,%s) RETURNING worker_id;"""
     try:
         cur = conn.cursor()
@@ -67,6 +74,8 @@ def insert_user(conn,worker_id,assignment_id,hit_id,exp_condition):
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print("ERROR!!!!",error)
+
+
 
 if __name__ == '__main__':
 	conn = connect()

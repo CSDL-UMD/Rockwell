@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request, url_for
+import pandas as pd
 #import oauth2 as oauth
 #import urllib.request
 from requests_oauthlib import OAuth1Session
@@ -16,6 +17,10 @@ request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
+
+workerId = ""
+assignmentId = ""
+hitId = ""
 
 # Support keys from environment vars (Heroku).
 #app.config['APP_CONSUMER_KEY'] = os.getenv(
@@ -39,6 +44,14 @@ def hello():
 
 @app.route('/start')
 def start():
+    workerId = request.args.get('workerId')
+    assignmentId = request.args.get('assignmentId')
+    hitId = request.args.get('hitId')
+    f = open("/home/saumya/Documents/USF/Project/ASD/mock_social_media_platform/infodiversity-mock-social-media/twitter_api/twauth-web-master/mturk_indentifiers.txt",'w')
+    f.write(workerId+"\n")
+    f.write(assignmentId+"\n")
+    f.write(hitId)
+    f.close()
     # note that the external callback URL must be added to the whitelist on
     # the developer.twitter.com portal, inside the app settings
     app_callback_url = url_for('callback', _external=True)
@@ -73,6 +86,12 @@ def start():
 
 @app.route('/callback')
 def callback():
+    f = open("/home/saumya/Documents/USF/Project/ASD/mock_social_media_platform/infodiversity-mock-social-media/twitter_api/twauth-web-master/mturk_indentifiers.txt",'r')
+    mturk_identifiers = f.read()
+    f.close()
+    workerId = mturk_identifiers.split("\n")[0]
+    assignmentId = mturk_identifiers.split("\n")[1]
+    hitId = mturk_identifiers.split("\n")[2]
     # Accept the callback params, get the token and call the API to
     # display the logged-in user's name and handle
     oauth_token = request.args.get('oauth_token')
@@ -159,6 +178,12 @@ def callback():
     statuses_count = response['statuses_count']
     followers_count = response['followers_count']
     name = response['name']
+
+    f = open("/home/saumya/Documents/USF/Project/ASD/mock_social_media_platform/infodiversity-mock-social-media/twitter_api/twauth-web-master/screening_result.csv",'w')
+    f.write("Worker ID,Assignment ID,Hit ID,Twitter ID,Twitter handle,Friends Count,Statuses Count,Followers Count\n")
+    values = ','.join([workerId,assignmentId,hitId,user_id,screen_name,str(friends_count),str(statuses_count),str(followers_count)])
+    f.write(values)
+    f.close()
 
     # don't keep this token and secret in memory any longer
     del oauth_store[oauth_token]

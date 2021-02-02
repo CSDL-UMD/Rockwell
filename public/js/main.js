@@ -1,3 +1,4 @@
+const axx = require('axios');
 //$(document).ready(function() {
 
 //Before Page load:
@@ -137,9 +138,14 @@ $('.right.floated.time.meta, .date').each(function() {
 });
 
   //Sign Up Button
+  //Changing to work with python twitter authenticator
   $('.ui.big.green.labeled.icon.button.signup')
   .on('click', function() {
-    window.location.href='/signup';
+    //window.location.href='/signup';
+    function makeGetRequest(path) {
+
+    }
+    makeGetRequest('http://127.0.0.1:50/getfeed/');
   });
 
   //Sign Up Info Skip Button
