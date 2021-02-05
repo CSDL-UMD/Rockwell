@@ -5,6 +5,7 @@ import os
 #import glob
 #import tweepy
 #import pandas as pd # No longer needed?
+import ../database_access/access_object.py
 import datetime
 import json
 import Cardinfo
@@ -55,7 +56,7 @@ def get_feed():
 
 #	for file in fileList_actor:
 #		os.remove(file)
-
+	dbwrite = access_object.access_object() # This might be the wrong syntax dont recall.
 	feed_json = []
 	i = 1
 	for tweet in public_tweets:
@@ -168,6 +169,8 @@ def get_feed():
 				else:
 					finalRetweets = str(counterVar) + "." + str(tempRetweets)[0] + "k"
 					break
+		dbwrite.insert_tweet(tweet["id"])
+		#dbwrite.insert_tweet_session(fav_before,sid,tid,rtbefore,rank)
 
 		feed = {
 			'body':body,
