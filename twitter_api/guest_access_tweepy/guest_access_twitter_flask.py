@@ -169,7 +169,7 @@ def get_feed():
 				else:
 					finalRetweets = str(counterVar) + "." + str(tempRetweets)[0] + "k"
 					break
-		dbwrite.insert_tweet(tweet["id"])
+		dbwrite.insert_tweet(tweet["id"],tweet["favorited"],SESSIONID,tweet["id"],tweet["retweeted"],i)
 		#dbwrite.insert_tweet_session(fav_before,sid,tid,rtbefore,rank)
 
 		feed = {
