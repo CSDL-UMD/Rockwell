@@ -12,7 +12,14 @@ import json
 import time
 
 def auth():
-    return "AAAAAAAAAAAAAAAAAAAAAG1zMAEAAAAA3MKSCxkXn%2FB0dIZ3Zgq2dScBoZg%3DvFXgu6k3BOpWxc22eiuCFn7YETQck26gwSU20dhFHg5W2bYdiy"
+    cred = {}
+    with open('credentials_v2', 'r') as f:
+        for line in f.readlines():
+            key, value = line.split(':')
+            value = str.rstrip(value)
+            cred[key] = value
+
+    return cred['Bearer_token']
 
 def create_url_following(user_id,pagination_token):
     if pagination_token:
