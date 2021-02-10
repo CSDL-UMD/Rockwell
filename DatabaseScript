@@ -1,6 +1,7 @@
 CREATE TABLE truman_user (
    worker_id VARCHAR(50) PRIMARY KEY,
    assignment_id VARCHAR(80) NOT NULL,
+   twitter_id bigint NOT NULL,
    Hit_id VARCHAR(100) NOT NULL,
    exp_condition VARCHAR(8) NOT NULL
 );
@@ -11,7 +12,6 @@ CREATE TABLE tweet (
 
 CREATE TABLE session (
    session_id BIGSERIAL PRIMARY KEY,
-   twitter_handle VARCHAR(50) NOT NULL,
    twitter_id bigint NOT NULL,
    session_start TIME NOT NULL,
    session_end TIME NOT NULL,
