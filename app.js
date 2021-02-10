@@ -248,7 +248,8 @@ app.use('/profile_pictures',express.static(path.join(__dirname, 'profile_picture
 /**
  * Primary app routes.
  */
-app.get('/', passportConfig.isAuthenticated, scriptController.getScript);
+//app.get('/', passportConfig.isAuthenticated, scriptController.getScript);
+app.get('/', scriptController.getScript);
 
 app.get('/newsfeed/:caseId', scriptController.getScriptFeed);
 

@@ -1,4 +1,3 @@
-const axx = require('axios');
 //$(document).ready(function() {
 
 //Before Page load:
@@ -142,10 +141,14 @@ $('.right.floated.time.meta, .date').each(function() {
   $('.ui.big.green.labeled.icon.button.signup')
   .on('click', function() {
     //window.location.href='/signup';
-    function makeGetRequest(path) {
-
-    }
-    makeGetRequest('http://127.0.0.1:50/getfeed/');
+      $.ajax({
+            url: "http://localhost:5000/start",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({"calling": "truman"})        
+        }).done(function(data) {
+            console.log(data);
+      });
   });
 
   //Sign Up Info Skip Button
