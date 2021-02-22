@@ -27,10 +27,10 @@ class access_object:
 
 
 
-    def insert_user(self,worker_id,assignment_id,hit_id,exp_condition) -> None:
+    def insert_user(self,worker_id,assignment_id,twitter_id,hit_id,exp_condition) -> None:
         """ insert a new vendor into the vendors table """
-        sql = """INSERT INTO truman_user(worker_id,assignment_id,Hit_id,exp_condition)
-             VALUES(%s,%s,%s,%s) RETURNING worker_id;"""
+        sql = """INSERT INTO truman_user(worker_id,assignment_id,twitter_id,Hit_id,exp_condition)
+             VALUES(%s,%s,%s,%s,%s) RETURNING worker_id;"""
         try:
             cur.execute(sql, (worker_id,assignment_id,hit_id,exp_condition,))
             conn.commit()
