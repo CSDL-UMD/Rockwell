@@ -3,14 +3,18 @@ from psycopg2 import pool
 from database_config import config
 import asyncio
 from database_config import config
+
+
 """Object for a pool connection, """
 class poolObject:
-    def __init__(self, max_conn):
-        """Initialize the connection pool."""
+    def __init__(self, min_conn = 5,max_conn = 50):
+        """Initialize the connection pool with max and min, default 50 and 5"""
         # try catch wrap, ask saumya how config is working
+        self.min_conn = min_conn
+        self.max_conn = max_conn
         try:
             params = config()
-            self.MainPool = psycopg2.pool.SimpleConnectionPool(1, 20,**params)
+            self.MainPool = psycopg2.pool.SimpleConnectionPool(min_conn, max_conn,**params)
         except:
             print("FAILED to create object, critical error.")
                                                               """user = "postgres",
@@ -20,8 +24,8 @@ class poolObject:
                                                   database = "postgres_db")"""
 
 
-    async def _get_conn(self, key=None):
-        """Get a free connection and assign it to 'key' if not None."""
+    async def get_conn(self, key=None):
+        """Get a free connection."""
         try:
             self.getconn()
             return True
@@ -49,7 +53,7 @@ class poolObject:
                 raise PoolError('Connection pool exhausted')
             return self._connect(key) """
 
-    def _close_conn(self,open_connection):
+    def close_conn(self,open_connection):
         """This should close the connection in the pool without deleting it."""
         try:
             self.putconn(open_connection,key=None,close=False)
