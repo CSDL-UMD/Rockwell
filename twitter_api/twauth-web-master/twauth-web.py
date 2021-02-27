@@ -17,7 +17,7 @@ request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
-truman_url = 'http://127.0.0.1/'
+truman_url = 'http://127.0.0.1:3000'
 
 workerId = ""
 assignmentId = ""
@@ -123,6 +123,11 @@ def start():
         oauth_token_secret = data_tokens[1].split("=")[1] 
 
         oauth_store[oauth_token] = oauth_token_secret
+
+        print("OAUTH token : "+oauth_token)
+        print("OAUTH token secret : "+oauth_token_secret)
+
+        #return render_template('start.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
         return redirect(authorize_url + '?oauth_token=' + oauth_token)
 
 

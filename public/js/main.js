@@ -138,18 +138,19 @@ $('.right.floated.time.meta, .date').each(function() {
 
   //Sign Up Button
   //Changing to work with python twitter authenticator
+  /*
   $('.ui.big.green.labeled.icon.button.signup')
   .on('click', function() {
     //window.location.href='/signup';
       $.ajax({
-            url: "http://localhost:5000/start",
+            url: "http://127.0.0.1:5000/start",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({"calling": "truman"})        
         }).done(function(data) {
             console.log(data);
       });
-  });
+  });*/
 
   //Sign Up Info Skip Button
   $('button.ui.button.skip')

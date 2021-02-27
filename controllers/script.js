@@ -29,7 +29,83 @@ function shuffle(array) {
  * GET /
  * List of Script posts for Feed
 */
+
 exports.getScript = (req, res, next) => {
+
+  function makeGetRequest(path) { 
+            axx.get(path).then( 
+              (response) => { 
+                var result = response.data;
+                feed = JSON.parse(JSON.stringify(result));
+                script_feed = []
+                for(var i=0;i<feed.length;i++){
+                  var feed_json = 
+                  { 
+                      body: feed[i].body,
+                      _id: '5fd46dd1050d402e5a3bb986',
+                      likes: feed[i].likes,
+                      retweets: feed[i].retweet_count,
+                      urls: feed[i].urls,
+                      expanded_urls: feed[i].expanded_urls,
+                      experiment_group: feed[i].experiment_group,
+                      post_id: feed[i].post_id,
+                      tweet_id: feed[i].tweet_id,
+                      class: feed[i].class, // Hard code this to "cohort" and save on json size?
+                      picture: feed[i].picture,
+                      picture_heading: feed[i].picture_heading,
+                      picture_description: feed[i].picture_description,
+                      //image: feed[i].image, I think I added this by mistake
+                      embedded_images: feed[i].embedded_image,
+                      lowread: 9,
+                      highread: 148,
+                      // Need to add eimage in here somehow with its own loop, or if this handles arrays...
+                      // embededimage:(whatever its called in this case) feed[i].eimage[iterator also in for loop perhaps]
+                      actor: 
+                      { 
+                        profile: // Is this where we need the users information as well? I can grab the user name, handle and image for this part.
+                        { 
+                          name: feed[i].actor_name,
+                          location: 'Ithaca, NY',
+                          picture: feed[i].actor_picture,
+                          bio: 'Sample Bio',
+                          age: 37 
+                        },
+                        _id: '5fd46dd0050d402e5a3bb97f',
+                        class: 'normal',
+                        username: feed[i].actor_username,
+                        createdAt: '2020-12-12T07:14:24.816Z',
+                        updatedAt: '2020-12-12T07:14:24.816Z',
+                        __v: 0 
+                      },
+                      time: timeStringToNum(feed[i].time),
+                      comments: []
+                  }
+                  script_feed.push(feed_json);
+              }
+              //console.log("Script_Feed : "+script_feed);
+              //console.log("Script Size is now: "+finalfeed.length);
+              res.render('script', { script: script_feed});
+            }, 
+            (error) => { 
+              console.log(error); 
+            } 
+          ); 
+        }
+        function timeStringToNum(v) {
+          var timeParts = v.split(":");
+          if (timeParts[0] == "-0")
+            return -1 * parseInt(((timeParts[0] * (60000 * 60)) + (timeParts[1] * 60000)), 10);
+          else if (timeParts[0].startsWith('-'))
+            return parseInt(((timeParts[0] * (60000 * 60)) + (-1 * (timeParts[1] * 60000))), 10);
+          else
+            return parseInt(((timeParts[0] * (60000 * 60)) + (timeParts[1] * 60000)), 10);
+          };
+        
+        const { oauthAccessToken, oauthAccessTokenSecret } = req.session
+        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret);
+
+}
+exports.getScript_prev = (req, res, next) => {
 
   //req.user.createdAt
   var time_now = Date.now();
@@ -118,7 +194,7 @@ exports.getScript = (req, res, next) => {
     current_day = -1;
     console.log("@@@@@@@@@@_NO_DAY");
   }
-
+  
   
   
     //Get the newsfeed

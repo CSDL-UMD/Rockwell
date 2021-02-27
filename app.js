@@ -18,6 +18,11 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const expressValidator = require('express-validator'); // Can this go?
 const expressStatusMonitor = require('express-status-monitor');
+const {
+  getOAuthRequestToken,
+  getOAuthAccessTokenWith,
+  oauthGetUserById
+} = require('./oauth-utilities')
 var schedule = require('node-schedule');
 
 const multer = require('multer');
@@ -156,7 +161,7 @@ var j3 = schedule.scheduleJob(rule3, function(){
 /**
  * Express configuration. Can we remove the mongo parts from this? _________-----------_________---------__________-------________---------_______------
  */
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 5000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 //app.use(expressStatusMonitor());
@@ -209,6 +214,26 @@ app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
 });
+/*
+// Add headers
+app.use(function (req, res, next) {
+
+    // Website you wish to allow to connect
+    res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5000/start');
+
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'Origin,Content-Type,Authorization,X-Auth-Token');
+
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});*/
 
 app.use((req, res, next) => {
   // After successful login, redirect back to the intended page
@@ -249,6 +274,45 @@ app.use('/profile_pictures',express.static(path.join(__dirname, 'profile_picture
  * Primary app routes.
  */
 //app.get('/', passportConfig.isAuthenticated, scriptController.getScript);
+
+app.get('/twitter/authorize', twitter('authorize'))
+function twitter (method = 'authorize') {
+    return async (req, res) => {
+      console.log(`/twitter/${method}`)
+      const { oauthRequestToken, oauthRequestTokenSecret } = await getOAuthRequestToken()
+
+      req.session = req.session || {}
+      req.session.oauthRequestToken = oauthRequestToken
+      req.session.oauthRequestTokenSecret = oauthRequestTokenSecret
+
+      console.log("SESSION IN AUTHORIZE : ",req.session)
+
+      const authorizationUrl = `https://api.twitter.com/oauth/${method}?oauth_token=${oauthRequestToken}`
+      console.log('redirecting user to ', authorizationUrl)
+      res.redirect(authorizationUrl)
+  }
+}
+
+app.get('/callback', async (req, res) => {
+  console.log("SESSION : ",req.session)
+  const { oauthRequestToken, oauthRequestTokenSecret } = req.session
+  const { oauth_verifier: oauthVerifier } = req.query
+
+  console.log('CALLBACK THINGS ::: ', { oauthRequestToken, oauthRequestTokenSecret, oauthVerifier })
+  
+  const { oauthAccessToken, oauthAccessTokenSecret, results } = await getOAuthAccessTokenWith({ oauthRequestToken, oauthRequestTokenSecret, oauthVerifier })
+  req.session.oauthAccessToken = oauthAccessToken
+  req.session.oauthAccessTokenSecret = oauthAccessTokenSecret
+  const { user_id: userId /*, screen_name */ } = results
+  const user = await oauthGetUserById(userId, { oauthAccessToken, oauthAccessTokenSecret })
+
+  req.session.twitter_screen_name = user.screen_name
+  res.cookie('twitter_screen_name', user.screen_name, { maxAge: 900000, httpOnly: true })
+
+  console.log('user succesfully logged in with twitter', user.screen_name)
+  req.session.save(() => res.redirect('/'))
+})
+
 app.get('/', scriptController.getScript);
 
 app.get('/newsfeed/:caseId', scriptController.getScriptFeed);
@@ -321,10 +385,10 @@ app.post('/user', passportConfig.isAuthenticated, actorsController.postBlockOrRe
 app.get('/bell', passportConfig.isAuthenticated, userController.checkBell);
 
 //getScript
-app.get('/feed', passportConfig.isAuthenticated, scriptController.getScript);
-app.post('/feed', passportConfig.isAuthenticated, scriptController.postUpdateFeedAction);
-app.post('/pro_feed', passportConfig.isAuthenticated, scriptController.postUpdateProFeedAction);
-app.post('/userPost_feed', passportConfig.isAuthenticated, scriptController.postUpdateUserPostFeedAction);
+//app.get('/feed', passportConfig.isAuthenticated, scriptController.getScript);
+//app.post('/feed', passportConfig.isAuthenticated, scriptController.postUpdateFeedAction);
+//app.post('/pro_feed', passportConfig.isAuthenticated, scriptController.postUpdateProFeedAction);
+//app.post('/userPost_feed', passportConfig.isAuthenticated, scriptController.postUpdateUserPostFeedAction);
 
 /**
  * Error Handler.
