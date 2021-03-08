@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, url_for, jsonify
-import Pool
+from database_config import config
+#import Pool
 import time
 import asyncio
 
@@ -8,7 +9,8 @@ pool_is_full = False
 MIN = 5
 MAX = 100
 universal_buffer = []
-accessPool = Pool.poolObject(MIN,MAX) # Maybe make 2 pools and half the functions use each or make this one huge.
+params = config()
+accessPool =  psycopg2.pool.SimpleConnectionPool(min_conn, max_conn,**params)# Maybe make 2 pools and half the functions use each or make this one huge.
 app = Flask(__name__)
 
 app.debug = False
@@ -50,7 +52,11 @@ def insert_tweet():
         print("Request : ")
         print(request.args)
         tweet_id = request.args.get('tweet_id')
-        connection = accessPool.get_conn()
+        connection = None
+        try: 
+            connection = accessPool.get_conn()
+        except:
+            connection = False
         if connection is not False:
             sql = """INSERT INTO tweet(tweet_id) ON CONFLICT DO NOTHING
             VALUES(%s) RETURNING worker_id;"""
