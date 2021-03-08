@@ -9,6 +9,7 @@ import os
 import datetime
 import json
 import Cardinfo
+import requests
 #import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
@@ -89,6 +90,10 @@ def get_feed():
 		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
+		dictToSend = {'tweet_id':tweet["id"]}
+		res = requests.post('http://127.0.0.1:5052/insert_tweet/', json=dictToSend)
+		print("Response : ")
+		print(res)
 		entities_keys = tweet["entities"].keys()
 		urls_list = []
 		expanded_urls_list = []

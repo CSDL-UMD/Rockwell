@@ -161,7 +161,7 @@ var j3 = schedule.scheduleJob(rule3, function(){
 /**
  * Express configuration. Can we remove the mongo parts from this? _________-----------_________---------__________-------________---------_______------
  */
-app.set('port', process.env.PORT || 5000);
+app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 //app.use(expressStatusMonitor());
@@ -181,7 +181,7 @@ app.use(session({
     secure: false,
     maxAge: 7200000
   },
-  secret: process.env.SESSION_SECRET,
+  secret: "secret",
   store: new MongoStore({  // THE MONGO PROCESS IS ALSO HERE, CAN THIS ALL GO?
     url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
     autoReconnect: true,

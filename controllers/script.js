@@ -101,7 +101,10 @@ exports.getScript = (req, res, next) => {
             return parseInt(((timeParts[0] * (60000 * 60)) + (timeParts[1] * 60000)), 10);
           };
         
-        const { oauthAccessToken, oauthAccessTokenSecret } = req.session
+        //const { oauthAccessToken, oauthAccessTokenSecret } = req.session
+        //console.log(req);
+        oauthAccessToken = req.query.access_token
+        oauthAccessTokenSecret = req.query.access_token_secret
         makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret);
 
 }

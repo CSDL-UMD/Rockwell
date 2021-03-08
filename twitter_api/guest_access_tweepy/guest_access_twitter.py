@@ -7,6 +7,7 @@ import datetime
 import json
 import Cardinfo
 import TweetObject
+import requests
 from flask import jsonify
 
 cred = {}
@@ -50,6 +51,10 @@ for tweet in public_tweets:
 	i = i + 1
 	idd.append(i)
 	tweet_id.append(str(tweet.id))
+	dictToSend = {'tweet_id':tweet.id}
+	res = requests.post('http://127.0.0.1:5052/insert_tweet/', json=dictToSend)
+	print("Response : ")
+	print(res)
 	actor.append(tweet.user.screen_name)
 	likes.append(tweet.favorite_count)
 	entities_keys = list(tweet.entities.keys())
@@ -111,6 +116,6 @@ for tweet in public_tweets:
 		time.append("-00:"+str(minutes))
 	#time.append(td.seconds)
 
-pd_all = pd.concat([pd.DataFrame(idd),pd.DataFrame(tweet_id),pd.DataFrame(body),pd.DataFrame(picture),pd.DataFrame(likes),pd.DataFrame(urls),pd.DataFrame(expanded_urls),pd.DataFrame(actor),pd.DataFrame(picture),pd.DataFrame(picture_heading),pd.DataFrame(picture_description),pd.DataFrame(time),pd.DataFrame(classs),pd.DataFrame(experiment_group)],axis=1)
-pd_all.columns = ["id","tweet_id","body","picture","likes","urls","expanded_urls","actor","pictures","pictures_title","pictures_description","time","class","experiment_group"]
-pd_all.to_csv("../../truman/truman_infodiversity/input/posts_twitter_demo.csv",encoding='utf-8', index=False)
+#pd_all = pd.concat([pd.DataFrame(idd),pd.DataFrame(tweet_id),pd.DataFrame(body),pd.DataFrame(picture),pd.DataFrame(likes),pd.DataFrame(urls),pd.DataFrame(expanded_urls),pd.DataFrame(actor),pd.DataFrame(picture),pd.DataFrame(picture_heading),pd.DataFrame(picture_description),pd.DataFrame(time),pd.DataFrame(classs),pd.DataFrame(experiment_group)],axis=1)
+#pd_all.columns = ["id","tweet_id","body","picture","likes","urls","expanded_urls","actor","pictures","pictures_title","pictures_description","time","class","experiment_group"]
+#pd_all.to_csv("../../truman/truman_infodiversity/input/posts_twitter_demo.csv",encoding='utf-8', index=False)
