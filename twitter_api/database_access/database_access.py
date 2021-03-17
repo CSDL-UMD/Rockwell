@@ -90,15 +90,16 @@ def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will tak
 
     try:
         #Getting connection from pool
-        connection = accessPool.get_conn()
+        connection = accessPool.getconn()
         if connection is not False:
             sql = """INSERT INTO tweet_in_session(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank)
-            VALUES(%s,%s,%s,%s,%s,%s,%s,%s) RETURNING worker_id;"""
+            VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
             cursor = connection.cursor()
-            cursor.execute(sql)
-            returnData = cursor.fetchall()
+            cursor.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,)) # could pass False directly maybe? not sure if it will translate right
+            #returnData = cursor.fetchall()
             cursor.close()
-            accessPool.close_conn(connection) #closing the connection
+            connection.commit()
+            accessPool.putconn(connection) #closing the connection
         else:   #Indicates the pool is full
             data = []
             data.append("insert_tweet_session")
@@ -111,6 +112,23 @@ def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will tak
             #return "Full"
     except Exception as error:
         print(error)
+
+def insert_user(self,worker_id,assignment_id,twitter_id,hit_id,exp_condition) -> None:
+        """ insert a new vendor into the vendors table """
+        sql = """INSERT INTO truman_user(worker_id,assignment_id,twitter_id,Hit_id,exp_condition)
+             VALUES(%s,%s,%s,%s,%s) RETURNING worker_id;"""
+        try:
+            connection = accessPool.getconn()
+            if connection is not False: 
+                cursor = connection.cursot()
+                cursor.execute(sql, (worker_id,assignment_id,twitter_id,hit_id,exp_condition,))
+                cursor.close()
+                connection.commit()
+                acessPool.putconn(connection)
+        except (Exception, psycopg2.DatabaseError) as error:
+            print("ERROR!!!!",error)
+
+
 
 
 @app.after_request
