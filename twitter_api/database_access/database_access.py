@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, url_for, jsonify
 from database_config import config
+import psycopg2
+from psycopg2 import pool
 #import Pool
 import time
 import asyncio
@@ -10,7 +12,9 @@ MIN = 5
 MAX = 100
 universal_buffer = []
 params = config()
-accessPool =  psycopg2.pool.SimpleConnectionPool(min_conn, max_conn,**params)# Maybe make 2 pools and half the functions use each or make this one huge.
+accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host="early-database-truman.c8wc9kfclicm.us-east-2.rds.amazonaws.com",database="metrics",user="platform_manager",password="xZw53AbD",port="5432")# Maybe make 2 pools and half the functions use each or make this one huge.
+print("Access Pool object")
+print(accessPool)
 app = Flask(__name__)
 
 app.debug = False
@@ -45,36 +49,40 @@ async def queueLoop() -> None: # async so it doesnt interfere with the rest of t
             time.sleep(5)
 
 
-@app.route('/insert_tweet/', methods=['GET','POST'])
+@app.route('/insert_tweet', methods=['POST'])
 def insert_tweet():
     try:
         #Getting connection from pool
-        print("Request : ")
-        print(request.args)
-        tweet_id = request.args.get('tweet_id')
+        tweet_id = int(request.args.get('tweet_id'))
         connection = None
         try: 
-            connection = accessPool.get_conn()
+            connection = accessPool.getconn()
         except:
+            print("NO CONNECTION")
             connection = False
         if connection is not False:
-            sql = """INSERT INTO tweet(tweet_id) ON CONFLICT DO NOTHING
-            VALUES(%s) RETURNING worker_id;"""
-            conn_cur = connection.cursor()
-            conn_cur.execute(sql)
-            returnData = conn_cur.fetchall()
-            conn_cur.close()
-            accessPool.close_conn(connection) #closing the connection
+            sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
+            try:
+                conn_cur = connection.cursor()
+                conn_cur.execute(sql, (tweet_id,))
+                #returnData = conn_cur.fetchall()
+                #conn_cur.commit()
+                conn_cur.close()
+                connection.commit()
+                accessPool.putconn(connection) #closing the connection
+            except Exception as error:# (Exception, psycopg2.DatabaseError) as error:
+                print("ERROR!!!!",error)
         else:
             data = []
             data.append("insert_tweet")
             data.append(tweet_id)
             universal_buffer.append(data) # offload it to the queue.
-            return "Full"
+            #return "Full"
     except Exception as error:
         print(error)
+    return "Done!"
 
-@app.route('/insert_tweet_session/', methods=['GET'])
+@app.route('/insert_tweet_session/', methods=['POST'])
 def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will take many arguments and takes logic in the guest access twitter to work
     favorite_now = False
     retweet_now = False
@@ -100,10 +108,9 @@ def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will tak
             data.append(rtbefore)
             data.append(rank)
             universal_buffer.append(data) # offload it to the queue.
-            return "Full"
+            #return "Full"
     except Exception as error:
         print(error)
-
 
 
 @app.after_request

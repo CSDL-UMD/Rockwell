@@ -18,7 +18,7 @@ class access_object:
 
     def __del__(self): # Destructor to close the database connection on object going out of scope.
         try:
-	        self.connector.close()
+            self.connector.close()
             cur.close()
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)

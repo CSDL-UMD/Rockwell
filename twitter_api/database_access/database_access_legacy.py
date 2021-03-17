@@ -61,14 +61,13 @@ def close_connection(conn):
 	except (Exception, psycopg2.DatabaseError) as error:
 		print(error)
 
-def insert_user(conn,worker_id,assignment_id,hit_id,exp_condition):
+def insert_user(conn,worker_id):
     """ insert a new vendor into the vendors table """
-    sql = """INSERT INTO truman_user(worker_id,assignment_id,Hit_id,exp_condition)
-             VALUES(%s,%s,%s,%s) RETURNING worker_id;"""
+    sql = """INSERT INTO tweet(tweet_id) VALUES(%s);"""
     try:
         cur = conn.cursor()
         # execute the INSERT statement
-        cur.execute(sql, (worker_id,assignment_id,hit_id,exp_condition,))
+        cur.execute(sql, (worker_id,))
         # commit the changes to the database
         conn.commit()
         # close communication with the database
@@ -79,9 +78,9 @@ def insert_user(conn,worker_id,assignment_id,hit_id,exp_condition):
 
 
 if __name__ == '__main__':
-	#conn = connect()
-	#insert_user(conn,2,23,"ABC","XYZ")
-	#close_connection(conn)
-	access_object_session = access_object.access_object(1)
-	access_object_session.insert_user(3,50,"45xysz","EXP_COND")
-	del access_object_session
+	conn = connect()
+	insert_user(conn,1)
+	close_connection(conn)
+	#access_object_session = access_object.access_object(1)
+	#access_object_session.insert_user(4,52,"33saumya","EXP_COND")
+	#del access_object_session

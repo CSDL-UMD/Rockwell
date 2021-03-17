@@ -91,9 +91,9 @@ def get_feed():
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
-		res = requests.post('http://127.0.0.1:5052/insert_tweet/', json=dictToSend)
-		print("Response : ")
-		print(res)
+		requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
+		#print("Response : ")
+		#print(res)
 		entities_keys = tweet["entities"].keys()
 		urls_list = []
 		expanded_urls_list = []
