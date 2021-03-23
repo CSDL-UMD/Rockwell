@@ -43,3 +43,11 @@ CREATE TABLE click (
    FOREIGN KEY (session_id) REFERENCES session (session_id),
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id)
 );
+
+CREATE TABLE user_tweet_ass (
+   tweet_id bigint,
+   worker_id VARCHAR(50) NOT NULL,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
+   PRIMARY KEY (worker_id,tweet_id)
+);
