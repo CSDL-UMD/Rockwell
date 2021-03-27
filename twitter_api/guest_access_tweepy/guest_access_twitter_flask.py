@@ -25,6 +25,7 @@ def get_feed():
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	cred = {}
+	session_id = 1
 
 	f = open("guest_credentials_2.txt")
 	for line in f:
@@ -92,7 +93,8 @@ def get_feed():
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
 		requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
-		#print("Response : ")
+		requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
+		#print("Response : ")sid
 		#print(res)
 		entities_keys = tweet["entities"].keys()
 		urls_list = []

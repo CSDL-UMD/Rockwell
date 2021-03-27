@@ -2,17 +2,22 @@
 #Requires full tweet links in order to work as anticipated.
 import html # This may not be needed and can be removed if you take out line 18. Im not sure it actually does anything.
 import requests as rq
+from bs4 import BeautifulSoup
 
 # no longer fetches the actual image this should increase the speed of execution by alot. !!
 def getCardData(link) -> dict: 
     content = rq.get(link)
     searchMe = content.text
+    soup = BeautifulSoup(searchMe,"html.parser")
+    meta_tag_image = soup.find("meta", {"property": "og:image"})
+
     try:      
         # Block to find the image
-        tagLocation = searchMe.find('\"og:image\"')
-        openQuote = searchMe.find("\"",tagLocation + 10) # Plus 10 so we dont count our own mark.
-        closeQuote = searchMe.find("\"",openQuote + 1)
-        imageLink = searchMe[int(openQuote) + 1:int(closeQuote)]
+        #tagLocation = searchMe.find('\"og:image\"')
+        #openQuote = searchMe.find("\"",tagLocation + 10) # Plus 10 so we dont count our own mark.
+        #closeQuote = searchMe.find("\"",openQuote + 1)
+        #imageLink = BeautifulSoupsearchMe[int(openQuote) + 1:int(closeQuote)]
+        imageLink = meta_tag_image.get('content')
         #imageRaw = rq.get(imageLink) # This is the image.
         #End block
 

@@ -70,7 +70,8 @@ block content
           img(src="image.png" style="position: absolute; z-index: 2;")
           span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
         .content
-          .description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
+          //.description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
+          .description(style="color: #000000;")=val.body
             if val.urls.length > 0
               a(href=val.urls)=" "+val.urls
         // Inserting loop for media here --------______----------________---------_______--------______--------##########
@@ -78,7 +79,8 @@ block content
         if val.embedded_images.length > 0
           //.img.post
           //img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
-          img(src=val.embedded_images, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
+          //img(src=val.embedded_images, style="width:100%;aspect-ratio: auto 344 / 194;height: 300px;", id="images", onload="autoresize(this)")
+          img(src=val.embedded_images, style="width:100%;", id="images", onload="autoresize(this)")
           //iframe(type='text/html', style="overflow:hidden;width:100%;height:200%", height="200%", width="100%", frameborder="0", src=val.embedded_images)
         if val.picture.length > 0
           if val.picture_heading.length > 3
@@ -88,7 +90,9 @@ block content
               //img.post(src="/"+val.picture)
               //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
               //img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;height:100%")
-              img(src=val.picture, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
+              //img(src=val.picture, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
+              img(src=val.picture, style="width:100%;", id="images", onload="autoresize(this)")
+              //img(src=val.picture, style="width:100%;aspect-ratio: auto 344 / 194;height: 300px;", id="images", onload="autoresize(this)")
               //img(src=val.picture) 
               // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
             if val.picture_heading.length > 0
@@ -146,6 +150,9 @@ block content
     script.
       var win = $(window);
       window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,win.scrollTop(),topPadding)});
+    script.
+      function autoresize(imgele) {
+        imgele.height = imgele.width * (0.68);      }
 
     br
     br

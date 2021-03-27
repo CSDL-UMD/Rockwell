@@ -82,17 +82,22 @@ def insert_tweet():
         print(error)
     return "Done!"
 
-@app.route('/insert_tweet_session/', methods=['POST'])
-def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will take many arguments and takes logic in the guest access twitter to work
+@app.route('/insert_tweet_session', methods=['POST'])
+def insert_tweet_session(): # This will take many arguments and takes logic in the guest access twitter to work
     favorite_now = False
     retweet_now = False
     tweet_seen = False
-
+    connection = None
     try:
         #Getting connection from pool
         connection = accessPool.getconn()
         if connection is not False:
-            sql = """INSERT INTO tweet_in_session(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank)
+            fav_before = request.args.get('fav_before')
+            sid = request.args.get('sid')
+            tid = request.args.get('tid')
+            rtbefore = request.args.get('rtbefore')
+            rank = request.args.get('rank')
+            sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
             VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
             cursor = connection.cursor()
             cursor.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,)) # could pass False directly maybe? not sure if it will translate right
@@ -101,6 +106,7 @@ def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will tak
             connection.commit()
             accessPool.putconn(connection) #closing the connection
         else:   #Indicates the pool is full
+            print("Coming here")
             data = []
             data.append("insert_tweet_session")
             data.append(fav_before)
@@ -112,6 +118,7 @@ def insert_tweet_session(self,fav_before,sid,tid,rtbefore,rank): # This will tak
             #return "Full"
     except Exception as error:
         print(error)
+    return "Done!"
 
 def insert_user(self,worker_id,assignment_id,twitter_id,hit_id,exp_condition) -> None:
         """ insert a new vendor into the vendors table """
