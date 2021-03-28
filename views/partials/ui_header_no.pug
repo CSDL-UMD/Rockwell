@@ -2,12 +2,13 @@
   .ui.borderless.fixed.menu
     .ui.container
       a.item(href='/')
-        img.ui.tiny.image(src='/public/logo.png', id='logo')
+        //img.ui.tiny.image(src='/public/logo.png', id='logo')
+        h1 InfoDiversity
       |  
       .right.menu
-        if !user
-          a.item(href='/login') Login
-          a.item(href='/signup') Create Account
+        //if !user
+        //  a.item(href='/login') Login
+        //  a.item(href='/signup') Create Account
         else
           a.item.newpost
             i.big.write.square.icon
@@ -30,10 +31,11 @@
 .mobile.only.row
   .ui.fluid.top.fixed.four.item.menu
     a.item(href='/')
-      img.ui.tiny.image(src='/public/logo.png', id='cell_logo')
-    if !user
-      a.item(href='/login') Login
-      a.item(href='/signup') Create Account
+      //img.ui.tiny.image(src='/public/logo.png', id='cell_logo')
+      h1 InfoDiversity
+    //if !user
+    //  a.item(href='/login') Login
+    //  a.item(href='/signup') Create Account
     else
       a.item.newpost
         i.big.write.square.icon
