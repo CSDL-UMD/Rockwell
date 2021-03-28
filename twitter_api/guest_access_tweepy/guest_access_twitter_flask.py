@@ -93,7 +93,7 @@ def get_feed():
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
 		requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
-		requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
+		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
 		#print("Response : ")sid
 		#print(res)
 		entities_keys = tweet["entities"].keys()

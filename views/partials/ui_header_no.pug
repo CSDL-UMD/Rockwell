@@ -6,9 +6,7 @@
         h1 InfoDiversity
       |  
       .right.menu
-        //if !user
-        //  a.item(href='/login') Login
-        //  a.item(href='/signup') Create Account
+        if !user
         else
           a.item.newpost
             i.big.write.square.icon
@@ -33,9 +31,7 @@
     a.item(href='/')
       //img.ui.tiny.image(src='/public/logo.png', id='cell_logo')
       h1 InfoDiversity
-    //if !user
-    //  a.item(href='/login') Login
-    //  a.item(href='/signup') Create Account
+    if !user
     else
       a.item.newpost
         i.big.write.square.icon
