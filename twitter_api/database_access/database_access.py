@@ -144,7 +144,7 @@ def insert_session():
             now = datetime.datetime.now()
             time = now.year + '-' + now.month + '-' + now.day + ' ' + now.hour + ':' + now.minute + ':' + now.second
             worker_id = request.args.get('worker_id')
-            sql = """INSERT INTO truman_user(session_start,worker_id)
+            sql = """INSERT INTO session(session_start,worker_id)
                 VALUES(%s,%s) RETURNING session_id;"""
             cursor = connection.cursor()
             cursor.execute(sql,(session_start,worker_id,))
@@ -156,7 +156,20 @@ def insert_session():
 
 @app.route('/insert_user_tweet_ass', methods=['POST'])
 def insert_usert_tweet():
-    print("Plcae holder.")
+     try:
+        #Getting connection from pool
+        connection = accessPool.getconn()
+        if connection is not False:
+            now = datetime.datetime.now()
+            time = now.year + '-' + now.month + '-' + now.day + ' ' + now.hour + ':' + now.minute + ':' + now.second
+            worker_id = request.args.get('worker_id')
+            tweet_id = reqest.args.get('tweet_id')
+            sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id,)
+                VALUES(%s,%s) RETURNING session_id;"""
+            cursor = connection.cursor()
+            cursor.execute(sql,(tweet_id,worker_id,))
+            cursor.close()
+            accessPool.putconn(connection)
 
 @app.after_request
 def add_headers(response):
