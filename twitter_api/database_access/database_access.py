@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, url_for, jsonify
 from database_config import config
 import psycopg2
 from psycopg2 import pool
-#import Pool
+import datetime
 import time
 import asyncio
 
@@ -131,12 +131,32 @@ def insert_user(self,worker_id,assignment_id,twitter_id,hit_id,exp_condition) ->
                 cursor.execute(sql, (worker_id,assignment_id,twitter_id,hit_id,exp_condition,))
                 cursor.close()
                 connection.commit()
-                acessPool.putconn(connection)
+                accessPool.putconn(connection)
         except (Exception, psycopg2.DatabaseError) as error:
             print("ERROR!!!!",error)
 
+@app.route('/insert_session', methods=['POST']) # Also must return session ID. We might want the date also..
+def insert_session():
+    try:
+        #Getting connection from pool
+        connection = accessPool.getconn()
+        if connection is not False:
+            now = datetime.datetime.now()
+            time = now.year + '-' + now.month + '-' + now.day + ' ' + now.hour + ':' + now.minute + ':' + now.second
+            worker_id = request.args.get('worker_id')
+            sql = """INSERT INTO truman_user(session_start,worker_id)
+                VALUES(%s,%s) RETURNING session_id;"""
+            cursor = connection.cursor()
+            cursor.execute(sql,(session_start,worker_id,))
+            retVal = cursor.fetchall()
+            cursor.close()
+            accessPool.putconn(connection)
 
 
+
+@app.route('/insert_user_tweet_ass', methods=['POST'])
+def insert_usert_tweet():
+    print("Plcae holder.")
 
 @app.after_request
 def add_headers(response):
