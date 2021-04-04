@@ -10,6 +10,8 @@ def getCardData(link) -> dict:
     searchMe = content.text
     soup = BeautifulSoup(searchMe,"html.parser")
     meta_tag_image = soup.find("meta", {"property": "og:image"})
+    meta_tag_title = soup.find("meta", {"property": "og:title"})
+    meta_tag_description = soup.find("meta", {"property": "og:description"})
 
     try:      
         # Block to find the image
@@ -22,20 +24,24 @@ def getCardData(link) -> dict:
         #End block
 
         #Block to find the Title
-        html.unescape(searchMe)
-        tagLocation = searchMe.find("\"og:title\"")
-        openQuote = searchMe.find("\"",tagLocation + 15) # Plus 15 to avoid overlap.
-        closeQuote = searchMe.find("\"",openQuote + 1)
-        articleTitle = searchMe[openQuote + 1: closeQuote]
-        articleTitleFiltered = articleTitle.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
+        #html.unescape(searchMe)
+        #tagLocation = searchMe.find("\"og:title\"")
+        #openQuote = searchMe.find("\"",tagLocation + 15) # Plus 15 to avoid overlap.
+        #closeQuote = searchMe.find("\"",openQuote + 1)
+        #articleTitle = searchMe[openQuote + 1: closeQuote]
+        #articleTitleFiltered = articleTitle.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
+        articleTitleFiltered = meta_tag_title.get('content')
+        #articleTitleFiltered = articleTitle.replace("&#x27;","\'")
         #End block
 
         #Block to find description
-        tagLocation = searchMe.find("\"og:description\"")
-        openQuote = searchMe.find("\"",tagLocation + 16) # Plus 16 to avoid overlap.
-        closeQuote = searchMe.find("\"",openQuote + 1)
-        articleDescription = searchMe[openQuote + 1: closeQuote]
-        articleDescriptionFiltered = articleDescription.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
+        #tagLocation = searchMe.find("\"og:description\"")
+        #openQuote = searchMe.find("\"",tagLocation + 16) # Plus 16 to avoid overlap.
+        #closeQuote = searchMe.find("\"",openQuote + 1)
+        #articleDescription = searchMe[openQuote + 1: closeQuote]
+        #articleDescriptionFiltered = articleDescription.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
+        articleDescriptionFiltered = meta_tag_description.get('content')
+        #articleDescriptionFiltered = articleDescription.replace("&#x27;","\'")
         #End block
 
         #Creating the return dictonary if all actions worked.
@@ -48,45 +54,7 @@ def getCardData(link) -> dict:
         return out # Returning a dictonary with all neccessary information
         
     except:
-        # Attempt to load with alternate more generic tags if the first failed.
-        try:
-            # Block to find the image
-            tagLocation = searchMe.find('\"twitter:image\"')
-            openQuote = searchMe.find("\"",tagLocation + 15) # Plus 15 so we dont count our own mark.
-            closeQuote = searchMe.find("\"",openQuote + 1)
-            imageLink = searchMe[int(openQuote) + 1:int(closeQuote)]
-            #imageRaw = rq.get(imageLink) # This is the image.
-            #End block
-
-            #Block to find the Title
-            html.unescape(searchMe)
-            tagLocation = searchMe.find("\"twitter:title\"")
-            openQuote = searchMe.find("\"",tagLocation + 18) # Plus 18 to avoid overlap.
-            closeQuote = searchMe.find("\"",openQuote + 1)
-            articleTitle = searchMe[openQuote + 1: closeQuote]
-            articleTitleFiltered = articleTitle.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
-            #End block
-
-            #Block to find description
-            tagLocation = searchMe.find("\"twitter:description\"")
-            openQuote = searchMe.find("\"",tagLocation + 22) # Plus 22 to avoid overlap.
-            closeQuote = searchMe.find("\"",openQuote + 1)
-            articleDescription = searchMe[openQuote + 1: closeQuote]
-            articleDescriptionFiltered = articleDescription.replace("&#x27;","\'") # Dirty but effectively converts the "code" to a '
-            #End block
-
-            #Creating the return dictonary if all actions worked.
-            out = {
-                "image": imageLink,
-                "title": articleTitleFiltered,
-                "description": articleDescriptionFiltered
-            }
-
-            return out # Returning a dictonary with all neccessary information
-            
-
-        except:
-            return {}
+        return {}
     #test = open("test.jpg","wb") This is the code to write out the image if desired.
     #test.write(imageRaw.content)
 

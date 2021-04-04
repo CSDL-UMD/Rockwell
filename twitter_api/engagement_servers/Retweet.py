@@ -10,8 +10,12 @@ app.debug = False
 
 @app.route('/retweet/', methods=['POST'])
 def retweet():
+    data = request.get_json()
+    tweet_id = data['tweet_id']
+    access_token = data['access_token']
+    access_token_secret = data['access_token_secret']
     cred = {}
-    f = open("guest_credentials.txt")
+    f = open("guest_credentials_2.txt")
     for line in f:
         name, value = line.split(":")
         cred[name] = value.strip()
@@ -22,11 +26,9 @@ def retweet():
     #api = tweepy.API(auth)
     oauth = OAuth1Session(cred['key'],
                        client_secret=cred['key_secret'],
-                       resource_owner_key=cred['token'],
-                       resource_owner_secret=cred['token_secret'])
+                       access_token,
+                       access_token_secret)
 
-    data = request.get_json()
-    tweet_id = data['tweet_id']
     try:
         #api.retweet(int(tweet_id))
         #params = {"id": int(tweet_id)}
@@ -38,6 +40,10 @@ def retweet():
 
 @app.route('/like/', methods=['POST'])
 def like():
+    data = request.get_json()
+    tweet_id = data['tweet_id']
+    access_token = data['access_token']
+    access_token_secret = data['access_token_secret']
     cred = {}
     f = open("guest_credentials.txt")
     for line in f:

@@ -1,6 +1,6 @@
 var furthestSeen = 0;
 
-function retweet_clicked(tweet_id) {
+function retweet_clicked(tweet_id,access_token,access_token_secret) {
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
   //var process = spawn('python',["./Retweet.py", 
@@ -13,17 +13,18 @@ function retweet_clicked(tweet_id) {
   //  console.log('After Spawn');
     // ... use spawn()
   //});
+  console.log(access_token);
   $.ajax({
-            url: "http://localhost:5050/retweet/",
+            url: "http://localhost:5050/retweet",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"tweet_id": String(tweet_id)})        
+            data: JSON.stringify({"tweet_id": String(tweet_id),"access_token": String(oauthAccessToken),"access_token_secret": String(oauthAccessTokenSecret)})        
         }).done(function(data) {
             console.log(data);
         });    
 }
 
-function like_clicked(tweet_id) {
+function like_clicked(tweet_id,access_token,access_token_secret) {
 
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
@@ -38,10 +39,10 @@ function like_clicked(tweet_id) {
     // ... use spawn()
   //});
   $.ajax({
-            url: "http://localhost:5050/like/",
+            url: "http://localhost:5050/like",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"tweet_id": String(tweet_id)})        
+            data: JSON.stringify({"tweet_id": String(tweet_id),"access_token": String(oauthAccessToken),"access_token_secret": String(oauthAccessTokenSecret)})        
         }).done(function(data) {
             console.log(data);
         });    

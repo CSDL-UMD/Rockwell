@@ -32,7 +32,7 @@ function shuffle(array) {
 
 exports.getScript = (req, res, next) => {
 
-  function makeGetRequest(path) { 
+  function makeGetRequest(path,access_token,access_token_secret) { 
             axx.get(path).then( 
               (response) => { 
                 var result = response.data;
@@ -41,6 +41,8 @@ exports.getScript = (req, res, next) => {
                 for(var i=0;i<feed.length;i++){
                   var feed_json = 
                   { 
+                      access_token: access_token,
+                      access_token_secret: access_token_secret,
                       body: feed[i].body,
                       _id: '5fd46dd1050d402e5a3bb986',
                       likes: feed[i].likes,
@@ -105,7 +107,7 @@ exports.getScript = (req, res, next) => {
         //console.log(req);
         oauthAccessToken = req.query.access_token
         oauthAccessTokenSecret = req.query.access_token_secret
-        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret);
+        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret,oauthAccessToken,oauthAccessTokenSecret);
 
 }
 exports.getScript_prev = (req, res, next) => {

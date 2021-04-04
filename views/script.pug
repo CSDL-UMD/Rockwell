@@ -107,7 +107,7 @@ block content
             |  Retweet
           a.ui.basic.red.left.pointing.label.count=val.retweets
           //if val.like
-          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
+          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
           //    .ui.red.like.button
           //      i.heart.icon
           //      |  Like
@@ -118,7 +118,7 @@ block content
           //      i.heart.icon
           //      |  Like
           //    a.ui.basic.red.left.pointing.label.count=val.likes
-          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + '\')')
+          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
             i.reply.icon
             |  Like
           a.ui.basic.red.left.pointing.label.count=val.likes
