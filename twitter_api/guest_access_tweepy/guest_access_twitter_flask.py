@@ -124,6 +124,7 @@ def get_feed():
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
 		full_text = tweet["full_text"]
+		print("Full Text Tweet : "+full_text)
 		#url_idx = full_text.index(urls_list[0])
 		#starting_para = full_text[:url_idx]
 		#url_para = full_text[url_idx:url_idx+len(urls_list[0])]
