@@ -6,14 +6,13 @@ from bs4 import BeautifulSoup
 
 # no longer fetches the actual image this should increase the speed of execution by alot. !!
 def getCardData(link) -> dict: 
-    content = rq.get(link)
-    searchMe = content.text
-    soup = BeautifulSoup(searchMe,"html.parser")
-    meta_tag_image = soup.find("meta", {"property": "og:image"})
-    meta_tag_title = soup.find("meta", {"property": "og:title"})
-    meta_tag_description = soup.find("meta", {"property": "og:description"})
-
-    try:      
+    try:
+        content = rq.get(link)
+        searchMe = content.text
+        soup = BeautifulSoup(searchMe,"html.parser")
+        meta_tag_image = soup.find("meta", {"property": "og:image"})
+        meta_tag_title = soup.find("meta", {"property": "og:title"})
+        meta_tag_description = soup.find("meta", {"property": "og:description"})
         # Block to find the image
         #tagLocation = searchMe.find('\"og:image\"')
         #openQuote = searchMe.find("\"",tagLocation + 10) # Plus 10 so we dont count our own mark.
