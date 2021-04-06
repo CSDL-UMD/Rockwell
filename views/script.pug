@@ -61,7 +61,8 @@ block content
             img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
-          a(href=val.actor.username target="_blank")     
+          -console.log("LINK: " + val.profile_link)
+          a(href=val.profile_link target="_blank")     
             //Change the line above to val.actor.profile.picture since it is a link now/
             img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name

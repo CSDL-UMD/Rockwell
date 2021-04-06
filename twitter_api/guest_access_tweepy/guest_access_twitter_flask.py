@@ -13,6 +13,8 @@ import requests
 #import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
+import xml
+import xml.sax.saxutils
 #import requests as rq
 
 app = Flask(__name__)
@@ -123,7 +125,16 @@ def get_feed():
 				#picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
-		full_text = tweet["full_text"]
+		full_text = ""
+		isRetweet = False
+		try:
+			full_text = tweet["retweeted_status"]["full_text"]
+			isRetweet = True
+		except:
+			isRetweet = False
+		if isRetweet is False:
+			full_text = tweet["full_text"]
+
 		print("Full Text Tweet : "+full_text)
 		#url_idx = full_text.index(urls_list[0])
 		#starting_para = full_text[:url_idx]
@@ -141,6 +152,8 @@ def get_feed():
 			full_text = full_text.replace(urll,"")
 		#full_text = "!{t('" + full_text + "')}"
 		#print(full_text)
+		full_text = xml.sax.saxutils.unescape(full_text)
+
 		body = full_text
 		date_string_temp = tweet['created_at'].split()
 		date_string = date_string_temp[1] + " " + date_string_temp[2] + " " + date_string_temp[3] + " " + date_string_temp[5]
@@ -184,7 +197,11 @@ def get_feed():
 					break
 		#dbwrite.insert_tweet(tweet["id"],tweet["favorited"],SESSIONID,tweet["id"],tweet["retweeted"],i)
 		#dbwrite.insert_tweet_session(fav_before,sid,tid,rtbefore,rank)
-
+		profile_link = ""
+		if tweet["user"]["url"]:
+			profile_link = tweet["user"]["url"]
+		print("PROFILE LINK: " + tweet["user"]["url"])
+		
 		feed = {
 			'body':body,
 			'likes': finalLikes,
@@ -202,7 +219,8 @@ def get_feed():
 			'actor_username': tweet["user"]["screen_name"],
 			'time':time,
 			'embedded_image': eimage[0],
-			'retweet_count': finalRetweets
+			'retweet_count': finalRetweets,
+			'profile_link': profile_link
 		}
 		feed_json.append(feed)
 		i = i + 1
