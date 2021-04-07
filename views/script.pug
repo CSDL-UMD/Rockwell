@@ -93,8 +93,7 @@ block content
               //img(src=val.picture, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
               img(src=val.picture, style="width:100%;", id="images", onload="autoresize(this)")
               //img(src=val.picture, style="width:100%;aspect-ratio: auto 344 / 194;height: 300px;", id="images", onload="autoresize(this)")
-              //img(src=val.picture) 
-              // Not sure what the line above is actually doing... was picture_raw ___________--------________---------________-------_______------ Need forloop to go through embeded_images and add them to the post. Array of links to media.
+              
             if val.picture_heading.length > 0
               .content
                 .description(style="font-weight: 1000; text-align: center")=val.picture_heading

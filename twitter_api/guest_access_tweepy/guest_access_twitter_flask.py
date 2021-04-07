@@ -70,27 +70,7 @@ def get_feed():
 	i = 1
 	for tweet in public_tweets:
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
-		eimage = []  
-		mediaArr = tweet['entities'].get('media',[])
-		#if 'extended_entities' in tweet.keys():
-		#	extended_entities = tweet['extended_entities'].get('media',[])
-		#	print(extended_entities[0]['variants'])
-		flag_image = False   
-		if len(mediaArr) > 0:    
-			for x in range(len(mediaArr)):
-				if mediaArr[x]['type'] == 'photo':
-					eimage.append(mediaArr[x]['media_url'])
-					flag_image = True   
-		if not flag_image:
-			eimage.append("") 
-		# End of embeded image code. Working however there has not been a way to send an array down the pipeline yet. To be solved by Saumya
-		
 
-		#actor_profile_pic = rq.get(tweet.user.profile_image_url) # What is this doing? Seems to be used to write out... Then the name of the file is passed down? 
-		#random_string_actor_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16)) # what is this? __________--------________-----_______
-		#actor_test = open("../profile_pictures/"+random_string_actor_pic+".jpg","wb") # Need to make relative paths
-		#actor_test.write(actor_profile_pic.content) # What is this doing ____----_______-----______----- 
-		#actor_picture = random_string_actor_pic+'.jpg' # I think I see what you are doing, why do we need to write out these photos? Can we not pass them as code along the pipeline?
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
@@ -98,17 +78,46 @@ def get_feed():
 		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
 		#print("Response : ")sid
 		#print(res)
-		entities_keys = tweet["entities"].keys()
+
+		full_text = tweet["full_text"]
+		isRetweet = False 
+		retweeted_by = ""
+		actor_picture = tweet["user"]["profile_image_url"]
+		actor_username = tweet["user"]["screen_name"]
+		tempLikes = tweet["favorite_count"]
+		try:
+			full_text = actor_username + " Retweeted:	" + tweet["retweeted_status"]["full_text"]
+			retweeted_by = actor_name # Grab it here before changing the name
+			actor_name = tweet["retweeted_status"]["user"]["name"] # original tweeter info used below.
+			actor_username = tweet["retweeted_status"]["user"]["screen_name"]
+			actor_picture = tweet["retweeted_status"]["user"]["profile_image_url"]
+			tempLikes = tweet["retweeted_status"]["favorite_count"]
+			isRetweet = True
+		except:
+			isRetweet = False
+		entities_keys = ""
+		all_urls = ""
 		urls_list = []
 		expanded_urls_list = []
 		urls = ""
 		expanded_urls = ""
-		#picture = ""
 		image_raw = ""
 		picture_heading = ""
 		picture_description = ""
+		mediaArr = ""
+			# Decision making for the block to retrieve article cards AND embedded images
+		if isRetweet:
+			entities_keys = tweet["retweeted_status"]["entities"].keys()
+			mediaArr = tweet["retweeted_status"]['entities'].get('media',[])
+			if "urls" in entities_keys:
+				all_urls = tweet["retweeted_status"]["entities"]["urls"]
+		else:
+			entities_keys = tweet["entities"].keys()
+			mediaArr = tweet['entities'].get('media',[])
+			if "urls" in entities_keys:
+				all_urls = tweet["entities"]["urls"]
+			# Redesigned block to retrieve the Cardinfo data.
 		if "urls" in entities_keys:
-			all_urls = tweet["entities"]["urls"]
 			for each_url in all_urls:
 				urls_list.append(each_url["url"])
 				expanded_urls_list.append(each_url["expanded_url"])
@@ -119,38 +128,32 @@ def get_feed():
 			card_data = Cardinfo.getCardData(card_url)
 			if "image" in card_data.keys():
 				image_raw = card_data['image']
-				#random_string_card_pic = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-				#test = open("../post_pictures/"+random_string_card_pic+".jpg","wb")
-				#test.write(image_raw.content) # What is this doing__________________________________________________________________________---------___________-------________-
-				#picture = image_raw #random_string_card_pic+".jpg"
 				picture_heading = card_data["title"]
 				picture_description = card_data["description"]
-		full_text = ""
-		isRetweet = False
-		try:
-			full_text = tweet["retweeted_status"]["full_text"]
-			isRetweet = True
-		except:
-			isRetweet = False
-		if isRetweet is False:
-			full_text = tweet["full_text"]
 
-		print("Full Text Tweet : "+full_text)
-		#url_idx = full_text.index(urls_list[0])
-		#starting_para = full_text[:url_idx]
-		#url_para = full_text[url_idx:url_idx+len(urls_list[0])]
-		#end_para = full_text[url_idx+len(urls_list[0]):]
-		#full_text = full_text.replace(starting_para,"#["+starting_para+"]")
-		#full_text = full_text.replace(url_para,"#[a(href=\""+url_para+"\")"+url_para+"]")
-		#full_text = full_text.replace(end_para,"#["+end_para+"]")
-		#print(full_text)
-		#full_text = full_text.replace(starting_para,"#["+starting_para+"]")
+
+
+		# Embedded image retrieval (edited to handle retweets also now)
+
+		eimage = []
+		try: # Not sure why this has an issue all of a sudden.
+			flag_image = False   
+			if len(mediaArr) > 0:    
+				for x in range(len(mediaArr)):
+					if mediaArr[x]['type'] == 'photo':
+						eimage.append(mediaArr[x]['media_url'])
+						flag_image = True   
+			if not flag_image:
+				eimage.append("") 
+		except Exception as error:
+			print(error)
+			eimage[0] = ""
+
+		#if isRetweet:
+			#print("Is a retweet.")
+
 		for urll in urls_list:
-		#	full_text = full_text.replace(urll,"<a href=\""+urll+"\")"+urll+"</a>")
-			#full_text = full_text.replace(urll,"#[a(href=\""+urll+"\")"+urll+"]")
-			#full_text = full_text.replace(urll,"<l>"+urll+"<l>")
 			full_text = full_text.replace(urll,"")
-		#full_text = "!{t('" + full_text + "')}"
 		#print(full_text)
 		full_text = xml.sax.saxutils.unescape(full_text)
 
@@ -168,7 +171,6 @@ def get_feed():
 		#time.append(td.seconds)
 		# Fixing the like system
 		finalLikes = ""
-		tempLikes = tweet["favorite_count"]
 		if (tempLikes <= 999):
 			finalLikes = str(tempLikes)
 		elif (tempLikes >= 1000):
@@ -195,12 +197,11 @@ def get_feed():
 				else:
 					finalRetweets = str(counterVar) + "." + str(tempRetweets)[0] + "k"
 					break
-		#dbwrite.insert_tweet(tweet["id"],tweet["favorited"],SESSIONID,tweet["id"],tweet["retweeted"],i)
-		#dbwrite.insert_tweet_session(fav_before,sid,tid,rtbefore,rank)
+
 		profile_link = ""
 		if tweet["user"]["url"]:
 			profile_link = tweet["user"]["url"]
-		print("PROFILE LINK: " + tweet["user"]["url"])
+		#print("PROFILE LINK: " + tweet["user"]["url"])
 		
 		feed = {
 			'body':body,
@@ -215,44 +216,18 @@ def get_feed():
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture':tweet["user"]["profile_image_url"],
-			'actor_username': tweet["user"]["screen_name"],
+			'actor_picture': actor_picture,
+			'actor_username': actor_username,
 			'time':time,
 			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets,
-			'profile_link': profile_link
+			'profile_link': profile_link,
+			'retweet_by': retweeted_by
 		}
 		feed_json.append(feed)
 		i = i + 1
-	"""
-	tweet_collections = []
-	for i in range(len(idd)):
-		tweet_object = TweetObject.TweetObject(urls[i],expanded_urls[i],experiment_group[i],idd[i],tweet_id[i],body[i],classs[i],picture[i],picture_heading[i],picture_description[i],actor[i],time[i],post_name[i],post_handle[i],post_photo[i])
-		tweet_collections.append(tweet_object)
-	feed_json = []
-	for i in range(len(idd)):
-		feed_json.append(ob.__dict__ for ob in tweet_collections)	
-	"""
-	#out = json.dumps([ob.__dict__ for ob in tweet_collections], indent = 1)
-	#out = '###'.join([jsonify(ob.__dict__) for ob in tweet_collections])
-	#print(feed_json)
-
 
 	return jsonify(feed_json) # What is this doing?? Is this where we are sending the json of our feed_json to the other script?
-
-
-	#return jsonify({'feed':feed_json})
-	#print("Saumya Bhadani : "+out)
-	#sys.stdout.flush()
-
-	"""
-	writeOut = open("data.json","w")
-	writeOut.write(out)
-	
-	pd_all = pd.concat([pd.DataFrame(idd),pd.DataFrame(tweet_id),pd.DataFrame(body),pd.DataFrame(picture),pd.DataFrame(likes),pd.DataFrame(urls),pd.DataFrame(expanded_urls),pd.DataFrame(actor),pd.DataFrame(picture),pd.DataFrame(picture_heading),pd.DataFrame(picture_description),pd.DataFrame(time),pd.DataFrame(classs),pd.DataFrame(experiment_group)],axis=1)
-	pd_all.columns = ["id","tweet_id","body","picture","likes","urls","expanded_urls","actor","pictures","pictures_title","pictures_description","time","class","experiment_group"]
-	pd_all.to_csv("../../truman/truman_infodiversity/input/posts_twitter_demo.csv",encoding='utf-8', index=False)
-	"""
 
 @app.after_request
 def add_headers(response):
