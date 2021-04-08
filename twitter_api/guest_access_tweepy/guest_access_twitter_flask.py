@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 app.debug = False
 
-@app.route('/getfeed/', methods=['GET'])
+@app.route('/getfeed', methods=['GET'])
 def get_feed():
 
 	access_token = request.args.get('access_token')
@@ -86,7 +86,7 @@ def get_feed():
 		actor_username = tweet["user"]["screen_name"]
 		tempLikes = tweet["favorite_count"]
 		try:
-			full_text = actor_username + " Retweeted:	" + tweet["retweeted_status"]["full_text"]
+			full_text = tweet["retweeted_status"]["full_text"]
 			retweeted_by = actor_name # Grab it here before changing the name
 			actor_name = tweet["retweeted_status"]["user"]["name"] # original tweeter info used below.
 			actor_username = tweet["retweeted_status"]["user"]["screen_name"]

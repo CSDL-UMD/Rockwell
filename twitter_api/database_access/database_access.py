@@ -151,12 +151,13 @@ def insert_session():
             retVal = cursor.fetchall()
             cursor.close()
             accessPool.putconn(connection)
-
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("ERROR!!!!",error)
 
 
 @app.route('/insert_user_tweet_ass', methods=['POST'])
 def insert_usert_tweet():
-     try:
+    try:
         #Getting connection from pool
         connection = accessPool.getconn()
         if connection is not False:
@@ -170,6 +171,9 @@ def insert_usert_tweet():
             cursor.execute(sql,(tweet_id,worker_id,))
             cursor.close()
             accessPool.putconn(connection)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("ERROR!!!!",error)
+
 
 @app.after_request
 def add_headers(response):
