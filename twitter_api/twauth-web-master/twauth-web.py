@@ -120,7 +120,10 @@ def callback():
 
     del oauth_store[oauth_token]
 
-    return redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+    #redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+    print(real_oauth_token,real_oauth_token_secret)
+
+    return render_template('placeholder.html', access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
 
 @app.errorhandler(500)
 def internal_server_error(e):

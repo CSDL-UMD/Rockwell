@@ -35,8 +35,8 @@ def get_feed():
 	    cred[name] = value.strip()
 	f.close()
 
-	cred['token'] = access_token
-	cred['token_secret'] = access_token_secret
+	cred['token'] = access_token.strip()
+	cred['token_secret'] = access_token_secret.strip()
 
 	'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
 	auth.set_access_token(cred["token"], cred["token_secret"])
@@ -53,6 +53,7 @@ def get_feed():
 	#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
 	params = {"count": "20","tweet_mode": "extended"}
 	response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
+	print(response)
 	public_tweets = json.loads(response.text)
 	#print(tweets)
 	if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
@@ -69,8 +70,7 @@ def get_feed():
 	feed_json = []
 	i = 1
 	for tweet in public_tweets:
-		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list. 
-
+		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
