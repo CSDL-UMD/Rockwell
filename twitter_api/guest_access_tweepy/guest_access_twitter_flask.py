@@ -141,7 +141,7 @@ def get_feed():
 			if len(mediaArr) > 0:    
 				for x in range(len(mediaArr)):
 					if mediaArr[x]['type'] == 'photo':
-						eimage.append(mediaArr[x]['media_url'])
+						eimage.append(mediaArr[x]['media_url']+':small')
 						flag_image = True   
 			if not flag_image:
 				eimage.append("") 
