@@ -141,13 +141,22 @@ def get_feed():
 			if len(mediaArr) > 0:    
 				for x in range(len(mediaArr)):
 					if mediaArr[x]['type'] == 'photo':
-						small_width = int(mediaArr[x]["sizes"]["small"]["w"])
-						small_height = int(mediaArr[x]["sizes"]["small"]["h"])
-						small_aspect_ratio = small_height/small_width
-						if small_aspect_ratio > 0.89:
-							eimage.append(mediaArr[x]['media_url']+':thumb')
+						if "sizes" in mediaArr[x].keys():
+							if "small" in mediaArr[x]["sizes"].keys():
+								small_width = int(mediaArr[x]["sizes"]["small"]["w"])
+								small_height = int(mediaArr[x]["sizes"]["small"]["h"])
+								small_aspect_ratio = small_height/small_width
+								if small_aspect_ratio > 0.89:
+									if "thumb" in mediaArr[x]["sizes"].keys():
+										eimage.append(mediaArr[x]['media_url']+':thumb')
+									else:
+										eimage.append(mediaArr[x]['media_url']+':small')
+								else:
+									eimage.append(mediaArr[x]['media_url']+':small')
+							else:
+								eimage.append(mediaArr[x]['media_url'])
 						else:
-							eimage.append(mediaArr[x]['media_url']+':small')
+							eimage.append(mediaArr[x]['media_url'])
 						flag_image = True   
 			if not flag_image:
 				eimage.append("") 
