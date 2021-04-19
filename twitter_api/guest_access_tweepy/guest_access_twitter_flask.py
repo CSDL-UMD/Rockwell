@@ -68,8 +68,12 @@ def get_feed():
 #		os.remove(file)
 	#dbwrite = access_object.access_object() # This might be the wrong syntax dont recall.
 	feed_json = []
+	tweet_ids_seen = []
 	i = 1
 	for tweet in public_tweets:
+		if tweet["id"] in tweet_ids_seen:
+			continue
+		tweet_ids_seen.append(tweet["id"])
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
