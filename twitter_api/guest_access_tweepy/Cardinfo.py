@@ -20,7 +20,7 @@ def getCardData(link) -> dict:
     while(failCounter < 3):
         searchMe = fetchWebpage(link)
         if(searchMe == None):
-            time.sleep(3) # This can be adjusted and async may be desirable.
+            time.sleep(0.1) # This can be adjusted and async may be desirable.
             failCounter = failCounter + 1
         else:
             break

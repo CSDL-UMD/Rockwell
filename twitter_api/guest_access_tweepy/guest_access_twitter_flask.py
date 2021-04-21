@@ -89,16 +89,40 @@ def get_feed():
 		actor_picture = tweet["user"]["profile_image_url"]
 		actor_username = tweet["user"]["screen_name"]
 		tempLikes = tweet["favorite_count"]
-		try:
+		quoted_by = ""
+		isQuote = False
+		try: # This will handle retweet case and nested try will handle retweeted quote
 			full_text = tweet["retweeted_status"]["full_text"]
 			retweeted_by = actor_name # Grab it here before changing the name
-			actor_name = tweet["retweeted_status"]["user"]["name"] # original tweeter info used below.
-			actor_username = tweet["retweeted_status"]["user"]["screen_name"]
-			actor_picture = tweet["retweeted_status"]["user"]["profile_image_url"]
-			tempLikes = tweet["retweeted_status"]["favorite_count"]
-			isRetweet = True
+			# Now I need to check if the retweeted status is a quoted status I think. 
+			try:
+				full_text = tweet["retweeted_status"]["quoted_status"]["full_text"]
+				quoted_by = tweet["retweeted_status"]["user"]["name"]         # name of the retweet who quoted
+				actor_name = tweet["retweeted_status"]["quoted_status"]["user"]["name"] # original tweeter info used below.
+				actor_username = tweet["retweeted_status"]["quoted_status"]["user"]["screen_name"]
+				actor_picture = tweet["retweeted_status"]["quoted_status"]["user"]["profile_image_url"]
+				tempLikes = tweet["retweeted_status"]["quoted_status"]["favorite_count"]
+				isQuote = True
+			except: # if its not a quote default to normal retweet settings
+				actor_name = tweet["retweeted_status"]["user"]["name"] # original tweeter info used below.
+				actor_username = tweet["retweeted_status"]["user"]["screen_name"]
+				actor_picture = tweet["retweeted_status"]["user"]["profile_image_url"]
+				tempLikes = tweet["retweeted_status"]["favorite_count"]
+				isRetweet = True
+
 		except:
 			isRetweet = False
+
+		if not isRetweet: # case where its not a retweet but still could be a quote.
+			try:
+				full_text = tweet["quoted_status"]["full_text"]
+				quoted_by = tweet["user"]["name"]         # name of the person who quoted
+				actor_name = tweet["quoted_status"]["user"]["name"] # original tweeter info used below.
+				actor_username = twee["quoted_status"]["user"]["screen_name"]
+				actor_picture = tweet["quoted_status"]["user"]["profile_image_url"]
+				tempLikes = tweet["quoted_status"]["favorite_count"]
+				isQuote = True
+
 		entities_keys = ""
 		all_urls = ""
 		urls_list = []
@@ -109,8 +133,19 @@ def get_feed():
 		picture_heading = ""
 		picture_description = ""
 		mediaArr = ""
-			# Decision making for the block to retrieve article cards AND embedded images
-		if isRetweet:
+		# Decision making for the block to retrieve article cards AND embedded images
+
+		if isQuote and is Retweet: # Check for the case of a quote within a retweet.
+			entities_keys = tweet["retweeted_status"]["quoted_status"]["entities"].keys()
+			mediaArr = tweet["retweeted_status"]["quoted_status"]['entities'].get('media',[])
+			if "urls" in entities_keys:
+				all_urls = tweet["retweeted_status"]["quoted_status"]["entities"]["urls"]
+		elif isQuote: #  quote only case
+			entities_keys = tweet["quoted_status"]["entities"].keys()
+			mediaArr = tweet["quoted_status"]['entities'].get('media',[])
+			if "urls" in entities_keys:
+				all_urls = tweet["quoted_status"]["entities"]["urls"]
+		elif isRetweet:
 			entities_keys = tweet["retweeted_status"]["entities"].keys()
 			mediaArr = tweet["retweeted_status"]['entities'].get('media',[])
 			if "urls" in entities_keys:
@@ -120,6 +155,7 @@ def get_feed():
 			mediaArr = tweet['entities'].get('media',[])
 			if "urls" in entities_keys:
 				all_urls = tweet["entities"]["urls"]
+
 			# Redesigned block to retrieve the Cardinfo data.
 		if "urls" in entities_keys:
 			for each_url in all_urls:
@@ -127,7 +163,7 @@ def get_feed():
 				expanded_urls_list.append(each_url["expanded_url"])
 			urls = ",".join(urls_list)
 			expanded_urls = ",".join(expanded_urls_list)
-		if len(expanded_urls_list) > 0:
+		if len(expanded_urls_list) > 0 and not isQuote: # not isQuote is to save time in the case of a quote. no card needed
 			card_url = expanded_urls_list[0]
 			card_data = Cardinfo.getCardData(card_url)
 			if "image" in card_data.keys():
@@ -242,6 +278,7 @@ def get_feed():
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
 			'retweet_by': retweeted_by
+			'quoted_by': quoted_by
 		}
 		feed_json.append(feed)
 		i = i + 1
