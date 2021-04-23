@@ -58,13 +58,13 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
   // Access the database and update how many tweets have been seen. We also need to figure out how to activate the main loop to load more tweets.
 
   // Main loop Ideally there will be no break, only return statements that end the function.
-  console.log("CALLED SCROLL FUNCTION");
-  for(var i=0;i<sizeList.length;i++){
-    console.log(i + " :::: "+sizeList[i]);
-  }
+  //console.log("CALLED SCROLL FUNCTION");
+  //for(var i=0;i<sizeList.length;i++){
+  //  console.log(i + " :::: "+sizeList[i]);
+  //}
   //console.log("sizeList : "+sizeList);
-  console.log("curPos : "+curPos);
-  console.log("topPadding : "+topPadding);
+  //console.log("curPos : "+curPos);
+  //console.log("topPadding : "+topPadding);
   var countScrollBased = 0;
    while(1){
      if(curPos < topPadding){

@@ -65,11 +65,11 @@ block content
             img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
-          a(href=val.profile_link target="_blank")     
+          //a(href=val.profile_link target="_blank")     
             //Change the line above to val.actor.profile.picture since it is a link now/
-            img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
-            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
-            span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
+          img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+          span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
+          span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
         //-div(style="position: relative; z-index: 1;")
           img(src="image.png" style="position: absolute; z-index: 2;")
           span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
@@ -83,7 +83,7 @@ block content
           //.img.post
           //img.lazyload(data-src=val.embedded_images, style="max-width:100%;width:100%;")
           //img(src=val.embedded_images, style="width:100%;aspect-ratio: auto 344 / 194;height: 300px;", id="images", onload="autoresize(this)")
-          img(src=val.embedded_images, style="width:100%;", id="images", onload="autoresize(this)")
+          img(src=val.embedded_images, style="width:100%;", class="imagesPost", onload="autoresize(this)")
           //iframe(type='text/html', style="overflow:hidden;width:100%;height:200%", height="200%", width="100%", frameborder="0", src=val.embedded_images)
         if val.picture.length > 0
           if val.picture_heading.length > 3
@@ -94,7 +94,7 @@ block content
               //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
               //img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;height:100%")
               //img(src=val.picture, style="max-width:100%;width:100%;max-height:100%;height:100%", id="images")
-              img(src=val.picture, style="width:100%;", id="images", onload="autoresize(this)")
+              img(src=val.picture, style="width:100%;", class="imagesPost", onload="autoresize(this)")
               //img(src=val.picture, style="width:100%;aspect-ratio: auto 344 / 194;height: 300px;", id="images", onload="autoresize(this)")
               
             if val.picture_heading.length > 0
@@ -133,33 +133,60 @@ block content
         |  End of Posts for the last 48 hours.
 
     script.
-      topPadding = 0;
-      sizeList = [];
-      var all_elements = document.getElementsByClassName("fluid");
-      margin = all_elements[1].offsetTop;
-      topPadding = all_elements[0].clientHeight + 2*margin;
-      var i = 1;
-      for(i = 1;i<all_elements.length-1;i++){
-        var post_element = document.getElementById("tweet_"+i);
-        img_elements = post_element.getElementsByTagName('img');
-        var height_img = 0;
-        /*if(img_elements.length > 2) { // New case to handle embeded and article image.
-          height_img = img_elements[1].width * 0.68;
-          height_img = height_img + img_elements[2].width * 0.68;
-          console.log("CALCULATED HEIGHT : "+height_img);
-        }*/
-        if(img_elements.length > 1){
-          height_img = img_elements[1].width * 0.68;
-          console.log("CALCULATED HEIGHT : "+height_img);
+      function calSizeList(onresize){
+        //sizeList.length = 0;
+        sizeList = [];
+        topPadding = 0;
+        var all_elements = document.getElementsByClassName("fluid");
+        var lennn = 0;
+        if(onresize == 0){
+          lennn = all_elements.length-1;
         }
-        sizeList.push(post_element.clientHeight + margin); // was + height_img
+        else{
+          lennn = all_elements.length-2;
+        }
+        margin = all_elements[1].offsetTop;
+        topPadding = all_elements[0].clientHeight + 2*margin;
+        var i = 1;
+        for(i = 1;i<lennn;i++){
+          //console.log("i : "+i);
+          var post_element = document.getElementById("tweet_"+i);
+          img_elements = post_element.getElementsByTagName('img');
+          var height_img = 0;
+          //if(img_elements.length > 2) { // New case to handle embeded and article image.
+          //  height_img = img_elements[1].width * 0.68;
+          //  height_img = height_img + img_elements[2].width * 0.68;
+          //  console.log("CALCULATED HEIGHT : "+height_img);
+          //}
+          if(img_elements.length > 1){
+            height_img = img_elements[1].width * 0.68;
+            if(img_elements.length > 2){
+              height_img = height_img*2;
+            } 
+            //console.log("CALCULATED HEIGHT : "+height_img);
+          }
+          sizeList.push(post_element.clientHeight + margin + height_img); // was + height_img
+        }
+        return sizeList;
       }
+      sizeList = calSizeList(0);
     script.
       var win = $(window);
       window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,win.scrollTop(),topPadding)});
     script.
       function autoresize(imgele) {
-        imgele.height = imgele.width * (0.68);      }
+        imgele.height = imgele.width * (0.68);
+      }
+    script.
+      var win = $(window);
+      window.addEventListener('resize', function(){
+        img_elements_resize = document.getElementsByClassName("imagesPost");
+        var i = 0;
+        for(i = 0;i<img_elements_resize.length;i++){
+          img_elements_resize[i].height = img_elements_resize[i].clientWidth * (0.68);
+        }
+        sizeList = calSizeList(1);
+      });
 
     br
     br

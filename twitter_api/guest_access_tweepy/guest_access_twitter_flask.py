@@ -122,6 +122,8 @@ def get_feed():
 				actor_picture = tweet["quoted_status"]["user"]["profile_image_url"]
 				tempLikes = tweet["quoted_status"]["favorite_count"]
 				isQuote = True
+			except:
+				isQuote = False
 
 		entities_keys = ""
 		all_urls = ""
@@ -135,7 +137,7 @@ def get_feed():
 		mediaArr = ""
 		# Decision making for the block to retrieve article cards AND embedded images
 
-		if isQuote and is Retweet: # Check for the case of a quote within a retweet.
+		if isQuote and isRetweet: # Check for the case of a quote within a retweet.
 			entities_keys = tweet["retweeted_status"]["quoted_status"]["entities"].keys()
 			mediaArr = tweet["retweeted_status"]["quoted_status"]['entities'].get('media',[])
 			if "urls" in entities_keys:
@@ -277,7 +279,7 @@ def get_feed():
 			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
-			'retweet_by': retweeted_by
+			'retweet_by': retweeted_by,
 			'quoted_by': quoted_by
 		}
 		feed_json.append(feed)
