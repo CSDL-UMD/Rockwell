@@ -27,7 +27,10 @@ def get_feed():
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	cred = {}
-	session_id = 1
+	worker_id = 3
+	twitter_id = 24678965
+	resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id)+'&twitter_id='+str(twitter_id))
+	session_id = resp_session_id.json()["data"]
 
 	f = open("guest_credentials_2.txt")
 	for line in f:
@@ -53,7 +56,6 @@ def get_feed():
 	#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
 	params = {"count": "20","tweet_mode": "extended"}
 	response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
-	print(response)
 	public_tweets = json.loads(response.text)
 	#print(tweets)
 	if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
@@ -79,7 +81,7 @@ def get_feed():
 		#tweet_id = str(tweet.id)
 		dictToSend = {'tweet_id':tweet["id"]}
 		requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
-		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
+		requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
 		#print("Response : ")sid
 		#print(res)
 

@@ -135,24 +135,29 @@ def insert_user(self,worker_id,assignment_id,twitter_id,hit_id,exp_condition) ->
         except (Exception, psycopg2.DatabaseError) as error:
             print("ERROR!!!!",error)
 
-@app.route('/insert_session', methods=['POST']) # Also must return session ID. We might want the date also..
+@app.route('/insert_session', methods=['GET']) # Also must return session ID. We might want the date also..
 def insert_session():
+    retVal123 = -1
     try:
         #Getting connection from pool
         connection = accessPool.getconn()
         if connection is not False:
-            now = datetime.datetime.now()
-            time = now.year + '-' + now.month + '-' + now.day + ' ' + now.hour + ':' + now.minute + ':' + now.second
+            now_session_start = datetime.datetime.now()
+            session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             worker_id = request.args.get('worker_id')
-            sql = """INSERT INTO session(session_start,worker_id)
-                VALUES(%s,%s) RETURNING session_id;"""
+            twitter_id = request.args.get('twitter_id')
+            sql = """INSERT INTO session(session_start,session_end,twitter_id,worker_id)
+                VALUES(%s,%s,%s,%s) RETURNING session_id;"""
             cursor = connection.cursor()
-            cursor.execute(sql,(session_start,worker_id,))
-            retVal = cursor.fetchall()
+            cursor.execute(sql,(session_start,session_start,twitter_id,worker_id,))
+            retVal123 = cursor.fetchall()[0][0]
             cursor.close()
+            connection.commit()
             accessPool.putconn(connection)
+            return jsonify(data=retVal123)
     except (Exception, psycopg2.DatabaseError) as error:
         print("ERROR!!!!",error)
+    return retVal123
 
 
 @app.route('/insert_user_tweet_ass', methods=['POST'])

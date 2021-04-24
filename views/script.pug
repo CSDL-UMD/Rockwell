@@ -67,9 +67,12 @@ block content
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
           //a(href=val.profile_link target="_blank")     
             //Change the line above to val.actor.profile.picture since it is a link now/
-          img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
-          span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
-          span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
+          div(style="display: flex;align-items: center")
+            div
+              img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+            div(style="display: inline-grid;")
+              div(style="margin-left: 4px; margin-top: 0px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")=val.actor.profile.name
+              div(style="margin-left: 4px; margin-top: 3px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")="@"+val.actor.username
         //-div(style="position: relative; z-index: 1;")
           img(src="image.png" style="position: absolute; z-index: 2;")
           span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
