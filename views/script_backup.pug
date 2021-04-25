@@ -141,52 +141,44 @@ block content
         sizeList = [];
         topPadding = 0;
         var all_elements = document.getElementsByClassName("fluid");
-        //var lennn = 0;
-        var lennn = all_elements.length-2;
-        //if(onresize == 0){
-        //  lennn = all_elements.length-1;
-        //}
-        //else{
-        //  lennn = all_elements.length-2;
-        //}
+        var lennn = 0;
+        if(onresize == 0){
+          lennn = all_elements.length-1;
+        }
+        else{
+          lennn = all_elements.length-2;
+        }
         margin = all_elements[1].offsetTop;
         topPadding = all_elements[0].clientHeight + 2*margin;
         var i = 1;
         for(i = 1;i<lennn;i++){
           //console.log("i : "+i);
           var post_element = document.getElementById("tweet_"+i);
-          //img_elements = post_element.getElementsByTagName('img');
-          //var height_img = 0;
+          img_elements = post_element.getElementsByTagName('img');
+          var height_img = 0;
           //if(img_elements.length > 2) { // New case to handle embeded and article image.
           //  height_img = img_elements[1].width * 0.68;
           //  height_img = height_img + img_elements[2].width * 0.68;
           //  console.log("CALCULATED HEIGHT : "+height_img);
           //}
-          //if(img_elements.length > 1){
-          //  height_img = img_elements[1].width * 0.68;
-          //  if(img_elements.length > 2){
-          //    height_img = height_img*2;
-          //  } 
-          //}
-          //if(onresize == 0){
-          //  sizeList.push(post_element.clientHeight + margin + height_img); // was + height_img
-          //}
-          //else{
-          sizeList.push(post_element.clientHeight + margin);
-          //}
+          if(img_elements.length > 1){
+            height_img = img_elements[1].width * 0.68;
+            if(img_elements.length > 2){
+              height_img = height_img*2;
+            } 
+            console.log("CALCULATED HEIGHT : "+height_img);
+          }
+          console.log("CALCULATED CLIENT HEIGHT : "+post_element.clientHeight);
+          if(onresize == 0){
+            sizeList.push(post_element.clientHeight + margin + height_img); // was + height_img
+          }
+          else{
+            sizeList.push(post_element.clientHeight + margin);
+          }
         }
         return sizeList;
       }
-      function resizeeventhandler(){  
-        img_elements_resize = document.getElementsByClassName("imagesPost");
-        var i = 0;
-        for(i = 0;i<img_elements_resize.length;i++){
-          img_elements_resize[i].height = img_elements_resize[i].clientWidth * (0.68);
-        }
-        sizeList = calSizeList(1);
-      }
-      //sizeList = calSizeList(0);
-      resizeeventhandler()
+      sizeList = calSizeList(0);
     script.
       var win = $(window);
       window.addEventListener("scroll", function(){viewCountScrollBased(sizeList,win.scrollTop(),topPadding)});
@@ -196,7 +188,15 @@ block content
       }
     script.
       var win = $(window);
-      window.addEventListener('resize', function(){resizeeventhandler()});
+      window.addEventListener('resize', function(){
+        img_elements_resize = document.getElementsByClassName("imagesPost");
+        var i = 0;
+        for(i = 0;i<img_elements_resize.length;i++){
+          img_elements_resize[i].height = img_elements_resize[i].clientWidth * (0.68);
+        }
+        console.log("RESIZE!!!!");
+        sizeList = calSizeList(1);
+      });
 
     br
     br
