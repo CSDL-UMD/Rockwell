@@ -92,6 +92,9 @@ def get_feed():
 		actor_username = tweet["user"]["screen_name"]
 		tempLikes = tweet["favorite_count"]
 		quoted_by = ""
+		quoted_by_text = ""
+		quoted_by_actor_username = ""
+		quoted_by_actor_picture = ""
 		isQuote = False
 		try: # This will handle retweet case and nested try will handle retweeted quote
 			full_text = tweet["retweeted_status"]["full_text"]
@@ -100,6 +103,9 @@ def get_feed():
 			try:
 				full_text = tweet["retweeted_status"]["quoted_status"]["full_text"]
 				quoted_by = tweet["retweeted_status"]["user"]["name"]         # name of the retweet who quoted
+				quoted_by_text = tweet["retweeted_status"]["full_text"]
+				quoted_by_actor_username = tweet["retweeted_status"]["user"]["screen_name"]
+				quoted_by_actor_picture = tweet["retweeted_status"]["user"]["profile_image_url"]
 				actor_name = tweet["retweeted_status"]["quoted_status"]["user"]["name"] # original tweeter info used below.
 				actor_username = tweet["retweeted_status"]["quoted_status"]["user"]["screen_name"]
 				actor_picture = tweet["retweeted_status"]["quoted_status"]["user"]["profile_image_url"]
@@ -119,8 +125,11 @@ def get_feed():
 			try:
 				full_text = tweet["quoted_status"]["full_text"]
 				quoted_by = tweet["user"]["name"]         # name of the person who quoted
+				quoted_by_text = tweet["full_text"]
+				quoted_by_actor_username = tweet["user"]["screen_name"]
+				quoted_by_actor_picture = tweet["user"]["profile_image_url"]
 				actor_name = tweet["quoted_status"]["user"]["name"] # original tweeter info used below.
-				actor_username = twee["quoted_status"]["user"]["screen_name"]
+				actor_username = tweet["quoted_status"]["user"]["screen_name"]
 				actor_picture = tweet["quoted_status"]["user"]["profile_image_url"]
 				tempLikes = tweet["quoted_status"]["favorite_count"]
 				isQuote = True
@@ -282,7 +291,10 @@ def get_feed():
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
 			'retweet_by': retweeted_by,
-			'quoted_by': quoted_by
+			'quoted_by': quoted_by,
+			'quoted_by_text' : quoted_by_text,
+			'quoted_by_actor_username' : quoted_by_actor_username,
+			'quoted_by_actor_picture' : quoted_by_actor_picture
 		}
 		feed_json.append(feed)
 		i = i + 1

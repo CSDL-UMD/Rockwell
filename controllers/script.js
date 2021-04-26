@@ -62,6 +62,10 @@ exports.getScript = (req, res, next) => {
                       highread: 148,
                       profile_link: feed[i].profile_link,
                       retweeted_by: feed[i].retweet_by,
+                      quoted_by: feed[i].quoted_by,  
+                      quoted_by_text: feed[i].quoted_by_text,
+                      quoted_by_actor_username: feed[i].quoted_by_actor_username,
+                      quoted_by_actor_picture: feed[i].quoted_by_actor_picture,
                       // Need to add eimage in here somehow with its own loop, or if this handles arrays...
                       // embededimage:(whatever its called in this case) feed[i].eimage[iterator also in for loop perhaps]
                       actor: 
