@@ -1,6 +1,12 @@
 var furthestSeen = 0;
+var session_id = 0;
 
-function retweet_clicked(tweet_id,access_token,access_token_secret) {
+function set_session_id(sid) {
+  console.log("Setting Session ID : "+sid);
+  session_id = sid;
+}
+
+function retweet_clicked(arguments) {
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
   //var process = spawn('python',["./Retweet.py", 
@@ -13,18 +19,17 @@ function retweet_clicked(tweet_id,access_token,access_token_secret) {
   //  console.log('After Spawn');
     // ... use spawn()
   //});
-  console.log(access_token);
   $.ajax({
-            url: "http://localhost:5050/retweet",
+            url: "http://127.0.0.1:5050/retweet",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"tweet_id": String(tweet_id),"access_token": String(oauthAccessToken),"access_token_secret": String(oauthAccessTokenSecret)})        
+            data: JSON.stringify({"arguments": String(arguments)})        
         }).done(function(data) {
             console.log(data);
         });    
 }
 
-function like_clicked(tweet_id,access_token,access_token_secret) {
+function like_clicked(arguments) {
 
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
@@ -39,10 +44,35 @@ function like_clicked(tweet_id,access_token,access_token_secret) {
     // ... use spawn()
   //});
   $.ajax({
-            url: "http://localhost:5050/like",
+            url: "http://127.0.0.1:5050/like",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"tweet_id": String(tweet_id),"access_token": String(oauthAccessToken),"access_token_secret": String(oauthAccessTokenSecret)})        
+            data: JSON.stringify({"arguments": String(arguments)})        
+        }).done(function(data) {
+            console.log(data);
+        });    
+}
+
+function link_clicked(arguments) {
+
+  //var spawn = require("child_process").spawn;
+  //const { spawn } = require('child_process');
+  //var process = spawn('python',["./Retweet.py", 
+  //                          tweet_id] );
+  //require(["child_process"], function (cp) {
+  //  console.log('Before Spawn definition');
+  //  var spawn = cp.spawn;
+  //  console.log('After Spawn definition');
+  //  var process = spawn('python3',["./Retweet.py",tweet_id] );
+  //  console.log('After Spawn');
+    // ... use spawn()
+  //});
+  console.log("In Link Clicked");
+  $.ajax({
+            url: "http://127.0.0.1:5050/link",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({"arguments": String(arguments)})        
         }).done(function(data) {
             console.log(data);
         });    
@@ -112,4 +142,15 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
 // Also must consider whether or not we must update the data base. I propose another function here below
 // That is called prior to valid return statements where read status must be updated. This function may need an array with the 
 // appropriate data like tweet id to find the right row in the data tables.
+}
+
+function logout_send_data(){
+  $.ajax({
+            url: "http://127.0.0.1:5050/tracking",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({"session_id": String(session_id),"furthestSeen": String(furthestSeen)})        
+        }).done(function(data) {
+            console.log(data);
+        });
 }

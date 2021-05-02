@@ -1,6 +1,7 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 #import tweepy
 from requests_oauthlib import OAuth1Session
+import requests
 import json
 from flask import Flask, render_template, request, url_for, jsonify
 
@@ -8,12 +9,14 @@ app = Flask(__name__)
 
 app.debug = False
 
-@app.route('/retweet/', methods=['POST'])
+@app.route('/retweet', methods=['POST'])
 def retweet():
     data = request.get_json()
-    tweet_id = data['tweet_id']
-    access_token = data['access_token']
-    access_token_secret = data['access_token_secret']
+    data_arg = data['arguments']
+    tweet_id = data_arg.split(',')[0].strip()
+    session_id = data_arg.split(',')[1].strip()
+    access_token = data_arg.split(',')[2].strip()
+    access_token_secret = data_arg.split(',')[3].strip()
     cred = {}
     f = open("guest_credentials_2.txt")
     for line in f:
@@ -26,26 +29,29 @@ def retweet():
     #api = tweepy.API(auth)
     oauth = OAuth1Session(cred['key'],
                        client_secret=cred['key_secret'],
-                       access_token,
-                       access_token_secret)
+                       resource_owner_key=access_token,
+                       resource_owner_secret=access_token_secret)
 
     try:
         #api.retweet(int(tweet_id))
         #params = {"id": int(tweet_id)}
         response_retweet = oauth.post("https://api.twitter.com/1.1/statuses/retweet/"+tweet_id+".json")
+        requests.post('http://127.0.0.1:5052/update_tweet_retweet?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
         return jsonify({"success":0}) # Retweet failed
 
-@app.route('/like/', methods=['POST'])
+@app.route('/like', methods=['POST'])
 def like():
     data = request.get_json()
-    tweet_id = data['tweet_id']
-    access_token = data['access_token']
-    access_token_secret = data['access_token_secret']
+    data_arg = data['arguments']
+    tweet_id = data_arg.split(',')[0].strip()
+    session_id = data_arg.split(',')[1].strip()
+    access_token = data_arg.split(',')[2].strip()
+    access_token_secret = data_arg.split(',')[3].strip()
     cred = {}
-    f = open("guest_credentials.txt")
+    f = open("guest_credentials_2.txt")
     for line in f:
         name, value = line.split(":")
         cred[name] = value.strip()
@@ -56,16 +62,45 @@ def like():
     #api = tweepy.API(auth)
     oauth = OAuth1Session(cred['key'],
                        client_secret=cred['key_secret'],
-                       resource_owner_key=cred['token'],
-                       resource_owner_secret=cred['token_secret'])
-
-    data = request.get_json()
-    tweet_id = data['tweet_id']
+                       resource_owner_key=access_token,
+                       resource_owner_secret=access_token_secret)
     try:
         #tweet = api.get_status(int(tweet_id))
         #tweet.favorite()
         response_like = oauth.post("https://api.twitter.com/1.1/favorites/create.json",params = {"id":int(tweet_id)})
-        print(response_like)
+        requests.post('http://127.0.0.1:5052/update_tweet_like?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
+        return jsonify({"success":1}) # Retweet successful
+    except Exception as e:
+        print(e)
+        return jsonify({"success":0}) # Retweet failed
+
+@app.route('/link', methods=['POST'])
+def link():
+    data = request.get_json()
+    data_arg = data['arguments']
+    tweet_id = data_arg.split(',')[0].strip()
+    session_id = data_arg.split(',')[1].strip()
+    urll = data_arg.split(',')[2].strip()
+    iscard = data_arg.split(',')[3].strip()
+
+    try:
+        #tweet = api.get_status(int(tweet_id))
+        #tweet.favorite()
+        requests.post('http://127.0.0.1:5052/insert_click?tweet_id='+str(tweet_id)+'&session_id='+str(session_id)+'&urll='+str(urll)+'&iscard='+str(iscard))
+        return jsonify({"success":1}) # Retweet successful
+    except Exception as e:
+        print(e)
+        return jsonify({"success":0}) # Retweet failed
+
+@app.route('/tracking', methods=['POST'])
+def tracking():
+    data = request.get_json()
+    session_id = data['session_id']
+    furthestSeen = data['furthestSeen']
+    try:
+        #tweet = api.get_status(int(tweet_id))
+        #tweet.favorite()
+        requests.post('http://127.0.0.1:5052/insert_tracking?session_id='+str(session_id)+'&furthestSeen='+str(furthestSeen))
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)

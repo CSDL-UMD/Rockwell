@@ -15,6 +15,7 @@ html
     link(rel='shortcut icon', href='/public/favicon.ico')
     link(rel='manifest', href='/public/manifest.json')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')
     style(type='text/css').
       body {
       background-color: #F5F8FA;
@@ -94,6 +95,10 @@ html
   script(src='/public/js/main.js')
   script(src='/public/js/lib/require.js')
   script(src='/public/js/retweet.js')
+  script.
+    function logout_called(){
+      logout_send_data();
+    }
 
   body
     .ui.vertically.padded.grid.container
@@ -109,7 +114,7 @@ html
         {nudge = user.post_nudge}
     //-.ui.tiny.post.modal(nudge=nudge)
       i.close.icon
-      .header Add a New Post
+      .header Thank you!!!
       .content
         form#postform.ui.feed.form(action='/post/new', method='POST', enctype='multipart/form-data')
           input(type='hidden', name='_csrf', value=_csrf)

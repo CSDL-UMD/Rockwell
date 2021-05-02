@@ -1,5 +1,5 @@
 CREATE TABLE truman_user (
-   worker_id VARCHAR(50) PRIMARY KEY,
+   worker_id BIGSERIAL PRIMARY KEY,
    assignment_id VARCHAR(80) NOT NULL,
    twitter_id bigint NOT NULL,
    Hit_id VARCHAR(100) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE session (
    session_start TIME NOT NULL,
    session_end TIME NOT NULL,
    session_timeout boolean NULL,
-   worker_id VARCHAR(50) NOT NULL,
+   worker_id bigint NOT NULL,
    FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id)
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE click (
 
 CREATE TABLE user_tweet_ass (
    tweet_id bigint,
-   worker_id VARCHAR(50) NOT NULL,
+   worker_id bigint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
    PRIMARY KEY (worker_id,tweet_id)

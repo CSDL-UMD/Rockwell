@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, url_for, redirect
 #import oauth2 as oauth
 #import urllib.request
+import requests
 from requests_oauthlib import OAuth1Session
 #import requests
 #import urllib.parse
@@ -117,13 +118,19 @@ def callback():
     real_oauth_token = access_token[0].split("=")[1]
     real_oauth_token_secret = access_token[1].split("=")[1]
     user_id = access_token[2].split("=")[1]
+    screen_name = access_token[3].split("=")[1]
+
+    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id)+'&screen_name='+str(screen_name))
+    worker_id = resp_worker_id.json()["data"]
+
+    print(worker_id)
 
     del oauth_store[oauth_token]
 
     #redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
     print(real_oauth_token,real_oauth_token_secret)
 
-    return render_template('placeholder.html', access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
+    return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
 
 @app.errorhandler(500)
 def internal_server_error(e):

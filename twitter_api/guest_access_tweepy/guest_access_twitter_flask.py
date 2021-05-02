@@ -26,10 +26,9 @@ def get_feed():
 
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
+	worker_id = request.args.get('worker_id')
 	cred = {}
-	worker_id = 3
-	twitter_id = 24678965
-	resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id)+'&twitter_id='+str(twitter_id))
+	resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
 	session_id = resp_session_id.json()["data"]
 
 	f = open("guest_credentials_2.txt")
@@ -279,7 +278,7 @@ def get_feed():
 			'experiment_group':'var1',
 			'post_id':i,
 			'tweet_id':str(tweet["id"]),
-			'class':'cohort', # Can we remove this from the pipeline to save the amount of data transferred slightly?
+			'session_id':str(session_id),
 			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,

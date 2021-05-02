@@ -38,6 +38,7 @@ block content
     //  i.big.photo.link.icon
     
     -var ii = 0;
+    input(type='hidden', id='session_input', name=script[0].session_id, value=_csrf)
     each val in script
       -ii = ii + 1
       -console.log(ii)
@@ -103,7 +104,7 @@ block content
           if val.picture_heading.length > 3
             //Place the loop going through embeded images here presumably above the buttons and any articles.
             //.img.post
-            a(href=val.urls target="_blank")
+            a(href=val.urls,target="_blank",onclick='link_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.urls + ', True \')')
               //img.post(src="/"+val.picture)
               //img(src='/public/picture.svg', data-src="/post_pictures/"+val.picture, style="max-width:100%;width:100%;")
               //img.lazyload(data-src=val.picture, style="max-width:100%;width:100%;height:100%")
@@ -118,12 +119,12 @@ block content
               .content
                 .description=val.picture_description
         .three.ui.bottom.attached.icon.buttons
-          .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + '\')')
+          .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
             i.reply.icon
             |  Retweet
           a.ui.basic.red.left.pointing.label.count=val.retweets
           //if val.like
-          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
+          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
           //    .ui.red.like.button
           //      i.heart.icon
           //      |  Like
@@ -134,7 +135,7 @@ block content
           //      i.heart.icon
           //      |  Like
           //    a.ui.basic.red.left.pointing.label.count=val.likes
-          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
+          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
             i.reply.icon
             |  Like
           a.ui.basic.red.left.pointing.label.count=val.likes
@@ -147,6 +148,7 @@ block content
         |  End of Posts for the last 48 hours.
 
     script.
+      set_session_id(document.getElementById('session_input').getAttribute("name"));
       function calSizeList(onresize){
         //sizeList.length = 0;
         sizeList = [];
@@ -247,18 +249,19 @@ block content
     br
     .ui.tiny.post.modal()
       i.close.icon
-      .header Add a New Post
-      .content
-        form#postform.ui.feed.form(action='/post/new', method='POST', enctype='multipart/form-data')
-          input(type='hidden', name='_csrf', value=_csrf)
-          .field
-            textarea(rows='2', placeholder='Share your meal', name='body')
-          .field.image-upload
-            label(for='picinput')
-              .image.content
-                img#imgInp.ui.fluid.image(src='/public/photo-camera.svg')
-            //-input#picinput(type='file', accept='image/*', capture='camera', name='picinput')
-            input#picinput(type='file', accept='image/*', name='picinput')
-          .ui.error.message
-      .actions
-        input.ui.green.button(type='submit', name="foo", value='Submit', form='postform')
+      h1 Thank you for partcipating!!!
+      //.header Thank You!!!
+      //.content
+      //  form#postform.ui.feed.form(action='/post/new', method='POST', enctype='multipart/form-data')
+      //    input(type='hidden', name='_csrf', value=_csrf)
+      //    .field
+      //      textarea(rows='2', placeholder='Share your meal', name='body')
+      //    .field.image-upload
+      //      label(for='picinput')
+      //        .image.content
+      //          img#imgInp.ui.fluid.image(src='/public/photo-camera.svg')
+      //      //-input#picinput(type='file', accept='image/*', capture='camera', name='picinput')
+      //      input#picinput(type='file', accept='image/*', name='picinput')
+      //    .ui.error.message
+      //.actions
+      //  input.ui.green.button(type='submit', name="foo", value='Submit', form='postform')

@@ -52,7 +52,8 @@ exports.getScript = (req, res, next) => {
                       experiment_group: feed[i].experiment_group,
                       post_id: feed[i].post_id,
                       tweet_id: feed[i].tweet_id,
-                      class: feed[i].class, // Hard code this to "cohort" and save on json size?
+                      session_id: feed[i].session_id,
+                      class: "cohort",
                       picture: feed[i].picture,
                       picture_heading: feed[i].picture_heading,
                       picture_description: feed[i].picture_description,
@@ -113,7 +114,8 @@ exports.getScript = (req, res, next) => {
         //console.log(req);
         oauthAccessToken = req.query.access_token
         oauthAccessTokenSecret = req.query.access_token_secret
-        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret,oauthAccessToken,oauthAccessTokenSecret);
+        workerid = req.query.worker_id
+        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid,oauthAccessToken,oauthAccessTokenSecret);
 
 }
 exports.getScript_prev = (req, res, next) => {
