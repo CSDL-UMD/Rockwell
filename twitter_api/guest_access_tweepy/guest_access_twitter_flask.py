@@ -110,13 +110,14 @@ def get_feed():
 				actor_picture = tweet["retweeted_status"]["quoted_status"]["user"]["profile_image_url"]
 				tempLikes = tweet["retweeted_status"]["quoted_status"]["favorite_count"]
 				isQuote = True
+				
 			except: # if its not a quote default to normal retweet settings
 				actor_name = tweet["retweeted_status"]["user"]["name"] # original tweeter info used below.
 				actor_username = tweet["retweeted_status"]["user"]["screen_name"]
 				actor_picture = tweet["retweeted_status"]["user"]["profile_image_url"]
 				tempLikes = tweet["retweeted_status"]["favorite_count"]
 				isRetweet = True
-
+			isRetweet = True
 		except:
 			isRetweet = False
 
