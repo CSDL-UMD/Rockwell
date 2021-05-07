@@ -53,7 +53,7 @@ async def queueLoop() -> None: # async so it doesnt interfere with the rest of t
 def insert_tweet():
     try:
         #Getting connection from pool
-        tweet_id = int(request.args.get('tweet_id'))
+        tweet_ids = request.json
         connection = None
         try: 
             connection = accessPool.getconn()
@@ -61,18 +61,22 @@ def insert_tweet():
             print("NO CONNECTION")
             connection = False
         if connection is not False:
-            sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
-            try:
-                conn_cur = connection.cursor()
-                conn_cur.execute(sql, (tweet_id,))
-                #returnData = conn_cur.fetchall()
-                #conn_cur.commit()
-                conn_cur.close()
-                connection.commit()
-                accessPool.putconn(connection) #closing the connection
-            except Exception as error:# (Exception, psycopg2.DatabaseError) as error:
-                print("ERROR!!!!",error)
-        else:
+            for tweet_id in tweet_ids:
+                sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
+                try:
+                    conn_cur = connection.cursor()
+                    for tweet_id in tweet_ids:
+                        sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
+                        conn_cur.execute(sql, (tweet_id,))
+                        #returnData = conn_cur.fetchall()
+                        #conn_cur.commit()
+                        # Have to test to make sure I dont have to open and close the cursor each time here. If commit flushes the buffer we are fine.
+                        connection.commit()
+                    conn_cur.close()
+                    accessPool.putconn(connection) #closing the connection
+                except Exception as error:# (Exception, psycopg2.DatabaseError) as error:
+                    print("ERROR!!!!",error)
+        else: # not being used currently but this suggest pool overflow.
             data = []
             data.append("insert_tweet")
             data.append(tweet_id)
@@ -92,18 +96,21 @@ def insert_tweet_session(): # This will take many arguments and takes logic in t
         #Getting connection from pool
         connection = accessPool.getconn()
         if connection is not False:
-            fav_before = request.args.get('fav_before')
-            sid = request.args.get('sid')
-            tid = request.args.get('tid')
-            rtbefore = request.args.get('rtbefore')
-            rank = request.args.get('rank')
-            sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
-            VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+            payload = request.json
             cursor = connection.cursor()
-            cursor.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,)) # could pass False directly maybe? not sure if it will translate right
-            #returnData = cursor.fetchall()
+            for obj in payload:
+                # continue here
+                fav_before = obj['fav_before']
+                sid = obj['sid']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                rank = obj['rank']
+                sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+                cursor.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
+                #returnData = cursor.fetchall()
+                connection.commit()
             cursor.close()
-            connection.commit()
             accessPool.putconn(connection) #closing the connection
         else:   #Indicates the pool is full
             print("Coming here")
