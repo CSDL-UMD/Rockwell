@@ -169,31 +169,32 @@ def get_feed():
 			if "urls" in entities_keys:
 				all_urls = tweet["entities"]["urls"]
 
-			# Redesigned block to retrieve the Cardinfo data.
-		if "urls" in entities_keys:
-			for each_url in all_urls:
-				urls_list.append(each_url["url"])
-				expanded_urls_list.append(each_url["expanded_url"])
-			urls = ",".join(urls_list)
-			expanded_urls = ",".join(expanded_urls_list)
-		if len(expanded_urls_list) > 0 and not isQuote: # not isQuote is to save time in the case of a quote. no card needed
-			card_url = expanded_urls_list[0]
-			card_data = Cardinfo.getCardData(card_url)
-			if "image" in card_data.keys():
-				image_raw = card_data['image']
-				picture_heading = card_data["title"]
-				picture_description = card_data["description"]
+			# Redesigned block to retrieve the Cardinfo data. Old placement and OG version.
+		#if "urls" in entities_keys:
+		#	for each_url in all_urls:
+		#		urls_list.append(each_url["url"])
+		#		expanded_urls_list.append(each_url["expanded_url"])
+		#	urls = ",".join(urls_list)
+		#	expanded_urls = ",".join(expanded_urls_list)
+		#if len(expanded_urls_list) > 0 and not isQuote: # not isQuote is to save time in the case of a quote. no card needed
+		#	card_url = expanded_urls_list[0]
+		#	card_data = Cardinfo.getCardData(card_url)
+		#	if "image" in card_data.keys():
+		#		image_raw = card_data['image']
+		#		picture_heading = card_data["title"]
+		#		picture_description = card_data["description"]
 
 
 
 		# Embedded image retrieval (edited to handle retweets also now)
-
+		hasEmbed = False
 		eimage = []
 		try: # Not sure why this has an issue all of a sudden.
 			flag_image = False   
 			if len(mediaArr) > 0:    
 				for x in range(len(mediaArr)):
 					if mediaArr[x]['type'] == 'photo':
+						hasEmbed = True
 						if "sizes" in mediaArr[x].keys():
 							if "small" in mediaArr[x]["sizes"].keys():
 								small_width = int(mediaArr[x]["sizes"]["small"]["w"])
@@ -217,6 +218,21 @@ def get_feed():
 			print(error)
 			eimage[0] = ""
 
+
+			# Redesigned block to retrieve the Cardinfo data.
+		if "urls" in entities_keys and not hasEmbed:
+			for each_url in all_urls:
+				urls_list.append(each_url["url"])
+				expanded_urls_list.append(each_url["expanded_url"])
+			urls = ",".join(urls_list)
+			expanded_urls = ",".join(expanded_urls_list)
+		if len(expanded_urls_list) > 0 and not isQuote and not hasEmbed: # not isQuote is to save time in the case of a quote. no card needed
+			card_url = expanded_urls_list[0]
+			card_data = Cardinfo.getCardData(card_url)
+			if "image" in card_data.keys():
+				image_raw = card_data['image']
+				picture_heading = card_data["title"]
+				picture_description = card_data["description"]
 		#if isRetweet:
 			#print("Is a retweet.")
 
