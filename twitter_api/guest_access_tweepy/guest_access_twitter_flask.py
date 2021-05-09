@@ -69,6 +69,8 @@ def get_feed():
 #		os.remove(file)
 	#dbwrite = access_object.access_object() # This might be the wrong syntax dont recall.
 	feed_json = []
+	db_tweet_payload = []
+	db_tweet_session_payload = []
 	tweet_ids_seen = []
 	i = 1
 	for tweet in public_tweets:
@@ -78,9 +80,19 @@ def get_feed():
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
-		dictToSend = {'tweet_id':tweet["id"]}
-		requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
-		requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
+		db_tweet = {'tweet_id':tweet["id"]}
+		db_tweet_payload.append(db_tweet)
+		db_tweet_session = {
+			'fav_before':str(tweet['favorited']),
+			'sid':str(session_id),
+			'tid':str(tweet["id"]),
+			'rtbefore':str(tweet['retweeted']),
+			'rank':str(i)
+		}
+		db_tweet_session_payload.append(db_tweet_session)
+
+		#requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
+		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
 		#print("Response : ")sid
 		#print(res)
 
@@ -315,6 +327,8 @@ def get_feed():
 		feed_json.append(feed)
 		i = i + 1
 
+	requests.post('http://127.0.0.1:5052/insert_tweet',json=db_tweet_payload)
+	requests.post('http://127.0.0.1:5052/insert_tweet_session',json=db_tweet_session_payload)
 	return jsonify(feed_json) # What is this doing?? Is this where we are sending the json of our feed_json to the other script?
 
 @app.after_request

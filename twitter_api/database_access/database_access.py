@@ -53,7 +53,7 @@ async def queueLoop() -> None: # async so it doesnt interfere with the rest of t
 def insert_tweet():
     try:
         #Getting connection from pool
-        tweet_ids = request.json
+        payload = request.json
         connection = None
         try: 
             connection = accessPool.getconn()
@@ -61,21 +61,20 @@ def insert_tweet():
             print("NO CONNECTION")
             connection = False
         if connection is not False:
-            for tweet_id in tweet_ids:
-                sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
-                try:
-                    conn_cur = connection.cursor()
-                    for tweet_id in tweet_ids:
-                        sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
-                        conn_cur.execute(sql, (tweet_id,))
-                        #returnData = conn_cur.fetchall()
-                        #conn_cur.commit()
-                        # Have to test to make sure I dont have to open and close the cursor each time here. If commit flushes the buffer we are fine.
-                        connection.commit()
-                    conn_cur.close()
-                    accessPool.putconn(connection) #closing the connection
-                except Exception as error:# (Exception, psycopg2.DatabaseError) as error:
-                    print("ERROR!!!!",error)
+            try:
+                conn_cur = connection.cursor()
+                for obj in payload:
+                    tweet_id = obj['tweet_id']
+                    sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
+                    conn_cur.execute(sql, (tweet_id,))
+                    #returnData = conn_cur.fetchall()
+                    #conn_cur.commit()
+                    # Have to test to make sure I dont have to open and close the cursor each time here. If commit flushes the buffer we are fine.
+                    connection.commit()
+                conn_cur.close()
+                accessPool.putconn(connection) #closing the connection
+            except Exception as error:# (Exception, psycopg2.DatabaseError) as error:
+                print("ERROR!!!!",error)
         else: # not being used currently but this suggest pool overflow.
             data = []
             data.append("insert_tweet")
