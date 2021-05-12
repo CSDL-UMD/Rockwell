@@ -338,9 +338,12 @@ def get_feed():
 		}
 		feed_json.append(feed)
 		i = i + 1
-
-	requests.post('http://127.0.0.1:5052/insert_tweet',json=db_tweet_payload)
-	requests.post('http://127.0.0.1:5052/insert_tweet_session',json=db_tweet_session_payload)
+	finalJson = []
+	finalJson.append(db_tweet_payload)
+	finalJson.append(db_tweet_session_payload)
+	finalJson.append(worker_id)
+	requests.post('http://127.0.0.1:5052/insert_tweet',json=finalJson)
+	#requests.post('http://127.0.0.1:5052/insert_tweet_session',json=db_tweet_session_payload)
 	return jsonify(feed_json) # What is this doing?? Is this where we are sending the json of our feed_json to the other script?
 
 @app.after_request

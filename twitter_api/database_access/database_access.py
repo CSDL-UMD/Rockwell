@@ -80,7 +80,7 @@ def insert_tweet():
                 sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
                 conn_cur.execute(sql, (tweet_id,))
             connection.commit()
-            worker_id = payload[2]['worker_id']
+            worker_id = payload[2]
             for obj in payload[0]: # User_tweet_ass
                 tweet_id = obj['tweet_id']
                 sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id) VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
@@ -123,18 +123,17 @@ def insert_tweet_async():
             continue
         tries = -1
         try:
-            cur1 = connection.cursor()
-            cur2 = connection.cursor()
-            cur3 = connection.cursor()
-            tasks = []
-            loop = asyncio.get_event_loop()
-            tasks.append(loop.create_task(insert_async_tweet(payload[0],cur1)))
-            tasks.append(loop.create_task(user_tweet_ass(payload[0],payload[2]["worker_id"], cur2)))            
-            tasks.append(loop.create_task(tweet_session(payload[1],cur3)))
+            #cur1 = connection.cursor()
+            #cur2 = connection.cursor()
+            #cur3 = connection.cursor()
+            #tasks = []
+            #loop = asyncio.get_event_loop()
+            #tasks.append(loop.create_task(insert_async_tweet(payload[0],cur1)))
+            #tasks.append(loop.create_task(user_tweet_ass(payload[0],payload[2]["worker_id"], cur2)))            
+            #tasks.append(loop.create_task(tweet_session(payload[1],cur3)))
             #loop.run_until_complete(main())
-            loop.run_until_complete(asyncio.wait(tasks))
-            connection.commit()
-            accessPool.putconn(connection)
+            #loop.run_until_complete(asyncio.wait(tasks))
+            asyncio.run(run_tasks(payload,connection))
 
         
         except Exception as error:
@@ -142,6 +141,21 @@ def insert_tweet_async():
 
     print("TOTAL RUN TIME: ASYNCRONUS: " +str(time.time() - start_time) )
     return "Done"
+
+async def run_tasks(payload,connection):
+    cur1 = connection.cursor()
+    cur2 = connection.cursor()
+    cur3 = connection.cursor()
+    await asyncio.gather (
+        insert_async_tweet(payload[0],cur1),
+        user_tweet_ass(payload[0],payload[2], cur2),
+        tweet_session(payload[1],cur3)
+    )
+    connection.commit()
+    cur1.close()
+    cur2.close()
+    cur3.close()
+    accessPool.putconn(connection)
 
 async def insert_async_tweet(tweets, conn_cur) -> None:
     for obj in tweets:
