@@ -1,6 +1,7 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 #import tweepy
 from requests_oauthlib import OAuth1Session
+from configparser import ConfigParser
 import requests
 import json
 from flask import Flask, render_template, request, url_for, jsonify
@@ -8,6 +9,23 @@ from flask import Flask, render_template, request, url_for, jsonify
 app = Flask(__name__)
 
 app.debug = False
+
+def config(filename,section):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 @app.route('/retweet', methods=['POST'])
 def retweet():
@@ -17,12 +35,7 @@ def retweet():
     session_id = data_arg.split(',')[1].strip()
     access_token = data_arg.split(',')[2].strip()
     access_token_secret = data_arg.split(',')[3].strip()
-    cred = {}
-    f = open("guest_credentials_2.txt")
-    for line in f:
-        name, value = line.split(":")
-        cred[name] = value.strip()
-    f.close()
+    cred = config('../../config.ini','twitterapp')
 
     #auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
     #auth.set_access_token(cred["token"], cred["token_secret"])
@@ -50,12 +63,7 @@ def like():
     session_id = data_arg.split(',')[1].strip()
     access_token = data_arg.split(',')[2].strip()
     access_token_secret = data_arg.split(',')[3].strip()
-    cred = {}
-    f = open("guest_credentials_2.txt")
-    for line in f:
-        name, value = line.split(":")
-        cred[name] = value.strip()
-    f.close()
+    cred = config('../../config.ini','twitterapp')
 
     #auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
     #auth.set_access_token(cred["token"], cred["token_secret"])

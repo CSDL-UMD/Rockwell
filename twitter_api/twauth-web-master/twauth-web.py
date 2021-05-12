@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, url_for, redirect
 #import urllib.request
 import requests
 from requests_oauthlib import OAuth1Session
+from configparser import ConfigParser
 #import requests
 #import urllib.parse
 #import urllib.error
@@ -29,10 +30,25 @@ truman_url = 'http://127.0.0.1:3000'
 # config.cfg should look like:
 # APP_CONSUMER_KEY = 'API_Key_from_Twitter'
 # APP_CONSUMER_SECRET = 'API_Secret_from_Twitter'
-app.config.from_pyfile('config.cfg', silent=True)
 
 oauth_store = {}
 
+def config(filename,section):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 #@app.route('/')
 #def hello():
@@ -52,7 +68,8 @@ def start():
     resp, content = client.requests(request_token_url, "POST", body=urllib.parse.urlencode({
                                    "oauth_callback": app_callback_url}))
     """
-    request_token = OAuth1Session(client_key=app.config['APP_CONSUMER_KEY'],client_secret=app.config['APP_CONSUMER_SECRET'])
+    cred = config('../../config.ini','twitterapp')
+    request_token = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'])
     content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url})
     
     #if resp['status'] != '200':
@@ -106,8 +123,8 @@ def callback():
 
     #resp, content = client.request(access_token_url, "POST")
     
-    oauth_access_tokens = OAuth1Session(client_key=app.config['APP_CONSUMER_KEY'],client_secret=app.config['APP_CONSUMER_SECRET'],
-        resource_owner_key=oauth_token,resource_owner_secret=oauth_token_secret,verifier=oauth_verifier)
+    cred = config('../../config.ini','twitterapp')
+    oauth_access_tokens = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'],resource_owner_key=oauth_token,resource_owner_secret=oauth_token_secret,verifier=oauth_verifier)
     content = oauth_access_tokens.post(access_token_url)  
 
     #access_token = dict(urllib.parse.parse_qsl(content))
