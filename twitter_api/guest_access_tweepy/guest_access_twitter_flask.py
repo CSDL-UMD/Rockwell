@@ -13,6 +13,7 @@ import requests
 #import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
+from configparser import ConfigParser
 import xml
 import xml.sax.saxutils
 #import requests as rq
@@ -21,21 +22,32 @@ app = Flask(__name__)
 
 app.debug = False
 
+def config(filename,section):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
+
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	worker_id = request.args.get('worker_id')
-	cred = {}
+	cred = config('../../config.ini','twitterapp')
 	resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
 	session_id = resp_session_id.json()["data"]
-
-	f = open("guest_credentials_2.txt")
-	for line in f:
-	    name, value = line.split(":")
-	    cred[name] = value.strip()
-	f.close()
 
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
