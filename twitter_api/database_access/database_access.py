@@ -11,8 +11,8 @@ pool_is_full = False
 MIN = 5
 MAX = 100
 universal_buffer = []
-params = config()
-accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host="early-database-truman.c8wc9kfclicm.us-east-2.rds.amazonaws.com",database="metrics",user="platform_manager",password="xZw53AbD",port="5432")# Maybe make 2 pools and half the functions use each or make this one huge.
+params = config('../../config.ini','postgresql')
+accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host=params["host"],database=params["database"],user=params["user"],password=params["password"],port=params["port"])# Maybe make 2 pools and half the functions use each or make this one huge.
 print("Access Pool object")
 print(accessPool)
 app = Flask(__name__)
@@ -71,6 +71,7 @@ def insert_tweet():
             time.sleep(0.2)
             tries = tries - 1
             continue
+        tries = -1
         try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
             conn_cur = connection.cursor()
             # We can also async all 3 of these 
@@ -79,7 +80,7 @@ def insert_tweet():
                 sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
                 conn_cur.execute(sql, (tweet_id,))
             connection.commit()
-            worker_id = payload[3]
+            worker_id = payload[2]['worker_id']
             for obj in payload[0]: # User_tweet_ass
                 tweet_id = obj['tweet_id']
                 sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id) VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
@@ -102,7 +103,7 @@ def insert_tweet():
         except Exception as error:
             print(str(error) + " Something inside of the insertion failed.") # Log this.
     print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
-    return None # make sure this doesnt have to be arbitrary text, none might cause an error?
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
 
 @app.route('/insert_tweet_async', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
 def insert_tweet_async():
@@ -113,24 +114,25 @@ def insert_tweet_async():
         payload = request.json
     except:
         print("Failed to recieve the JSON package.") # Log this
-        return None
+        return "Failed"
     while(tries > 0):
         connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
         if connection is None:
             time.sleep(0.2)
             tries = tries - 1
             continue
+        tries = -1
         try:
             cur1 = connection.cursor()
             cur2 = connection.cursor()
             cur3 = connection.cursor()
             tasks = []
-            tasks.append(asyncio.create_task(insert_async_tweet(payload[0],cur1)))
-            tasks.append(asyncio.create_task(user_tweet_ass(payload[0],payload[3], cur2)))            
-            tasks.append(asyncio.create_task(tweet_session(payload[1],cur3)))
             loop = asyncio.get_event_loop()
+            tasks.append(loop.create_task(insert_async_tweet(payload[0],cur1)))
+            tasks.append(loop.create_task(user_tweet_ass(payload[0],payload[2]["worker_id"], cur2)))            
+            tasks.append(loop.create_task(tweet_session(payload[1],cur3)))
             #loop.run_until_complete(main())
-            loop.run_until_complete(*tasks)
+            loop.run_until_complete(asyncio.wait(tasks))
             connection.commit()
             accessPool.putconn(connection)
 
@@ -139,7 +141,7 @@ def insert_tweet_async():
             print("Big issue: " + str(error))
 
     print("TOTAL RUN TIME: ASYNCRONUS: " +str(time.time() - start_time) )
-    return None
+    return "Done"
 
 async def insert_async_tweet(tweets, conn_cur) -> None:
     for obj in tweets:
