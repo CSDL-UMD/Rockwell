@@ -184,6 +184,41 @@ async def tweet_session(tweets, conn_cur) -> None:
         conn_cur.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
 
 
+# New functions for the checking of existing tweets for a worker_id tweet_id relationship.
+
+@app.route('/get_existing_tweets', methods=['POST']) # Should the method be GET?
+def get_worker_tweet():
+    tries = 5
+    connection = None
+    worker_id = ''
+    try:
+        #Getting connection from pool
+        worker_id = request.args.get('worker_id')
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        sql = """SELECT tweet_id FROM user_ass_tweet UA, WHERE UA.worker_id = ?;"""
+        conn_cur.execute(sql, (worker_id))     
+        if conn_cur.rowcount > 0:
+            ret = conn_cur.fetchall()
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return ret
+        else:
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return None #Meaning we need to fetch new tweets.
+
+
 #@app.route('/insert_tweet_session', methods=['POST'])
 #def insert_tweet_session(): # This will take many arguments and takes logic in the guest access twitter to work
 #    favorite_now = False
