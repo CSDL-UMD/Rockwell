@@ -41,36 +41,39 @@ def config(filename,section):
 
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
-
-	access_token = request.args.get('access_token')
-	access_token_secret = request.args.get('access_token_secret')
+	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
+	public_tweets = None
 	worker_id = request.args.get('worker_id')
-	cred = config('../../config.ini','twitterapp')
-	resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
-	session_id = resp_session_id.json()["data"]
+	public_tweets = requests.post('http://127.0.0.1:5052/get_existing_tweets',worker_id=worker_id) # This definetely doesnt work right now.
+	if(public_tweets is None):
+		access_token = request.args.get('access_token')
+		access_token_secret = request.args.get('access_token_secret')
+		cred = config('../../config.ini','twitterapp')
+		resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
+		session_id = resp_session_id.json()["data"]
 
-	cred['token'] = access_token.strip()
-	cred['token_secret'] = access_token_secret.strip()
+		cred['token'] = access_token.strip()
+		cred['token_secret'] = access_token_secret.strip()
 
-	'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
-	auth.set_access_token(cred["token"], cred["token_secret"])
-	api = tweepy.API(auth)
+		'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
+		auth.set_access_token(cred["token"], cred["token_secret"])
+		api = tweepy.API(auth)
 
-	countt = 20
+		countt = 20
 
-	public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
-	'''
-	oauth = OAuth1Session(cred['key'],
-                       client_secret=cred['key_secret'],
-                       resource_owner_key=cred['token'],
-                       resource_owner_secret=cred['token_secret'])
-	#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
-	params = {"count": "20","tweet_mode": "extended"}
-	response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
-	public_tweets = json.loads(response.text)
-	#print(tweets)
-	if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
-		print("Rate limit exceeded.")
+		public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
+		'''
+		oauth = OAuth1Session(cred['key'],
+						client_secret=cred['key_secret'],
+						resource_owner_key=cred['token'],
+						resource_owner_secret=cred['token_secret'])
+		#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
+		params = {"count": "20","tweet_mode": "extended"}
+		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
+		public_tweets = json.loads(response.text)
+		#print(tweets)
+		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
+			print("Rate limit exceeded.")
 #	fileList = glob.glob("../post_pictures/*.jpg")
 #	fileList_actor = glob.glob("../profile_pictures/*.jpg")
 
@@ -85,7 +88,8 @@ def get_feed():
 	db_tweet_session_payload = []
 	tweet_ids_seen = []
 	i = 1
-	for tweet in public_tweets:
+	for tweet in public_tweets: # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
+
 		if tweet["id"] in tweet_ids_seen:
 			continue
 		tweet_ids_seen.append(tweet["id"])
