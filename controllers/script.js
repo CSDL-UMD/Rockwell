@@ -4,6 +4,8 @@ const Notification = require('../models/Notification');
 const python_json = require('../public/js/retweet.js');
 const _ = require('lodash');
 const axx = require('axios');
+const fs = require('fs');
+const today = new Date();
 
 function shuffle(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
@@ -35,6 +37,10 @@ exports.getScript = (req, res, next) => {
   function makeGetRequest(path,access_token,access_token_secret) { 
             axx.get(path).then( 
               (response) => { 
+                if(!response){ // If the response is empty something went wrong. Maybe ask for error code instead? Not sure of the best way, consult Saumya.
+                  log_error(error,[]);
+                  return;
+                }
                 var result = response.data;
                 feed = JSON.parse(JSON.stringify(result));
                 script_feed = []
@@ -95,8 +101,8 @@ exports.getScript = (req, res, next) => {
               //console.log("Script Size is now: "+finalfeed.length);
               res.render('script', { script: script_feed});
             }, 
-            (error) => { 
-              console.log(error); 
+            (error) => { // here we had an error calling guest access twitter.
+              log_error(error,[]); 
             } 
           ); 
         }
@@ -112,12 +118,30 @@ exports.getScript = (req, res, next) => {
         
         //const { oauthAccessToken, oauthAccessTokenSecret } = req.session
         //console.log(req);
-        oauthAccessToken = req.query.access_token
-        oauthAccessTokenSecret = req.query.access_token_secret
-        workerid = req.query.worker_id
-        makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid,oauthAccessToken,oauthAccessTokenSecret);
-
+        // The lines below mean we had an error gettings these from the authorizer/guest access
+        try {
+          oauthAccessToken = req.query.access_token
+          oauthAccessTokenSecret = req.query.access_token_secret
+          workerid = req.query.worker_id
+          makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid,oauthAccessToken,oauthAccessTokenSecret);
+        } catch (err) {
+          log_error(err, ["accesstoken: ",oauthAccessToken, " tokensecret: ",oauthAccessTokenSecret, " workerid: ",workerid]);
+        }
 }
+
+// function to handle errors, pass extra info as an array to otherInfo.
+function log_error(err, otherInfo) {
+  var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+  var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+  var error = '\n' + date + " " + time + ' Relevant information: ' + otherInfo + '\n' + err + '\n';
+
+  fs.appendFile('./' + date + '.txt', error, function (err2) {
+    if (err2) console.log("Log failed to log..." + err2);
+    else console.log("Error handled and saved to log at: " + date + " " + time);
+});
+}
+
+
 exports.getScript_prev = (req, res, next) => {
 
   //req.user.createdAt
