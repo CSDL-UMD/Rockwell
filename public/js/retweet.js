@@ -6,7 +6,7 @@ function set_session_id(sid) {
   session_id = sid;
 }
 
-function retweet_clicked(arguments) {
+function retweet_clicked(btn,arguments) {
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
   //var process = spawn('python',["./Retweet.py", 
@@ -19,17 +19,23 @@ function retweet_clicked(arguments) {
   //  console.log('After Spawn');
     // ... use spawn()
   //});
-  $.ajax({
+  if(btn.innerHTML != 'Retweeted'){
+    btn.innerHTML='Retweeted';
+    btn.style.color = 'red';
+    var tweet_id = arguments.split(',')[0].trim();
+    document.getElementById('retweet_counter_'+tweet_id).innerHTML = parseInt(document.getElementById('retweet_counter_'+tweet_id).innerHTML) + 1
+    $.ajax({
             url: "http://127.0.0.1:5050/retweet",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({"arguments": String(arguments)})        
-        }).done(function(data) {
+          }).done(function(data) {
             console.log(data);
-        });    
+          });
+  }    
 }
 
-function like_clicked(arguments) {
+function like_clicked(btn,arguments) {
 
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
@@ -43,14 +49,20 @@ function like_clicked(arguments) {
   //  console.log('After Spawn');
     // ... use spawn()
   //});
-  $.ajax({
+  if(btn.innerHTML != 'Liked'){
+    btn.innerHTML='Liked';
+    btn.style.color = 'red';
+    var tweet_id = arguments.split(',')[0].trim();
+    document.getElementById('like_counter_'+tweet_id).innerHTML = parseInt(document.getElementById('like_counter_'+tweet_id).innerHTML) + 1
+    $.ajax({
             url: "http://127.0.0.1:5050/like",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({"arguments": String(arguments)})        
-        }).done(function(data) {
+          }).done(function(data) {
             console.log(data);
-        });    
+          });
+  }    
 }
 
 function link_clicked(arguments) {

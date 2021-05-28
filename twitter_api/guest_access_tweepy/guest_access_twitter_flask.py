@@ -1,5 +1,6 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
+import re
 #import random
 #import string
 #import glob
@@ -44,7 +45,8 @@ def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
-	public_tweets = requests.post('http://127.0.0.1:5052/get_existing_tweets',worker_id=worker_id) # This definetely doesnt work right now.
+	public_tweets = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
+	public_tweets = None
 	if(public_tweets is None):
 		access_token = request.args.get('access_token')
 		access_token_secret = request.args.get('access_token_secret')
@@ -88,6 +90,9 @@ def get_feed():
 	db_tweet_session_payload = []
 	tweet_ids_seen = []
 	i = 1
+	ff = open('tweets_full_text.txt','w')
+	#print(json.dumps(public_tweets[0], indent=4, sort_keys=True))
+
 	for tweet in public_tweets: # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
 
 		if tweet["id"] in tweet_ids_seen:
@@ -96,7 +101,10 @@ def get_feed():
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
-		db_tweet = {'tweet_id':tweet["id"]}
+		db_tweet = {
+			'tweet_id':tweet["id"],
+			'tweet_json':tweet
+		}
 		db_tweet_payload.append(db_tweet)
 		db_tweet_session = {
 			'fav_before':str(tweet['favorited']),
@@ -106,13 +114,51 @@ def get_feed():
 			'rank':str(i)
 		}
 		db_tweet_session_payload.append(db_tweet_session)
-
 		#requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
 		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
 		#print("Response : ")sid
 		#print(res)
 
 		full_text = tweet["full_text"]
+		url_start = []
+		url_end = []
+		url_display = []
+		url_extend = []
+		url_actual = []
+		if "entities" in tweet.keys():
+			if "urls" in tweet["entities"]:
+				for url_dict in tweet["entities"]["urls"]:
+					url_start.append(url_dict["indices"][0])
+					url_end.append(url_dict["indices"][1])
+					url_display.append(url_dict["display_url"])
+					url_extend.append(url_dict["expanded_url"])
+					url_actual.append(url_dict["url"])
+
+		last_url_arr = re.findall("(?P<url>https?://[^\s]+)", full_text)
+		if last_url_arr:
+			last_url = last_url_arr[-1]
+			if last_url not in url_actual:
+				full_text = full_text.replace(last_url,'')
+
+		full_text_json = []
+		
+		if url_actual:
+			normal_idx = 0
+			url_idx = 0
+			for i in range(len(url_start)):
+				url_idx_start = url_start[i]
+				full_text_json.append({"text":full_text[normal_idx:url_idx_start],"url":""})
+				full_text_json.append({"text":url_display[i],"url":url_extend[i]})
+				normal_idx = url_end[i]
+			if normal_idx < len(full_text):
+				full_text_json.append({"text":full_text[normal_idx:len(full_text)],"url":""})
+		else:
+			full_text_json.append({"text":full_text,"url":""})
+		
+		ff.write(full_text)
+		ff.write("\n")
+		ff.write("\n".join(json.dumps(ffjson) for ffjson in full_text_json))
+		ff.write("\n")
 		isRetweet = False 
 		retweeted_by = ""
 		actor_picture = tweet["user"]["profile_image_url"]
@@ -257,10 +303,11 @@ def get_feed():
 		if len(expanded_urls_list) > 0 and not isQuote and not hasEmbed: # not isQuote is to save time in the case of a quote. no card needed
 			card_url = expanded_urls_list[0]
 			card_data = Cardinfo.getCardData(card_url)
-			if "image" in card_data.keys():
-				image_raw = card_data['image']
-				picture_heading = card_data["title"]
-				picture_description = card_data["description"]
+			if card_data:
+				if "image" in card_data.keys():
+					image_raw = card_data['image']
+					picture_heading = card_data["title"]
+					picture_description = card_data["description"]
 		#if isRetweet:
 			#print("Is a retweet.")
 
@@ -317,6 +364,7 @@ def get_feed():
 		
 		feed = {
 			'body':body,
+			'body_json':full_text_json,
 			'likes': finalLikes,
 			'urls':urls,
 			'expanded_urls':expanded_urls,
@@ -334,6 +382,8 @@ def get_feed():
 			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
+			'user_retweet': str(tweet['retweeted']),
+			'user_fav': str(tweet['favorited']),
 			'retweet_by': retweeted_by,
 			'quoted_by': quoted_by,
 			'quoted_by_text' : quoted_by_text,

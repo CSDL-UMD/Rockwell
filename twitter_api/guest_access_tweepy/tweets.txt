@@ -1,0 +1,3703 @@
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 18:00:12 +0000 2021",
+    "display_text_range": [
+        0,
+        264
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "nyti.ms/3vtEeIC",
+                "expanded_url": "https://nyti.ms/3vtEeIC",
+                "indices": [
+                    241,
+                    264
+                ],
+                "url": "https://t.co/kGgSFfLZtQ"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 2,
+    "favorited": false,
+    "full_text": "Virus alert apps have been downloaded more than 90 million times. But researchers don't yet know whether the apps\u2019 potential to accurately alert users of virus exposures outweighs potential drawbacks \u2014 like falsely warning unexposed people. https://t.co/kGgSFfLZtQ",
+    "geo": null,
+    "id": 1397975942484660236,
+    "id_str": "1397975942484660236",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 2,
+    "retweeted": false,
+    "source": "<a href=\"http://www.socialflow.com\" rel=\"nofollow\">SocialFlow</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Fri Mar 02 20:41:42 +0000 2007",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News tips? Share them here: https://t.co/ghL9OoYKMM",
+        "entities": {
+            "description": {
+                "urls": [
+                    {
+                        "display_url": "nyti.ms/2FVHq9v",
+                        "expanded_url": "http://nyti.ms/2FVHq9v",
+                        "indices": [
+                            28,
+                            51
+                        ],
+                        "url": "https://t.co/ghL9OoYKMM"
+                    }
+                ]
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "nytimes.com",
+                        "expanded_url": "http://www.nytimes.com/",
+                        "indices": [
+                            0,
+                            22
+                        ],
+                        "url": "http://t.co/ahvuWqicF9"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 18499,
+        "follow_request_sent": false,
+        "followers_count": 49921239,
+        "following": true,
+        "friends_count": 818,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 807095,
+        "id_str": "807095",
+        "is_translation_enabled": true,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 209323,
+        "location": "New York City",
+        "name": "The New York Times",
+        "notifications": false,
+        "profile_background_color": "131516",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme14/bg.gif",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme14/bg.gif",
+        "profile_background_tile": true,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/807095/1584666392",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1098244578472280064/gjkVMelR_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1098244578472280064/gjkVMelR_normal.png",
+        "profile_link_color": "607696",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "EFEFEF",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "nytimes",
+        "statuses_count": 433451,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "http://t.co/ahvuWqicF9",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 18:00:01 +0000 2021",
+    "display_text_range": [
+        0,
+        114
+    ],
+    "entities": {
+        "hashtags": [],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/3fEC7SwLKk",
+                "expanded_url": "https://twitter.com/timesofindia/status/1397975894694629376/photo/1",
+                "id": 1397886129928478723,
+                "id_str": "1397886129928478723",
+                "indices": [
+                    115,
+                    138
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2ZKB2LVIAMmLW3.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2ZKB2LVIAMmLW3.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "medium": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "small": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/3fEC7SwLKk"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/_ttY_b/a24gk",
+                "expanded_url": "http://toi.in/_ttY_b/a24gk",
+                "indices": [
+                    91,
+                    114
+                ],
+                "url": "https://t.co/HiSjETrOW5"
+            }
+        ],
+        "user_mentions": []
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "display_url": "pic.twitter.com/3fEC7SwLKk",
+                "expanded_url": "https://twitter.com/timesofindia/status/1397975894694629376/photo/1",
+                "id": 1397886129928478723,
+                "id_str": "1397886129928478723",
+                "indices": [
+                    115,
+                    138
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2ZKB2LVIAMmLW3.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2ZKB2LVIAMmLW3.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "medium": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "small": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/3fEC7SwLKk"
+            }
+        ]
+    },
+    "favorite_count": 6,
+    "favorited": false,
+    "full_text": "Covid-19: HC asks Delhi govt to consider ex-gratia, job to deceased judicial officers' kin https://t.co/HiSjETrOW5 https://t.co/3fEC7SwLKk",
+    "geo": null,
+    "id": 1397975894694629376,
+    "id_str": "1397975894694629376",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:57:25 +0000 2021",
+    "display_text_range": [
+        0,
+        228
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
+    },
+    "favorite_count": 15,
+    "favorited": false,
+    "full_text": "The legal team has filed habeas corpus petition in Dominica for Mehul Choksi and have also highlighted deprivation of access &amp; constitutional rights to him for legal assistance, Choksi's lawyer Vijay Aggarwal confirms to ANI",
+    "geo": null,
+    "id": 1397975240399998977,
+    "id_str": "1397975240399998977",
+    "in_reply_to_screen_name": "timesofindia",
+    "in_reply_to_status_id": 1397972752414478340,
+    "in_reply_to_status_id_str": "1397972752414478340",
+    "in_reply_to_user_id": 134758540,
+    "in_reply_to_user_id_str": "134758540",
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "retweet_count": 2,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:56:18 +0000 2021",
+    "display_text_range": [
+        0,
+        0
+    ],
+    "entities": {
+        "hashtags": [],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/SF8l88F7gm",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974960862289920/video/1",
+                "id": 1397973271325208576,
+                "id_str": "1397973271325208576",
+                "indices": [
+                    0,
+                    23
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973271325208576/pu/img/delEuhU9ZCeeB5iv.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973271325208576/pu/img/delEuhU9ZCeeB5iv.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "medium": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 376
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/SF8l88F7gm"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "additional_media_info": {
+                    "monetizable": false
+                },
+                "display_url": "pic.twitter.com/SF8l88F7gm",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974960862289920/video/1",
+                "id": 1397973271325208576,
+                "id_str": "1397973271325208576",
+                "indices": [
+                    0,
+                    23
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973271325208576/pu/img/delEuhU9ZCeeB5iv.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973271325208576/pu/img/delEuhU9ZCeeB5iv.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "medium": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 376
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "video",
+                "url": "https://t.co/SF8l88F7gm",
+                "video_info": {
+                    "aspect_ratio": [
+                        37,
+                        67
+                    ],
+                    "duration_millis": 26067,
+                    "variants": [
+                        {
+                            "bitrate": 2176000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973271325208576/pu/vid/592x1072/ZAKPKDIUhNtRjKFa.mp4?tag=12"
+                        },
+                        {
+                            "content_type": "application/x-mpegURL",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973271325208576/pu/pl/oZIFpX5HQaEIVoRs.m3u8?tag=12"
+                        },
+                        {
+                            "bitrate": 950000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973271325208576/pu/vid/480x868/syIP0quQl6PWL4z-.mp4?tag=12"
+                        },
+                        {
+                            "bitrate": 632000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973271325208576/pu/vid/320x578/HVCccjMV5_CekXxG.mp4?tag=12"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "favorite_count": 55,
+    "favorited": false,
+    "full_text": "https://t.co/SF8l88F7gm",
+    "geo": null,
+    "id": 1397974960862289920,
+    "id_str": "1397974960862289920",
+    "in_reply_to_screen_name": "arrahman",
+    "in_reply_to_status_id": 1397974926129340418,
+    "in_reply_to_status_id_str": "1397974926129340418",
+    "in_reply_to_user_id": 19895282,
+    "in_reply_to_user_id_str": "19895282",
+    "is_quote_status": false,
+    "lang": "und",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 10,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Feb 02 05:53:57 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Grammy and Academy Award winning musician. Writer, Producer & Composer of the movie #99Songs. Tweets by Administrator.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "instagram.com/arrahman",
+                        "expanded_url": "http://www.instagram.com/arrahman",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/beodWVOPb0"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 569,
+        "follow_request_sent": false,
+        "followers_count": 23775499,
+        "following": true,
+        "friends_count": 0,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 19895282,
+        "id_str": "19895282",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 10723,
+        "location": "Chennai, India",
+        "name": "A.R.Rahman #99Songs \ud83d\ude37",
+        "notifications": false,
+        "profile_background_color": "C6E2EE",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/19895282/1615458362",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_link_color": "1F98C7",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DAECF4",
+        "profile_text_color": "663B12",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "arrahman",
+        "statuses_count": 5915,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/beodWVOPb0",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:56:10 +0000 2021",
+    "display_text_range": [
+        0,
+        0
+    ],
+    "entities": {
+        "hashtags": [],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/3wMESrY4BW",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974926129340418/video/1",
+                "id": 1397973234490822656,
+                "id_str": "1397973234490822656",
+                "indices": [
+                    0,
+                    23
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973234490822656/pu/img/0J4wxrBHvmjfPwfd.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973234490822656/pu/img/0J4wxrBHvmjfPwfd.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 848,
+                        "resize": "fit",
+                        "w": 464
+                    },
+                    "medium": {
+                        "h": 848,
+                        "resize": "fit",
+                        "w": 464
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 372
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/3wMESrY4BW"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "additional_media_info": {
+                    "monetizable": false
+                },
+                "display_url": "pic.twitter.com/3wMESrY4BW",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974926129340418/video/1",
+                "id": 1397973234490822656,
+                "id_str": "1397973234490822656",
+                "indices": [
+                    0,
+                    23
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973234490822656/pu/img/0J4wxrBHvmjfPwfd.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973234490822656/pu/img/0J4wxrBHvmjfPwfd.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 848,
+                        "resize": "fit",
+                        "w": 464
+                    },
+                    "medium": {
+                        "h": 848,
+                        "resize": "fit",
+                        "w": 464
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 372
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "video",
+                "url": "https://t.co/3wMESrY4BW",
+                "video_info": {
+                    "aspect_ratio": [
+                        29,
+                        53
+                    ],
+                    "duration_millis": 36033,
+                    "variants": [
+                        {
+                            "bitrate": 632000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973234490822656/pu/vid/320x584/XAWK2psohFt9nauM.mp4?tag=12"
+                        },
+                        {
+                            "content_type": "application/x-mpegURL",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973234490822656/pu/pl/XEYfb0uByBfgwQKT.m3u8?tag=12"
+                        },
+                        {
+                            "bitrate": 950000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973234490822656/pu/vid/464x848/hZ317XC-MDWHjeBi.mp4?tag=12"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "favorite_count": 56,
+    "favorited": false,
+    "full_text": "https://t.co/3wMESrY4BW",
+    "geo": null,
+    "id": 1397974926129340418,
+    "id_str": "1397974926129340418",
+    "in_reply_to_screen_name": "arrahman",
+    "in_reply_to_status_id": 1397974892608294912,
+    "in_reply_to_status_id_str": "1397974892608294912",
+    "in_reply_to_user_id": 19895282,
+    "in_reply_to_user_id_str": "19895282",
+    "is_quote_status": false,
+    "lang": "und",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 11,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Feb 02 05:53:57 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Grammy and Academy Award winning musician. Writer, Producer & Composer of the movie #99Songs. Tweets by Administrator.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "instagram.com/arrahman",
+                        "expanded_url": "http://www.instagram.com/arrahman",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/beodWVOPb0"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 569,
+        "follow_request_sent": false,
+        "followers_count": 23775499,
+        "following": true,
+        "friends_count": 0,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 19895282,
+        "id_str": "19895282",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 10723,
+        "location": "Chennai, India",
+        "name": "A.R.Rahman #99Songs \ud83d\ude37",
+        "notifications": false,
+        "profile_background_color": "C6E2EE",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/19895282/1615458362",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_link_color": "1F98C7",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DAECF4",
+        "profile_text_color": "663B12",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "arrahman",
+        "statuses_count": 5915,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/beodWVOPb0",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:56:02 +0000 2021",
+    "display_text_range": [
+        0,
+        175
+    ],
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    38,
+                    50
+                ],
+                "text": "VeereKhadDe"
+            },
+            {
+                "indices": [
+                    67,
+                    75
+                ],
+                "text": "99Songs"
+            },
+            {
+                "indices": [
+                    92,
+                    101
+                ],
+                "text": "StaySafe"
+            }
+        ],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/KwitZx9LUI",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974892608294912/video/1",
+                "id": 1397973197945905152,
+                "id_str": "1397973197945905152",
+                "indices": [
+                    176,
+                    199
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973197945905152/pu/img/y7Cz70OHw0kY0zIP.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973197945905152/pu/img/y7Cz70OHw0kY0zIP.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "medium": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 376
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/KwitZx9LUI"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 1297843225709944833,
+                "id_str": "1297843225709944833",
+                "indices": [
+                    77,
+                    91
+                ],
+                "name": "Triller India",
+                "screen_name": "triller_india"
+            },
+            {
+                "id": 1059332359768563712,
+                "id_str": "1059332359768563712",
+                "indices": [
+                    102,
+                    113
+                ],
+                "name": "Jio Studios",
+                "screen_name": "jiostudios"
+            },
+            {
+                "id": 826336967445057536,
+                "id_str": "826336967445057536",
+                "indices": [
+                    114,
+                    124
+                ],
+                "name": "YM Movies",
+                "screen_name": "YM_Movies"
+            },
+            {
+                "id": 724637308809519104,
+                "id_str": "724637308809519104",
+                "indices": [
+                    125,
+                    137
+                ],
+                "name": "Ideal Entertainment",
+                "screen_name": "idealentinc"
+            },
+            {
+                "id": 726044995933732866,
+                "id_str": "726044995933732866",
+                "indices": [
+                    138,
+                    148
+                ],
+                "name": "JioCinema",
+                "screen_name": "JioCinema"
+            },
+            {
+                "id": 59135470,
+                "id_str": "59135470",
+                "indices": [
+                    149,
+                    159
+                ],
+                "name": "Vishwesh K",
+                "screen_name": "vishweshk"
+            },
+            {
+                "id": 360474312,
+                "id_str": "360474312",
+                "indices": [
+                    160,
+                    175
+                ],
+                "name": "Sony Music India",
+                "screen_name": "sonymusicindia"
+            }
+        ]
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "additional_media_info": {
+                    "monetizable": false
+                },
+                "display_url": "pic.twitter.com/KwitZx9LUI",
+                "expanded_url": "https://twitter.com/arrahman/status/1397974892608294912/video/1",
+                "id": 1397973197945905152,
+                "id_str": "1397973197945905152",
+                "indices": [
+                    176,
+                    199
+                ],
+                "media_url": "http://pbs.twimg.com/ext_tw_video_thumb/1397973197945905152/pu/img/y7Cz70OHw0kY0zIP.jpg",
+                "media_url_https": "https://pbs.twimg.com/ext_tw_video_thumb/1397973197945905152/pu/img/y7Cz70OHw0kY0zIP.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "medium": {
+                        "h": 1072,
+                        "resize": "fit",
+                        "w": 592
+                    },
+                    "small": {
+                        "h": 680,
+                        "resize": "fit",
+                        "w": 376
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "video",
+                "url": "https://t.co/KwitZx9LUI",
+                "video_info": {
+                    "aspect_ratio": [
+                        37,
+                        67
+                    ],
+                    "duration_millis": 20100,
+                    "variants": [
+                        {
+                            "bitrate": 950000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973197945905152/pu/vid/480x868/ut5wMKdElISjIUjj.mp4?tag=12"
+                        },
+                        {
+                            "bitrate": 2176000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973197945905152/pu/vid/592x1072/alG5Xo42qHCaGBNW.mp4?tag=12"
+                        },
+                        {
+                            "bitrate": 632000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973197945905152/pu/vid/320x578/JHSPzkK3yrRy9RqL.mp4?tag=12"
+                        },
+                        {
+                            "content_type": "application/x-mpegURL",
+                            "url": "https://video.twimg.com/ext_tw_video/1397973197945905152/pu/pl/q-nnLdSNmVIAh0w9.m3u8?tag=12&container=fmp4"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "favorite_count": 141,
+    "favorited": false,
+    "full_text": "Happy to share the contest winners of #VeereKhadDe from Triller \ud83d\udc4d\ud83d\ude42\n#99Songs \n@triller_india #StaySafe @jiostudios @YM_Movies @idealentinc @JioCinema @vishweshk @sonymusicindia https://t.co/KwitZx9LUI",
+    "geo": null,
+    "id": 1397974892608294912,
+    "id_str": "1397974892608294912",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 23,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Feb 02 05:53:57 +0000 2009",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "Grammy and Academy Award winning musician. Writer, Producer & Composer of the movie #99Songs. Tweets by Administrator.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "instagram.com/arrahman",
+                        "expanded_url": "http://www.instagram.com/arrahman",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/beodWVOPb0"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 569,
+        "follow_request_sent": false,
+        "followers_count": 23775499,
+        "following": true,
+        "friends_count": 0,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 19895282,
+        "id_str": "19895282",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 10723,
+        "location": "Chennai, India",
+        "name": "A.R.Rahman #99Songs \ud83d\ude37",
+        "notifications": false,
+        "profile_background_color": "C6E2EE",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme2/bg.gif",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/19895282/1615458362",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1209988634184581120/Bu95OE_R_normal.jpg",
+        "profile_link_color": "1F98C7",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DAECF4",
+        "profile_text_color": "663B12",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "arrahman",
+        "statuses_count": 5915,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": "https://t.co/beodWVOPb0",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:56:00 +0000 2021",
+    "display_text_range": [
+        0,
+        88
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/AzuiTa/a24gk",
+                "expanded_url": "http://toi.in/AzuiTa/a24gk",
+                "indices": [
+                    65,
+                    88
+                ],
+                "url": "https://t.co/FjGKMe1Weh"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 29,
+    "favorited": false,
+    "full_text": "France's Emmanuel Macron admits some guilt for Rwanda's genocide https://t.co/FjGKMe1Weh",
+    "geo": null,
+    "id": 1397974884404371457,
+    "id_str": "1397974884404371457",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 2,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:54:29 +0000 2021",
+    "display_text_range": [
+        0,
+        179
+    ],
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    61,
+                    71
+                ],
+                "text": "Newstrack"
+            },
+            {
+                "indices": [
+                    118,
+                    126
+                ],
+                "text": "Vaccine"
+            },
+            {
+                "indices": [
+                    127,
+                    139
+                ],
+                "text": "Vaccination"
+            },
+            {
+                "indices": [
+                    140,
+                    148
+                ],
+                "text": "COVID19"
+            },
+            {
+                "indices": [
+                    149,
+                    169
+                ],
+                "text": "CoronavirusPandemic"
+            },
+            {
+                "indices": [
+                    170,
+                    179
+                ],
+                "text": "Politics"
+            }
+        ],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/QdnvjJAC1f",
+                "expanded_url": "https://twitter.com/IndiaToday/status/1397974502164729856/video/1",
+                "id": 1397969797183275010,
+                "id_str": "1397969797183275010",
+                "indices": [
+                    180,
+                    203
+                ],
+                "media_url": "http://pbs.twimg.com/amplify_video_thumb/1397969797183275010/img/18AwMlgVBvwk36_A.jpg",
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/1397969797183275010/img/18AwMlgVBvwk36_A.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 720,
+                        "resize": "fit",
+                        "w": 1280
+                    },
+                    "medium": {
+                        "h": 675,
+                        "resize": "fit",
+                        "w": 1200
+                    },
+                    "small": {
+                        "h": 383,
+                        "resize": "fit",
+                        "w": 680
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/QdnvjJAC1f"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "intdy.in/jmqo10",
+                "expanded_url": "https://intdy.in/jmqo10",
+                "indices": [
+                    93,
+                    116
+                ],
+                "url": "https://t.co/5dOUzRDWa8"
+            }
+        ],
+        "user_mentions": [
+            {
+                "id": 75509967,
+                "id_str": "75509967",
+                "indices": [
+                    78,
+                    90
+                ],
+                "name": "Rahul Kanwal",
+                "screen_name": "rahulkanwal"
+            }
+        ]
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "additional_media_info": {
+                    "call_to_actions": {
+                        "visit_site": {
+                            "url": "https://intdy.in/jmqo10"
+                        }
+                    },
+                    "description": "",
+                    "embeddable": true,
+                    "monetizable": false,
+                    "title": ""
+                },
+                "display_url": "pic.twitter.com/QdnvjJAC1f",
+                "expanded_url": "https://twitter.com/IndiaToday/status/1397974502164729856/video/1",
+                "id": 1397969797183275010,
+                "id_str": "1397969797183275010",
+                "indices": [
+                    180,
+                    203
+                ],
+                "media_url": "http://pbs.twimg.com/amplify_video_thumb/1397969797183275010/img/18AwMlgVBvwk36_A.jpg",
+                "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/1397969797183275010/img/18AwMlgVBvwk36_A.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 720,
+                        "resize": "fit",
+                        "w": 1280
+                    },
+                    "medium": {
+                        "h": 675,
+                        "resize": "fit",
+                        "w": 1200
+                    },
+                    "small": {
+                        "h": 383,
+                        "resize": "fit",
+                        "w": 680
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "video",
+                "url": "https://t.co/QdnvjJAC1f",
+                "video_info": {
+                    "aspect_ratio": [
+                        16,
+                        9
+                    ],
+                    "duration_millis": 368840,
+                    "variants": [
+                        {
+                            "bitrate": 2176000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/amplify_video/1397969797183275010/vid/1280x720/g_rT5C5qgEaWD-pA.mp4?tag=14"
+                        },
+                        {
+                            "content_type": "application/x-mpegURL",
+                            "url": "https://video.twimg.com/amplify_video/1397969797183275010/pl/oTW21EkUjj6sTFmm.m3u8?tag=14"
+                        },
+                        {
+                            "bitrate": 832000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/amplify_video/1397969797183275010/vid/640x360/2EbBF2rTkR7vHVPh.mp4?tag=14"
+                        },
+                        {
+                            "bitrate": 288000,
+                            "content_type": "video/mp4",
+                            "url": "https://video.twimg.com/amplify_video/1397969797183275010/vid/480x270/hk3rcDeG5CIL2lgo.mp4?tag=14"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "favorite_count": 31,
+    "favorited": false,
+    "full_text": "Big vaccine face-off: What's causing vaccine shortage?\nWatch #Newstrack, with @rahulkanwal : https://t.co/5dOUzRDWa8\n\n#Vaccine #Vaccination #COVID19 #CoronavirusPandemic #Politics https://t.co/QdnvjJAC1f",
+    "geo": null,
+    "id": 1397974502164729856,
+    "id_str": "1397974502164729856",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 3,
+    "retweeted": false,
+    "source": "<a href=\"https://studio.twitter.com\" rel=\"nofollow\">Twitter Media Studio</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Feb 02 07:21:54 +0000 2009",
+        "default_profile": true,
+        "default_profile_image": false,
+        "description": "Brings you news breaks: Exclusive political, entertainment, sports insight, unbiased-nonaligned. We are also on Instagram : https://t.co/qf1v42FMpb",
+        "entities": {
+            "description": {
+                "urls": [
+                    {
+                        "display_url": "instagram.com/indiatoday",
+                        "expanded_url": "https://www.instagram.com/indiatoday",
+                        "indices": [
+                            124,
+                            147
+                        ],
+                        "url": "https://t.co/qf1v42FMpb"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 4444,
+        "follow_request_sent": false,
+        "followers_count": 5686374,
+        "following": true,
+        "friends_count": 248,
+        "geo_enabled": true,
+        "has_extended_profile": true,
+        "id": 19897138,
+        "id_str": "19897138",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 6020,
+        "location": "India",
+        "name": "IndiaToday",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/19897138/1619981381",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1395253672678809601/s-kiJ9xn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1395253672678809601/s-kiJ9xn_normal.png",
+        "profile_link_color": "1DA1F2",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "IndiaToday",
+        "statuses_count": 876012,
+        "time_zone": null,
+        "translator_type": "none",
+        "url": null,
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:52:46 +0000 2021",
+    "display_text_range": [
+        0,
+        123
+    ],
+    "entities": {
+        "hashtags": [],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/GCwYngqcoO",
+                "expanded_url": "https://twitter.com/timesofindia/status/1397974072986791936/photo/1",
+                "id": 1397973600867557377,
+                "id_str": "1397973600867557377",
+                "indices": [
+                    124,
+                    147
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2aZlU0VoAELFLV.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2aZlU0VoAELFLV.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "medium": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "small": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/GCwYngqcoO"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/Z9sOaY/a24gk",
+                "expanded_url": "http://toi.in/Z9sOaY/a24gk",
+                "indices": [
+                    100,
+                    123
+                ],
+                "url": "https://t.co/h3tiNtA3HV"
+            }
+        ],
+        "user_mentions": []
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "display_url": "pic.twitter.com/GCwYngqcoO",
+                "expanded_url": "https://twitter.com/timesofindia/status/1397974072986791936/photo/1",
+                "id": 1397973600867557377,
+                "id_str": "1397973600867557377",
+                "indices": [
+                    124,
+                    147
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2aZlU0VoAELFLV.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2aZlU0VoAELFLV.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "medium": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "small": {
+                        "h": 300,
+                        "resize": "fit",
+                        "w": 400
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "type": "photo",
+                "url": "https://t.co/GCwYngqcoO"
+            }
+        ]
+    },
+    "favorite_count": 65,
+    "favorited": false,
+    "full_text": "Priority of public is vaccines &amp; inflation, that of govt is 'false image': Rahul Gandhi \n\nREAD: https://t.co/h3tiNtA3HV https://t.co/GCwYngqcoO",
+    "geo": null,
+    "id": 1397974072986791936,
+    "id_str": "1397974072986791936",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 6,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:50:44 +0000 2021",
+    "display_text_range": [
+        0,
+        106
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/fDWjTZ/a24gk",
+                "expanded_url": "http://toi.in/fDWjTZ/a24gk",
+                "indices": [
+                    83,
+                    106
+                ],
+                "url": "https://t.co/0IufHtO9ej"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 25,
+    "favorited": false,
+    "full_text": "Govt issues guidelines on vaccinating elderly, differently-abled near home \n\nREAD: https://t.co/0IufHtO9ej",
+    "geo": null,
+    "id": 1397973560639983617,
+    "id_str": "1397973560639983617",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:50:24 +0000 2021",
+    "display_text_range": [
+        0,
+        120
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/CvYHnY1/a24gk",
+                "expanded_url": "http://toi.in/CvYHnY1/a24gk",
+                "indices": [
+                    97,
+                    120
+                ],
+                "url": "https://t.co/5hzenTAMuy"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 8,
+    "favorited": false,
+    "full_text": "Covid roundup: India's second wave on downswing, no local trials for foreign vaccines &amp; more https://t.co/5hzenTAMuy",
+    "geo": null,
+    "id": 1397973474665062404,
+    "id_str": "1397973474665062404",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 1,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:50:12 +0000 2021",
+    "display_text_range": [
+        0,
+        80
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/19vLeY/a24gk",
+                "expanded_url": "http://toi.in/19vLeY/a24gk",
+                "indices": [
+                    57,
+                    80
+                ],
+                "url": "https://t.co/7JziPamwvC"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 32,
+    "favorited": false,
+    "full_text": "MHA orders continuation of Covid guidelines till June 30 https://t.co/7JziPamwvC",
+    "geo": null,
+    "id": 1397973425633697793,
+    "id_str": "1397973425633697793",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 3,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:49:18 +0000 2021",
+    "display_text_range": [
+        0,
+        105
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/NjIy1b/a24gk",
+                "expanded_url": "http://toi.in/NjIy1b/a24gk",
+                "indices": [
+                    82,
+                    105
+                ],
+                "url": "https://t.co/lwsa5qTVHH"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 42,
+    "favorited": false,
+    "full_text": "UNICEF signs deal to procure up to 220 million doses of Sputnik V vaccine \n\nREAD: https://t.co/lwsa5qTVHH",
+    "geo": null,
+    "id": 1397973200735289351,
+    "id_str": "1397973200735289351",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 6,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:48:00 +0000 2021",
+    "display_text_range": [
+        0,
+        98
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "timesnownews.com/india/article/\u2026",
+                "expanded_url": "https://www.timesnownews.com/india/article/mha-orders-containment-measures-for-covid-19-extended-till-june/762760",
+                "indices": [
+                    75,
+                    98
+                ],
+                "url": "https://t.co/QXEAACUrDV"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 11,
+    "favorited": false,
+    "full_text": "MHA orders containment measures for COVID-19 to be extended till June 30.\n\nhttps://t.co/QXEAACUrDV",
+    "geo": null,
+    "id": 1397972871331291136,
+    "id_str": "1397972871331291136",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 1,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Thu Jan 20 12:17:23 +0000 2011",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "TIMES NOW is India\u2019s most watched English news channel. Follow for lightning fast #BreakingNews and #Alerts.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesnownews.com",
+                        "expanded_url": "http://www.timesnownews.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/1r9xZjg7do"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 4,
+        "follow_request_sent": false,
+        "followers_count": 10051089,
+        "following": true,
+        "friends_count": 376,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 240649814,
+        "id_str": "240649814",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 5427,
+        "location": "India",
+        "name": "TIMES NOW",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/240649814/1619848457",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_link_color": "1B95E0",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "TimesNow",
+        "statuses_count": 670682,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/1r9xZjg7do",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:59 +0000 2021",
+    "display_text_range": [
+        0,
+        81
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "toi.in/C58mca/a24gk",
+                "expanded_url": "http://toi.in/C58mca/a24gk",
+                "indices": [
+                    58,
+                    81
+                ],
+                "url": "https://t.co/GcQ1HJ0MFr"
+            }
+        ],
+        "user_mentions": []
+    },
+    "favorite_count": 18,
+    "favorited": false,
+    "full_text": "Boris Johnson defends virus record after ex-aide's attack https://t.co/GcQ1HJ0MFr",
+    "geo": null,
+    "id": 1397972870182031361,
+    "id_str": "1397972870182031361",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 0,
+    "retweeted": false,
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:39 +0000 2021",
+    "display_text_range": [
+        0,
+        140
+    ],
+    "entities": {
+        "hashtags": [
+            {
+                "indices": [
+                    15,
+                    23
+                ],
+                "text": "IPL2021"
+            },
+            {
+                "indices": [
+                    24,
+                    31
+                ],
+                "text": "Ashwin"
+            }
+        ],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 128555221,
+                "id_str": "128555221",
+                "indices": [
+                    3,
+                    13
+                ],
+                "name": "TOI Sports",
+                "screen_name": "toisports"
+            },
+            {
+                "id": 358814014,
+                "id_str": "358814014",
+                "indices": [
+                    84,
+                    97
+                ],
+                "name": "Mask up and take your vaccine\ud83d\ude4f\ud83d\ude4f\ud83c\uddee\ud83c\uddf3",
+                "screen_name": "ashwinravi99"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "full_text": "RT @toisports: #IPL2021 #Ashwin\n\nI couldn't sleep for 8-9 days while I was playing: @ashwinravi99 on why he had to leave IPL midway\n\nREAD\u25b6\ufe0f\u2026",
+    "geo": null,
+    "id": 1397972782919688194,
+    "id_str": "1397972782919688194",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "retweet_count": 5,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Thu May 27 17:44:03 +0000 2021",
+        "display_text_range": [
+            0,
+            147
+        ],
+        "entities": {
+            "hashtags": [
+                {
+                    "indices": [
+                        0,
+                        8
+                    ],
+                    "text": "IPL2021"
+                },
+                {
+                    "indices": [
+                        9,
+                        16
+                    ],
+                    "text": "Ashwin"
+                }
+            ],
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/jXoRwwFLoy",
+                    "expanded_url": "https://twitter.com/toisports/status/1397971878774456332/photo/1",
+                    "id": 1397971813792063489,
+                    "id_str": "1397971813792063489",
+                    "indices": [
+                        148,
+                        171
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2aX9TcVoAER_KX.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2aX9TcVoAER_KX.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 800
+                        },
+                        "medium": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 800
+                        },
+                        "small": {
+                            "h": 383,
+                            "resize": "fit",
+                            "w": 680
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/jXoRwwFLoy"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "toi.in/3NU4wY18/a24gk",
+                    "expanded_url": "http://toi.in/3NU4wY18/a24gk",
+                    "indices": [
+                        124,
+                        147
+                    ],
+                    "url": "https://t.co/UrbuEL2LHR"
+                }
+            ],
+            "user_mentions": [
+                {
+                    "id": 358814014,
+                    "id_str": "358814014",
+                    "indices": [
+                        69,
+                        82
+                    ],
+                    "name": "Mask up and take your vaccine\ud83d\ude4f\ud83d\ude4f\ud83c\uddee\ud83c\uddf3",
+                    "screen_name": "ashwinravi99"
+                }
+            ]
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/jXoRwwFLoy",
+                    "expanded_url": "https://twitter.com/toisports/status/1397971878774456332/photo/1",
+                    "id": 1397971813792063489,
+                    "id_str": "1397971813792063489",
+                    "indices": [
+                        148,
+                        171
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2aX9TcVoAER_KX.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2aX9TcVoAER_KX.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 800
+                        },
+                        "medium": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 800
+                        },
+                        "small": {
+                            "h": 383,
+                            "resize": "fit",
+                            "w": 680
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/jXoRwwFLoy"
+                }
+            ]
+        },
+        "favorite_count": 38,
+        "favorited": false,
+        "full_text": "#IPL2021 #Ashwin\n\nI couldn't sleep for 8-9 days while I was playing: @ashwinravi99 on why he had to leave IPL midway\n\nREAD\u25b6\ufe0fhttps://t.co/UrbuEL2LHR https://t.co/jXoRwwFLoy",
+        "geo": null,
+        "id": 1397971878774456332,
+        "id_str": "1397971878774456332",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "place": null,
+        "possibly_sensitive": false,
+        "possibly_sensitive_appealable": false,
+        "retweet_count": 5,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Thu Apr 01 13:26:56 +0000 2010",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "The top destination for all the major sports news from around the world - A Times Internet product\nhttps://t.co/pac68wnoDG",
+            "entities": {
+                "description": {
+                    "urls": [
+                        {
+                            "display_url": "facebook.com/toisports",
+                            "expanded_url": "https://www.facebook.com/toisports",
+                            "indices": [
+                                99,
+                                122
+                            ],
+                            "url": "https://t.co/pac68wnoDG"
+                        }
+                    ]
+                },
+                "url": {
+                    "urls": [
+                        {
+                            "display_url": "timesofindia.com/sports",
+                            "expanded_url": "http://timesofindia.com/sports",
+                            "indices": [
+                                0,
+                                23
+                            ],
+                            "url": "https://t.co/W9M0IsFjvK"
+                        }
+                    ]
+                }
+            },
+            "favourites_count": 12,
+            "follow_request_sent": false,
+            "followers_count": 1044980,
+            "following": false,
+            "friends_count": 248,
+            "geo_enabled": true,
+            "has_extended_profile": false,
+            "id": 128555221,
+            "id_str": "128555221",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 156,
+            "location": "New Delhi, India",
+            "name": "TOI Sports",
+            "notifications": false,
+            "profile_background_color": "C0DEED",
+            "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/128555221/1621504259",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/826320015024672768/Fm3wsT1s_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/826320015024672768/Fm3wsT1s_normal.jpg",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "toisports",
+            "statuses_count": 124823,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": "https://t.co/W9M0IsFjvK",
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:31 +0000 2021",
+    "display_text_range": [
+        0,
+        91
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
+    },
+    "favorite_count": 101,
+    "favorited": false,
+    "full_text": "Mehul Choksi is still in custody and is being investigated: Dominica Police confirms to ANI",
+    "geo": null,
+    "id": 1397972752414478340,
+    "id_str": "1397972752414478340",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "retweet_count": 11,
+    "retweeted": false,
+    "source": "<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Mon Apr 19 10:50:15 +0000 2010",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "News. Views. Analysis. Conversations. India\u2019s No.1 digital news destination, world\u2019s largest-selling English newspaper - A Times Internet Limited Product",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesofindia.com",
+                        "expanded_url": "http://www.timesofindia.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/JxQOlwNQ7E"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 5,
+        "follow_request_sent": false,
+        "followers_count": 13646649,
+        "following": true,
+        "friends_count": 470,
+        "geo_enabled": false,
+        "has_extended_profile": false,
+        "id": 134758540,
+        "id_str": "134758540",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 11970,
+        "location": "New Delhi",
+        "name": "The Times Of India",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/134758540/1621274063",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1129666669054324736/1W_E72cn_normal.png",
+        "profile_link_color": "0084B4",
+        "profile_sidebar_border_color": "C0DEED",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "timesofindia",
+        "statuses_count": 663593,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/JxQOlwNQ7E",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:13 +0000 2021",
+    "display_text_range": [
+        0,
+        140
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": [
+            {
+                "id": 981434972270743555,
+                "id_str": "981434972270743555",
+                "indices": [
+                    3,
+                    18
+                ],
+                "name": "Times Now Sports",
+                "screen_name": "timesnowsports"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "full_text": "RT @timesnowsports: No player that got out to my filthy off spin will be blocked: Vaughan, Jaffer enjoy funny banter on Twitter\n\nREAD: http\u2026",
+    "geo": null,
+    "id": 1397972676614967298,
+    "id_str": "1397972676614967298",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "retweet_count": 1,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Thu May 27 16:44:17 +0000 2021",
+        "display_text_range": [
+            0,
+            138
+        ],
+        "entities": {
+            "hashtags": [],
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/SOCN2uQSb9",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397956838688104448/photo/1",
+                    "id": 1397956826210004992,
+                    "id_str": "1397956826210004992",
+                    "indices": [
+                        139,
+                        162
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2aKU6WUcAAzZv1.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2aKU6WUcAAzZv1.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/SOCN2uQSb9"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "timesnownews.com/sports/cricket\u2026",
+                    "expanded_url": "https://www.timesnownews.com/sports/cricket/article/no-player-that-got-out-to-my-filthy-off-spin-will-be-blocked-vaughan-jaffer-enjoy-funny-banter-on-twitter/762781",
+                    "indices": [
+                        115,
+                        138
+                    ],
+                    "url": "https://t.co/1Itig4YQed"
+                }
+            ],
+            "user_mentions": []
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/SOCN2uQSb9",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397956838688104448/photo/1",
+                    "id": 1397956826210004992,
+                    "id_str": "1397956826210004992",
+                    "indices": [
+                        139,
+                        162
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2aKU6WUcAAzZv1.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2aKU6WUcAAzZv1.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/SOCN2uQSb9"
+                }
+            ]
+        },
+        "favorite_count": 10,
+        "favorited": false,
+        "full_text": "No player that got out to my filthy off spin will be blocked: Vaughan, Jaffer enjoy funny banter on Twitter\n\nREAD: https://t.co/1Itig4YQed https://t.co/SOCN2uQSb9",
+        "geo": null,
+        "id": 1397956838688104448,
+        "id_str": "1397956838688104448",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "place": null,
+        "possibly_sensitive": false,
+        "possibly_sensitive_appealable": false,
+        "retweet_count": 1,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Wed Apr 04 07:35:06 +0000 2018",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Your one-stop destination for sports news from across the globe. Follow for all latest updates related to Cricket, Football, Badminton, Tennis and other sports.",
+            "entities": {
+                "description": {
+                    "urls": []
+                }
+            },
+            "favourites_count": 12,
+            "follow_request_sent": false,
+            "followers_count": 8282,
+            "following": false,
+            "friends_count": 63,
+            "geo_enabled": false,
+            "has_extended_profile": false,
+            "id": 981434972270743555,
+            "id_str": "981434972270743555",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 45,
+            "location": "",
+            "name": "Times Now Sports",
+            "notifications": false,
+            "profile_background_color": "F5F8FA",
+            "profile_background_image_url": null,
+            "profile_background_image_url_https": null,
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/981434972270743555/1621317809",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "timesnowsports",
+            "statuses_count": 30617,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": null,
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Thu Jan 20 12:17:23 +0000 2011",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "TIMES NOW is India\u2019s most watched English news channel. Follow for lightning fast #BreakingNews and #Alerts.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesnownews.com",
+                        "expanded_url": "http://www.timesnownews.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/1r9xZjg7do"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 4,
+        "follow_request_sent": false,
+        "followers_count": 10051089,
+        "following": true,
+        "friends_count": 376,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 240649814,
+        "id_str": "240649814",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 5427,
+        "location": "India",
+        "name": "TIMES NOW",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/240649814/1619848457",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_link_color": "1B95E0",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "TimesNow",
+        "statuses_count": 670682,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/1r9xZjg7do",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:08 +0000 2021",
+    "display_text_range": [
+        0,
+        140
+    ],
+    "entities": {
+        "hashtags": [],
+        "media": [
+            {
+                "display_url": "pic.twitter.com/q1PRVEtwgn",
+                "expanded_url": "https://twitter.com/timesnowsports/status/1397931432073334784/photo/1",
+                "id": 1397931425316315139,
+                "id_str": "1397931425316315139",
+                "indices": [
+                    117,
+                    140
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "medium": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "small": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "source_status_id": 1397931432073334784,
+                "source_status_id_str": "1397931432073334784",
+                "source_user_id": 981434972270743555,
+                "source_user_id_str": "981434972270743555",
+                "type": "photo",
+                "url": "https://t.co/q1PRVEtwgn"
+            }
+        ],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "timesnownews.com/sports/cricket\u2026",
+                "expanded_url": "https://www.timesnownews.com/sports/cricket/article/virat-kohli-wishes-india-head-coach-ravi-shastri-on-59th-birthday/762748",
+                "indices": [
+                    93,
+                    116
+                ],
+                "url": "https://t.co/Aq6RlUfal9"
+            }
+        ],
+        "user_mentions": [
+            {
+                "id": 981434972270743555,
+                "id_str": "981434972270743555",
+                "indices": [
+                    3,
+                    18
+                ],
+                "name": "Times Now Sports",
+                "screen_name": "timesnowsports"
+            }
+        ]
+    },
+    "extended_entities": {
+        "media": [
+            {
+                "display_url": "pic.twitter.com/q1PRVEtwgn",
+                "expanded_url": "https://twitter.com/timesnowsports/status/1397931432073334784/photo/1",
+                "id": 1397931425316315139,
+                "id_str": "1397931425316315139",
+                "indices": [
+                    117,
+                    140
+                ],
+                "media_url": "http://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                "media_url_https": "https://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                "sizes": {
+                    "large": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "medium": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "small": {
+                        "h": 338,
+                        "resize": "fit",
+                        "w": 600
+                    },
+                    "thumb": {
+                        "h": 150,
+                        "resize": "crop",
+                        "w": 150
+                    }
+                },
+                "source_status_id": 1397931432073334784,
+                "source_status_id_str": "1397931432073334784",
+                "source_user_id": 981434972270743555,
+                "source_user_id_str": "981434972270743555",
+                "type": "photo",
+                "url": "https://t.co/q1PRVEtwgn"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "full_text": "RT @timesnowsports: Virat Kohli wishes India head coach Ravi Shastri on 59th birthday\n\nREAD: https://t.co/Aq6RlUfal9 https://t.co/q1PRVEtwgn",
+    "geo": null,
+    "id": 1397972653403787271,
+    "id_str": "1397972653403787271",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 3,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Thu May 27 15:03:20 +0000 2021",
+        "display_text_range": [
+            0,
+            96
+        ],
+        "entities": {
+            "hashtags": [],
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/q1PRVEtwgn",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397931432073334784/photo/1",
+                    "id": 1397931425316315139,
+                    "id_str": "1397931425316315139",
+                    "indices": [
+                        97,
+                        120
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/q1PRVEtwgn"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "timesnownews.com/sports/cricket\u2026",
+                    "expanded_url": "https://www.timesnownews.com/sports/cricket/article/virat-kohli-wishes-india-head-coach-ravi-shastri-on-59th-birthday/762748",
+                    "indices": [
+                        73,
+                        96
+                    ],
+                    "url": "https://t.co/Aq6RlUfal9"
+                }
+            ],
+            "user_mentions": []
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/q1PRVEtwgn",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397931432073334784/photo/1",
+                    "id": 1397931425316315139,
+                    "id_str": "1397931425316315139",
+                    "indices": [
+                        97,
+                        120
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                    "media_url_https": "https://pbs.twimg.com/media/E2ZzOYpVoAMuZnI.jpg",
+                    "sizes": {
+                        "large": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 338,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/q1PRVEtwgn"
+                }
+            ]
+        },
+        "favorite_count": 9,
+        "favorited": false,
+        "full_text": "Virat Kohli wishes India head coach Ravi Shastri on 59th birthday\n\nREAD: https://t.co/Aq6RlUfal9 https://t.co/q1PRVEtwgn",
+        "geo": null,
+        "id": 1397931432073334784,
+        "id_str": "1397931432073334784",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "place": null,
+        "possibly_sensitive": false,
+        "possibly_sensitive_appealable": false,
+        "retweet_count": 3,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Wed Apr 04 07:35:06 +0000 2018",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Your one-stop destination for sports news from across the globe. Follow for all latest updates related to Cricket, Football, Badminton, Tennis and other sports.",
+            "entities": {
+                "description": {
+                    "urls": []
+                }
+            },
+            "favourites_count": 12,
+            "follow_request_sent": false,
+            "followers_count": 8282,
+            "following": false,
+            "friends_count": 63,
+            "geo_enabled": false,
+            "has_extended_profile": false,
+            "id": 981434972270743555,
+            "id_str": "981434972270743555",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 45,
+            "location": "",
+            "name": "Times Now Sports",
+            "notifications": false,
+            "profile_background_color": "F5F8FA",
+            "profile_background_image_url": null,
+            "profile_background_image_url_https": null,
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/981434972270743555/1621317809",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "timesnowsports",
+            "statuses_count": 30617,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": null,
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Thu Jan 20 12:17:23 +0000 2011",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "TIMES NOW is India\u2019s most watched English news channel. Follow for lightning fast #BreakingNews and #Alerts.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesnownews.com",
+                        "expanded_url": "http://www.timesnownews.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/1r9xZjg7do"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 4,
+        "follow_request_sent": false,
+        "followers_count": 10051089,
+        "following": true,
+        "friends_count": 376,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 240649814,
+        "id_str": "240649814",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 5427,
+        "location": "India",
+        "name": "TIMES NOW",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/240649814/1619848457",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_link_color": "1B95E0",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "TimesNow",
+        "statuses_count": 670682,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/1r9xZjg7do",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}
+{
+    "contributors": null,
+    "coordinates": null,
+    "created_at": "Thu May 27 17:47:03 +0000 2021",
+    "display_text_range": [
+        0,
+        144
+    ],
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [
+            {
+                "display_url": "timesnownews.com/sports/cricket\u2026",
+                "expanded_url": "https://www.timesnownews.com/sports/cricket/article/jos-buttler-eoin-morgan-other-england-players-set-to-miss-ipl-2021-confirms-ecb/762720",
+                "indices": [
+                    109,
+                    132
+                ],
+                "url": "https://t.co/Py9j7Xc89j"
+            }
+        ],
+        "user_mentions": [
+            {
+                "id": 981434972270743555,
+                "id_str": "981434972270743555",
+                "indices": [
+                    3,
+                    18
+                ],
+                "name": "Times Now Sports",
+                "screen_name": "timesnowsports"
+            }
+        ]
+    },
+    "favorite_count": 0,
+    "favorited": false,
+    "full_text": "RT @timesnowsports: Jos Buttler, Eoin Morgan &amp; other England players set to miss IPL 2021, confirms ECB\n\nhttps://t.co/Py9j7Xc89j https://t.\u2026",
+    "geo": null,
+    "id": 1397972633715679232,
+    "id_str": "1397972633715679232",
+    "in_reply_to_screen_name": null,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "is_quote_status": false,
+    "lang": "en",
+    "place": null,
+    "possibly_sensitive": false,
+    "possibly_sensitive_appealable": false,
+    "retweet_count": 1,
+    "retweeted": false,
+    "retweeted_status": {
+        "contributors": null,
+        "coordinates": null,
+        "created_at": "Thu May 27 14:49:41 +0000 2021",
+        "display_text_range": [
+            0,
+            112
+        ],
+        "entities": {
+            "hashtags": [],
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/O5Qj43CxPp",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397927996615364618/photo/1",
+                    "id": 1397927983101353987,
+                    "id_str": "1397927983101353987",
+                    "indices": [
+                        113,
+                        136
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2ZwGBZVoAMDMmg.png",
+                    "media_url_https": "https://pbs.twimg.com/media/E2ZwGBZVoAMDMmg.png",
+                    "sizes": {
+                        "large": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/O5Qj43CxPp"
+                }
+            ],
+            "symbols": [],
+            "urls": [
+                {
+                    "display_url": "timesnownews.com/sports/cricket\u2026",
+                    "expanded_url": "https://www.timesnownews.com/sports/cricket/article/jos-buttler-eoin-morgan-other-england-players-set-to-miss-ipl-2021-confirms-ecb/762720",
+                    "indices": [
+                        89,
+                        112
+                    ],
+                    "url": "https://t.co/Py9j7Xc89j"
+                }
+            ],
+            "user_mentions": []
+        },
+        "extended_entities": {
+            "media": [
+                {
+                    "display_url": "pic.twitter.com/O5Qj43CxPp",
+                    "expanded_url": "https://twitter.com/timesnowsports/status/1397927996615364618/photo/1",
+                    "id": 1397927983101353987,
+                    "id_str": "1397927983101353987",
+                    "indices": [
+                        113,
+                        136
+                    ],
+                    "media_url": "http://pbs.twimg.com/media/E2ZwGBZVoAMDMmg.png",
+                    "media_url_https": "https://pbs.twimg.com/media/E2ZwGBZVoAMDMmg.png",
+                    "sizes": {
+                        "large": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "medium": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "small": {
+                            "h": 450,
+                            "resize": "fit",
+                            "w": 600
+                        },
+                        "thumb": {
+                            "h": 150,
+                            "resize": "crop",
+                            "w": 150
+                        }
+                    },
+                    "type": "photo",
+                    "url": "https://t.co/O5Qj43CxPp"
+                }
+            ]
+        },
+        "favorite_count": 8,
+        "favorited": false,
+        "full_text": "Jos Buttler, Eoin Morgan &amp; other England players set to miss IPL 2021, confirms ECB\n\nhttps://t.co/Py9j7Xc89j https://t.co/O5Qj43CxPp",
+        "geo": null,
+        "id": 1397927996615364618,
+        "id_str": "1397927996615364618",
+        "in_reply_to_screen_name": null,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "is_quote_status": false,
+        "lang": "en",
+        "place": null,
+        "possibly_sensitive": false,
+        "possibly_sensitive_appealable": false,
+        "retweet_count": 1,
+        "retweeted": false,
+        "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+        "truncated": false,
+        "user": {
+            "contributors_enabled": false,
+            "created_at": "Wed Apr 04 07:35:06 +0000 2018",
+            "default_profile": true,
+            "default_profile_image": false,
+            "description": "Your one-stop destination for sports news from across the globe. Follow for all latest updates related to Cricket, Football, Badminton, Tennis and other sports.",
+            "entities": {
+                "description": {
+                    "urls": []
+                }
+            },
+            "favourites_count": 12,
+            "follow_request_sent": false,
+            "followers_count": 8282,
+            "following": false,
+            "friends_count": 63,
+            "geo_enabled": false,
+            "has_extended_profile": false,
+            "id": 981434972270743555,
+            "id_str": "981434972270743555",
+            "is_translation_enabled": false,
+            "is_translator": false,
+            "lang": null,
+            "listed_count": 45,
+            "location": "",
+            "name": "Times Now Sports",
+            "notifications": false,
+            "profile_background_color": "F5F8FA",
+            "profile_background_image_url": null,
+            "profile_background_image_url_https": null,
+            "profile_background_tile": false,
+            "profile_banner_url": "https://pbs.twimg.com/profile_banners/981434972270743555/1621317809",
+            "profile_image_url": "http://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/981435345639264257/YbHh87ck_normal.jpg",
+            "profile_link_color": "1DA1F2",
+            "profile_sidebar_border_color": "C0DEED",
+            "profile_sidebar_fill_color": "DDEEF6",
+            "profile_text_color": "333333",
+            "profile_use_background_image": true,
+            "protected": false,
+            "screen_name": "timesnowsports",
+            "statuses_count": 30617,
+            "time_zone": null,
+            "translator_type": "none",
+            "url": null,
+            "utc_offset": null,
+            "verified": true,
+            "withheld_in_countries": []
+        }
+    },
+    "source": "<a href=\"https://mobile.twitter.com\" rel=\"nofollow\">Twitter Web App</a>",
+    "truncated": false,
+    "user": {
+        "contributors_enabled": false,
+        "created_at": "Thu Jan 20 12:17:23 +0000 2011",
+        "default_profile": false,
+        "default_profile_image": false,
+        "description": "TIMES NOW is India\u2019s most watched English news channel. Follow for lightning fast #BreakingNews and #Alerts.",
+        "entities": {
+            "description": {
+                "urls": []
+            },
+            "url": {
+                "urls": [
+                    {
+                        "display_url": "timesnownews.com",
+                        "expanded_url": "http://www.timesnownews.com",
+                        "indices": [
+                            0,
+                            23
+                        ],
+                        "url": "https://t.co/1r9xZjg7do"
+                    }
+                ]
+            }
+        },
+        "favourites_count": 4,
+        "follow_request_sent": false,
+        "followers_count": 10051089,
+        "following": true,
+        "friends_count": 376,
+        "geo_enabled": true,
+        "has_extended_profile": false,
+        "id": 240649814,
+        "id_str": "240649814",
+        "is_translation_enabled": false,
+        "is_translator": false,
+        "lang": null,
+        "listed_count": 5427,
+        "location": "India",
+        "name": "TIMES NOW",
+        "notifications": false,
+        "profile_background_color": "C0DEED",
+        "profile_background_image_url": "http://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_image_url_https": "https://abs.twimg.com/images/themes/theme1/bg.png",
+        "profile_background_tile": false,
+        "profile_banner_url": "https://pbs.twimg.com/profile_banners/240649814/1619848457",
+        "profile_image_url": "http://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1354074536925388802/qkHhpnVw_normal.jpg",
+        "profile_link_color": "1B95E0",
+        "profile_sidebar_border_color": "FFFFFF",
+        "profile_sidebar_fill_color": "DDEEF6",
+        "profile_text_color": "333333",
+        "profile_use_background_image": true,
+        "protected": false,
+        "screen_name": "TimesNow",
+        "statuses_count": 670682,
+        "time_zone": null,
+        "translator_type": "regular",
+        "url": "https://t.co/1r9xZjg7do",
+        "utc_offset": null,
+        "verified": true,
+        "withheld_in_countries": []
+    }
+}

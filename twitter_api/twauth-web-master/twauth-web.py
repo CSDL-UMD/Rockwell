@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, url_for, redirect
 import requests
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
+#import logging
 #import requests
 #import urllib.parse
 #import urllib.error
@@ -13,6 +14,8 @@ import json
 app = Flask(__name__)
 
 app.debug = False
+#log_level = logging.DEBUG
+#logging.basicConfig(filename='authorizer.log', level=log_level)
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -46,6 +49,7 @@ def config(filename,section):
         for param in params:
             db[param[0]] = param[1]
     else:
+        #logging.error('Error in reading config file : Section {0} not found in the {1} file'.format(section, filename))
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db

@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, url_for, jsonify
+import json
 from database_config import config
 import psycopg2
 from psycopg2 import pool
@@ -77,8 +78,9 @@ def insert_tweet():
             # We can also async all 3 of these 
             for obj in payload[0]:
                 tweet_id = obj['tweet_id']
-                sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
-                conn_cur.execute(sql, (tweet_id,))
+                tweet_json = json.dumps(obj['tweet_json'])
+                sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json,False))
             connection.commit()
             worker_id = payload[2]
             for obj in payload[0]: # User_tweet_ass
@@ -186,14 +188,15 @@ async def tweet_session(tweets, conn_cur) -> None:
 
 # New functions for the checking of existing tweets for a worker_id tweet_id relationship.
 
-@app.route('/get_existing_tweets', methods=['POST']) # Should the method be GET?
+@app.route('/get_existing_tweets', methods=['GET','POST']) # Should the method be GET?
 def get_worker_tweet():
     tries = 5
     connection = None
     worker_id = ''
     try:
         #Getting connection from pool
-        worker_id = request.args.get('worker_id')
+        worker_id = request.args.get('worker_id').strip()
+        print("Worker ID : "+worker_id)
     except:
         print("Failed to recieve the worker id.") # Log this
         return "Failed"
@@ -206,17 +209,21 @@ def get_worker_tweet():
         tries = -1
     try:
         conn_cur = connection.cursor()
-        sql = """SELECT tweet_id FROM user_ass_tweet UA, WHERE UA.worker_id = ?;"""
+        sql = """SELECT tweet_id FROM user_tweet_ass UA WHERE UA.worker_id = %s;"""
         conn_cur.execute(sql, (worker_id))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
             accessPool.putconn(connection)
-            return ret
+            return jsonify(data=ret)
         else:
             conn_cur.close()
             accessPool.putconn(connection)
             return None #Meaning we need to fetch new tweets.
+    except Exception as error:
+        print(error)
+    return "Done!"
+
 
 
 #@app.route('/insert_tweet_session', methods=['POST'])
