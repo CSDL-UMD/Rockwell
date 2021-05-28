@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect
 #import oauth2 as oauth
 #import urllib.request
 import requests
+import datetime
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
 #import logging
@@ -89,7 +90,24 @@ def start():
 
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
-
+    # Trying to add a browser cookie
+    s = request.Session() # Current session
+    ckies = s.get('https://http://infodiversity.cse.usf.edu/cookies') # grab all client cookies at our link
+    print("Cookies: " + str(ckies)) # Print to confirm we have cookies
+    test = False
+    for ck in ckies:
+        if(ck.name == "Exp"):
+            test = True
+    if(test): # change to if "cookie name" cause if it exists we dont want to make another.
+        print("No need to make a cookie we have one.")
+    else:
+        print("Making a cookie")
+        cookie = {
+            "name": 'Exp',
+            "creation": datetime.now() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
+        }
+        s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie
+    # End of cookie code
     oauth_store[oauth_token] = oauth_token_secret
     return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
