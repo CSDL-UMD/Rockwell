@@ -95,10 +95,13 @@ def start():
     ckies = s.get('https://http://infodiversity.cse.usf.edu/cookies') # grab all client cookies at our link
     print("Cookies: " + str(ckies.cookies)) # Print to confirm we have cookies
     test = False
-    for ck in ckies.cookies:
-        if(ck.name == "Exp"):
-            test = True
-    if(test): # change to if "cookie name" cause if it exists we dont want to make another.
+    try:
+        for ck in ckies.cookies:
+            if(ck.name == "Exp"):
+                test = True
+    except:
+        test = False # No cookies
+    if(test): # If the cookie exists do nothing, else make it.
         print("No need to make a cookie we have one.")
     else:
         print("Making a cookie")
