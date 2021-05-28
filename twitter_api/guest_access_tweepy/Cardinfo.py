@@ -28,9 +28,8 @@ def getCardData(link) -> dict:
         else:
             break
 
-
+    out = {}
     if(searchMe is not None): # Check if our request passed.
-        out = {}
         soup = ""
         try: # Create our BeautifulSoup parser "soup"
             soup = BeautifulSoup(searchMe,"html.parser")

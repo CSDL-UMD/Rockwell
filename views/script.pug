@@ -60,7 +60,7 @@ block content
             img.ui.avatar.image(src=cdn+'/profile_pictures/retweet.png', style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.retweeted_by + " Retweeted"
         if val.quoted_by.length > 0
-          .content
+          .content()
             div(style="display: flex;align-items: center")
               div
                 img.ui.avatar.image.lazyload(data-src=val.quoted_by_actor_picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
@@ -90,7 +90,13 @@ block content
           span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
         .content
           //.description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
-          .description(style="color: #000000;")=val.body
+          each body_comp in val.body_json
+            if body_comp.url.length > 0
+              //.description(style="color: #000000;")
+              a(href=body_comp.url)=body_comp.text
+            else
+              .description(style="color: #000000;")=body_comp.text
+          //.description(style="color: #000000;")=val.body
             //if val.urls.length > 0
             //  a(href=val.urls)=" "+val.urls
         //using first mediaLink in val.embedded_images
@@ -119,12 +125,12 @@ block content
               .content
                 .description=val.picture_description
         .three.ui.bottom.attached.icon.buttons
-          .ui.reply.button(tabindex='0',onclick='retweet_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
+          .ui.reply.button(tabindex='0',id="retweet_btn",onclick='retweet_clicked(this,\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
             i.reply.icon
             |  Retweet
-          a.ui.basic.red.left.pointing.label.count=val.retweets
+          a.ui.basic.red.left.pointing.label.count(id="retweet_counter_"+val.tweet_id,onload="userretweet(this,val.user_retweet)")=val.retweets
           //if val.like
-          //  .ui.labeled.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
+          //  .ui.labeled.button(tabindex='0',id="like_btn",onclick='like_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
           //    .ui.red.like.button
           //      i.heart.icon
           //      |  Like
@@ -135,10 +141,10 @@ block content
           //      i.heart.icon
           //      |  Like
           //    a.ui.basic.red.left.pointing.label.count=val.likes
-          .ui.reply.button(tabindex='0',onclick='like_clicked(\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
+          .ui.reply.button(tabindex='0',onclick='like_clicked(this,\'' + val.tweet_id + ',' + val.session_id + ',' + val.access_token + ',' + val.access_token_secret + '\')')
             i.reply.icon
             |  Like
-          a.ui.basic.red.left.pointing.label.count=val.likes
+          a.ui.basic.red.left.pointing.label.count(id="like_counter_"+val.tweet_id,onload="userlike(this,val.user_fav)")=val.likes
 
 
 
@@ -206,6 +212,19 @@ block content
     script.
       function autoresize(imgele) {
         imgele.height = imgele.width * (0.68);
+      }
+      function userretweet(btn,boool) {
+        console.log("Came here????");
+        if(boool == "True"){
+          btn.innerHTML='Retweeted';
+          btn.style.color = 'red';
+        }
+      }
+      function userlike(btn,boool) {
+        if(boool == "True"){
+          btn.innerHTML='Liked';
+          btn.style.color = 'red';
+        }
       }
     script.
       var win = $(window);

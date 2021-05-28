@@ -7,7 +7,9 @@ CREATE TABLE truman_user (
 );
 
 CREATE TABLE tweet (
-   tweet_id bigint PRIMARY KEY
+   tweet_id bigint PRIMARY KEY,
+   tweet_json JSON NOT NULL,
+   tweet_deleted boolean NOT NULL
 );
 
 CREATE TABLE session (
