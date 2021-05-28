@@ -93,9 +93,9 @@ def start():
     # Trying to add a browser cookie
     s = request.Session() # Current session
     ckies = s.get('https://http://infodiversity.cse.usf.edu/cookies') # grab all client cookies at our link
-    print("Cookies: " + str(ckies)) # Print to confirm we have cookies
+    print("Cookies: " + str(ckies.cookies)) # Print to confirm we have cookies
     test = False
-    for ck in ckies:
+    for ck in ckies.cookies:
         if(ck.name == "Exp"):
             test = True
     if(test): # change to if "cookie name" cause if it exists we dont want to make another.
