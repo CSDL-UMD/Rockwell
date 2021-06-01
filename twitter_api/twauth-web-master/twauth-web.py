@@ -106,7 +106,7 @@ def start():
         print("Making a cookie")
         cookie = {
             "name": 'Exp',
-            "creation": datetime.now() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
+            "expires": (datetime.datetime.now()+datetime.timedelta(minutes = 10)).isoformat() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
         }
         s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie'''
     index() # This alone should create and store the cookie, not sure if i need to call them a flask way or not.
