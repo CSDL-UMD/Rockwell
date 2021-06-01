@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request, url_for, redirect
+from flask.helpers import make_response
 #import oauth2 as oauth
 #import urllib.request
 import requests
@@ -91,13 +92,11 @@ def start():
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
     # Trying to add a browser cookie
-    s = request.Session() # Current session
-    ckies = s.get('https://http://infodiversity.cse.usf.edu/cookies') # grab all client cookies at our link
-    print("Cookies: " + str(ckies.cookies)) # Print to confirm we have cookies
     test = False
-    try:
-        for ck in ckies.cookies:
-            if(ck.name == "Exp"):
+    cookies = get_cookie()
+    print(cookies) # based on how it prints we can fine tune the logic below. As of now I have no idea.
+    '''try:
+            if(cookies): # needs to be worked on
                 test = True
     except:
         test = False # No cookies
@@ -109,11 +108,23 @@ def start():
             "name": 'Exp',
             "creation": datetime.now() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
         }
-        s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie
+        s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie'''
+    index() # This alone should create and store the cookie, not sure if i need to call them a flask way or not.
     # End of cookie code
     oauth_store[oauth_token] = oauth_token_secret
     return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
+
+@app.route('/') # This is a function to set a flask cookie
+def index():
+    resp = make_response(render_template())
+    resp.set_cookie("Exp",(datetime.datetime.now() + datetime.timedelta(mintues=10)).isoformat())
+    return resp
+
+@app.route('/get-cookie')
+def get_cookie():
+    return request.cookies.get("Exp")
+    
 
 @app.route('/callback')
 def callback():
