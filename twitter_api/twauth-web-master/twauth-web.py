@@ -91,12 +91,13 @@ def start():
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
     # Trying to add a browser cookie
-    s = request.Session() # Current session
-    ckies = s.get('https://http://infodiversity.cse.usf.edu/cookies') # grab all client cookies at our link
-    print("Cookies: " + str(ckies.cookies)) # Print to confirm we have cookies
+    s = requests.Session() # Current session
+    ckies = s.get('http://127.0.0.1/cookies') # grab all client cookies at our link
+    print("Cookies: " + str(ckies)) # Print to confirm we have cookies
     test = False
     try:
         for ck in ckies.cookies:
+            print("CK ::::: "+str(ck))
             if(ck.name == "Exp"):
                 test = True
     except:
@@ -107,9 +108,10 @@ def start():
         print("Making a cookie")
         cookie = {
             "name": 'Exp',
-            "creation": datetime.now() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
+            "expires": (datetime.datetime.now()+datetime.timedelta(minutes = 10)).isoformat() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
         }
-        s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie
+        cookie_get = s.get('http://127.0.0.1/cookies', cookies=cookie) # post the cookie
+        print("COOKIE CONTENT "+str(cookie_get.content))
     # End of cookie code
     oauth_store[oauth_token] = oauth_token_secret
     return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
