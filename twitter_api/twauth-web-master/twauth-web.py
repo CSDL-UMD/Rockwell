@@ -117,7 +117,7 @@ def start():
 
 @app.route('/') # This is a function to set a flask cookie
 def index():
-    resp = make_response(render_template())
+    resp = make_response(render_template(...))
     resp.set_cookie("Exp",(datetime.datetime.now() + datetime.timedelta(mintues=10)).isoformat())
     return resp
 
