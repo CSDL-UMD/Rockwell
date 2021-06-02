@@ -1,6 +1,6 @@
 import os
-from flask import Flask, render_template, request, url_for, redirect
-from flask.helpers import make_response
+from flask import Flask, render_template, request, url_for, redirect, flash, make_response
+#from flask.helpers import make_response
 #import oauth2 as oauth
 #import urllib.request
 import requests
@@ -92,9 +92,15 @@ def start():
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
     # Trying to add a browser cookie
+    """
     test = False
-    cookies = get_cookie()
-    print(cookies) # based on how it prints we can fine tune the logic below. As of now I have no idea.
+    #cookies = get_cookie()
+    cookies = requests.get('http://127.0.0.1:5000/get-cookie')
+    print("COOKIE : "+str(cookies)) # based on how it prints we can fine tune the logic below. As of now I have no idea.
+    if cookies is not None:
+        test = True
+
+    print("TESTT : "+str(test))
     '''try:
             if(cookies): # needs to be worked on
                 test = True
@@ -109,22 +115,34 @@ def start():
             "expires": (datetime.datetime.now()+datetime.timedelta(minutes = 10)).isoformat() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
         }
         s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie'''
-    index() # This alone should create and store the cookie, not sure if i need to call them a flask way or not.
+    if not test:
+        #index() # This alone should create and store the cookie, not sure if i need to call them a flask way or not.
+        requests.get('http://127.0.0.1:5000/cookie')
     # End of cookie code
+    """
     oauth_store[oauth_token] = oauth_token_secret
     return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
 
-@app.route('/') # This is a function to set a flask cookie
+@app.route('/cookie', methods=['GET']) # This is a function to set a flask cookie
 def index():
     resp = make_response("Setting a cookie")
-    resp.set_cookie("Exp",str((datetime.datetime.now() + datetime.timedelta(mintues=10)).isoformat()))
+    resp.set_cookie("Exp",str((datetime.datetime.now() + datetime.timedelta(minutes=10)).isoformat()))
     return resp
 
-@app.route('/get-cookie')
+@app.route('/get-cookie', methods=['GET'])
 def get_cookie():
-    return request.cookies.get("Exp")
-    
+    #return request.cookies.get("Exp")
+    print("In Get Cookie")
+    if not request.cookies.get('Exp'):
+        #res = make_response("Setting a cookie")
+        #res.set_cookie('foo', 'bar', max_age=60*60*24*365*2)
+        print("No cookie found!")
+    else:
+        res = make_response("Value of cookie Exp is {}".format(request.cookies.get('Exp')))
+        return res
+
+    return "Failed"    
 
 @app.route('/callback')
 def callback():
