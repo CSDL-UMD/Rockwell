@@ -40,9 +40,21 @@ def config(filename,section):
 
     return db
 
+
+
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
+	
+	test = False
+	cookies = requests.get('http://127.0.0.1:5000/get-cookie')
+	print("COOKIE : "+str(cookies)) # based on how it prints we can fine tune the logic below. As of now I have no idea.
+	if cookies != "Failed":
+		test = True
+	print("TESTT : "+str(test))
+	if not test:
+		requests.get('http://127.0.0.1:5000/cookie')
+
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
 	public_tweets = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
