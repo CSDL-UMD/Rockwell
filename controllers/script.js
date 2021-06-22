@@ -5,6 +5,7 @@ const python_json = require('../public/js/retweet.js');
 const _ = require('lodash');
 const axx = require('axios');
 const fs = require('fs');
+const cookieParser = require('cookie-parser');
 const today = new Date();
 
 function shuffle(array) {
@@ -61,7 +62,7 @@ exports.getScript = (req, res, next) => {
                       experiment_group: feed[i].experiment_group,
                       post_id: feed[i].post_id,
                       tweet_id: feed[i].tweet_id,
-                      session_id: feed[i].session_id,
+                      worker_id: feed[i].worker_id,
                       class: "cohort",
                       picture: feed[i].picture,
                       picture_heading: feed[i].picture_heading,
@@ -101,7 +102,7 @@ exports.getScript = (req, res, next) => {
                   script_feed.push(feed_json);
               }
               //console.log("Script_Feed : "+script_feed);
-              //console.log("Script Size is now: "+finalfeed.length);
+              res.cookie('exp', 'infodiversity', { maxAge: 120*1000, httpOnly: true });
               res.render('script', { script: script_feed});
             }, 
             (error) => { // here we had an error calling guest access twitter.

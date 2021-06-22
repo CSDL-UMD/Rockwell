@@ -38,7 +38,7 @@ block content
     //  i.big.photo.link.icon
     
     -var ii = 0;
-    input(type='hidden', id='session_input', name=script[0].session_id, value=_csrf)
+    input(type='hidden', id='session_input', name=script[0].worker_id, value=_csrf)
     each val in script
       -ii = ii + 1
       -console.log(ii)
@@ -60,8 +60,8 @@ block content
             img.ui.avatar.image(src=cdn+'/profile_pictures/retweet.png', style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
             span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.retweeted_by + " Retweeted"
         if val.quoted_by.length > 0
-          .content()
-            div(style="display: flex;align-items: center")
+          .content
+            div(style="display: flex;align-items: center; margin-left: 30px;")
               div
                 img.ui.avatar.image.lazyload(data-src=val.quoted_by_actor_picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
               div(style="display: inline-grid;")
@@ -155,6 +155,7 @@ block content
 
     script.
       set_session_id(document.getElementById('session_input').getAttribute("name"));
+      const interval = setInterval(test_function_sending_data, 1000);
       function calSizeList(onresize){
         //sizeList.length = 0;
         sizeList = [];

@@ -2,8 +2,8 @@ CREATE TABLE truman_user (
    worker_id BIGSERIAL PRIMARY KEY,
    assignment_id VARCHAR(80) NOT NULL,
    twitter_id bigint NOT NULL,
-   Hit_id VARCHAR(100) NOT NULL,
-   exp_condition VARCHAR(8) NOT NULL
+   session_start TIME NOT NULL,
+   session_end TIME NOT NULL
 );
 
 CREATE TABLE tweet (
@@ -12,44 +12,30 @@ CREATE TABLE tweet (
    tweet_deleted boolean NOT NULL
 );
 
-CREATE TABLE session (
-   session_id BIGSERIAL PRIMARY KEY,
-   session_start TIME NOT NULL,
-   session_end TIME NOT NULL,
-   session_timeout boolean NULL,
-   worker_id bigint NOT NULL,
-   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id)
-);
-
-CREATE TABLE tweet_in_session (
-   is_favorited_before boolean NOT NULL,
-   session_id bigint,
-   tweet_id bigint,
-   has_retweet_before boolean NOT NULL,
-   tweet_seen boolean NULL,
-   tweet_retweeted boolean NOT NULL,
-   tweet_favorited boolean NULL,
-   rank smallint NOT NULL,
-   FOREIGN KEY (session_id) REFERENCES session (session_id),
-   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
-   PRIMARY KEY (session_id,tweet_id)
-);
-
 CREATE TABLE click (
    click_id BIGSERIAL PRIMARY KEY,
    tweet_id bigint,
    url VARCHAR(1000) NOT NULL,
    is_card boolean NOT NULL,
    click_timestamp TIME NOT NULL,
-   session_id bigint,
-   FOREIGN KEY (session_id) REFERENCES session (session_id),
+   worker_id bigint NOT NULL,
+   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id)
 );
 
 CREATE TABLE user_tweet_ass (
    tweet_id bigint,
    worker_id bigint NOT NULL,
+   is_favorited_before boolean NOT NULL,
+   has_retweet_before boolean NOT NULL,
+   tweet_seen boolean NULL,
+   tweet_retweeted boolean NOT NULL,
+   tweet_favorited boolean NULL,
+   tweet_min boolean,
+   tweet_max boolean,
+   refreshh smallint NOT NULL,
+   rank smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
-   PRIMARY KEY (worker_id,tweet_id)
+   PRIMARY KEY (worker_id,tweet_id,refreshh)
 );

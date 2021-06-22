@@ -7,7 +7,7 @@ import requests
 import datetime
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
-#import logging
+import logging
 #import requests
 #import urllib.parse
 #import urllib.error
@@ -16,8 +16,10 @@ import json
 app = Flask(__name__)
 
 app.debug = False
-#log_level = logging.DEBUG
-#logging.basicConfig(filename='authorizer.log', level=log_level)
+
+log_level = logging.DEBUG
+logging.basicConfig(filename='authorizer.log', level=log_level)
+
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -51,7 +53,7 @@ def config(filename,section):
         for param in params:
             db[param[0]] = param[1]
     else:
-        #logging.error('Error in reading config file : Section {0} not found in the {1} file'.format(section, filename))
+        logging.error('Error in reading config file : Section {0} not found in the {1} file'.format(section, filename))
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
@@ -75,8 +77,13 @@ def start():
                                    "oauth_callback": app_callback_url}))
     """
     cred = config('../../config.ini','twitterapp')
-    request_token = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'])
-    content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url})
+
+    try:
+        request_token = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'])
+        content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url})
+        logging.info('Twitter access successfull')
+    except Exception as error:
+        logging.error('Twitter access failed with error : '+str(error))
     
     #if resp['status'] != '200':
     #    error_message = 'Invalid response, status {status}, {message}'.format(
@@ -121,14 +128,21 @@ def start():
     # End of cookie code
     """
     oauth_store[oauth_token] = oauth_token_secret
-    return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
+    res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
+    res.set_cookie('exp','infodiversity',max_age=120)
+    return res
+    #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
 
 @app.route('/cookie', methods=['GET']) # This is a function to set a flask cookie
 def index():
-    resp = make_response("Setting a cookie")
-    resp.set_cookie("Exp",str((datetime.datetime.now() + datetime.timedelta(minutes=10)).isoformat()))
-    return resp
+    print("Creating cookie")
+    #resp = make_response("Setting a cookie")
+    #resp.set_cookie("Exp",str((datetime.datetime.now() + datetime.timedelta(minutes=10)).isoformat()))
+    #return resp
+    res = make_response("<h1>cookie is set</h1>")  
+    res.set_cookie('foo1','bar1')
+    return res
 
 @app.route('/get-cookie', methods=['GET'])
 def get_cookie():
@@ -191,15 +205,12 @@ def callback():
     user_id = access_token[2].split("=")[1]
     screen_name = access_token[3].split("=")[1]
 
-    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id)+'&screen_name='+str(screen_name))
+    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id))
     worker_id = resp_worker_id.json()["data"]
-
-    print(worker_id)
 
     del oauth_store[oauth_token]
 
     #redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
-    print(real_oauth_token,real_oauth_token_secret)
 
     return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
 
