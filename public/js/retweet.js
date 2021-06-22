@@ -1,9 +1,9 @@
 var furthestSeen = 0;
-var session_id = 0;
+var worker_id = 0;
 
 function set_session_id(sid) {
-  console.log("Setting Session ID : "+sid);
-  session_id = sid;
+  console.log("Setting Session ID : "+wid);
+  worker_id = wid;
 }
 
 function retweet_clicked(btn,arguments) {
@@ -161,8 +161,12 @@ function logout_send_data(){
             url: "http://127.0.0.1:5050/tracking",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"session_id": String(session_id),"furthestSeen": String(furthestSeen)})        
+            data: JSON.stringify({"session_id": String(worker_id),"furthestSeen": String(furthestSeen)})        
         }).done(function(data) {
             console.log(data);
         });
+}
+
+function test_function_sending_data(){
+  console.log("CALLED!!!!!");
 }

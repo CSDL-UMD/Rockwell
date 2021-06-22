@@ -82,22 +82,20 @@ def insert_tweet():
                 sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
                 conn_cur.execute(sql, (tweet_id,tweet_json,False))
             connection.commit()
+
             worker_id = payload[2]
-            for obj in payload[0]: # User_tweet_ass
-                tweet_id = obj['tweet_id']
-                sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id) VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
-                conn_cur.execute(sql, (tweet_id,worker_id))            
-            connection.commit()
 
             for obj in payload[1]: # Take care of tweet in session here.
                 fav_before = obj['fav_before']
-                sid = obj['sid']
                 tid = obj['tid']
                 rtbefore = obj['rtbefore']
                 rank = obj['rank']
-                sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
-                conn_cur.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
+                tweet_min = obj['tweet_min']
+                tweet_max = obj['tweet_max']
+                refreshh = obj['refresh']
+                sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id,is_favorited_before,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,tweet_min,tweet_max,refreshh,rank)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,tweet_seen,retweet_now,favorite_now,tweet_min,tweet_max,refreshh,rank,))
             connection.commit()
 
             conn_cur.close()
@@ -209,8 +207,9 @@ def get_worker_tweet():
         tries = -1
     try:
         conn_cur = connection.cursor()
-        sql = """SELECT tweet_id FROM user_tweet_ass UA WHERE UA.worker_id = %s;"""
-        conn_cur.execute(sql, (worker_id))     
+        sql = """SELECT UA.tweet_id,UA.tweet_min,UA.tweet_max,UA.refreshh,T.tweet_json FROM user_tweet_ass UA,tweet T 
+        WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where worker_id = %s)"""
+        conn_cur.execute(sql, (worker_id,worker_id))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
@@ -219,13 +218,27 @@ def get_worker_tweet():
         else:
             conn_cur.close()
             accessPool.putconn(connection)
-            return None #Meaning we need to fetch new tweets.
+            return jsonify(data="NEW") #Meaning we need to fetch new tweets.
     except Exception as error:
         print(error)
     return "Done!"
 
-
-
+@app.route('/set_deleted_tweets', methods=['POST']) # Should the method be GET?
+def set_deleted_tweets():
+    connection = None
+    try:
+        connection = accessPool.getconn()
+        if connection is not False:
+            payload = request.json
+            conn_cur = connection.cursor()
+            for obj in payload:
+                tweet_id = obj['del_tweet']
+                sql = """UPDATE tweet SET tweet_deleted = %s WHERE tweet_id = %s"""
+                conn_cur.execute(sql, (True,tweet_id))
+            connection.commit()
+    except Exception as error:
+        print(error)
+    return "Done"
 #@app.route('/insert_tweet_session', methods=['POST'])
 #def insert_tweet_session(): # This will take many arguments and takes logic in the guest access twitter to work
 #    favorite_now = False
@@ -307,15 +320,16 @@ def update_tweet_like():
 def insert_user():
     """ insert a new vendor into the vendors table """
     retVal123 = -1
-    sql = """INSERT INTO truman_user(assignment_id,twitter_id,Hit_id,exp_condition)
+    sql = """INSERT INTO truman_user(assignment_id,twitter_id,session_start,session_end)
          VALUES(%s,%s,%s,%s) RETURNING worker_id;"""
     try:
         connection = accessPool.getconn()
         if connection is not False: 
             twitter_id = request.args.get('twitter_id')
-            hit_id = request.args.get('screen_name')
+            now_session_start = datetime.datetime.now()
+            session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             cursor = connection.cursor()
-            cursor.execute(sql, ("BETA",twitter_id,hit_id,"EXP_COND",))
+            cursor.execute(sql, ("BETA",twitter_id,session_start,session_start,))
             retVal123 = cursor.fetchall()[0][0]
             cursor.close()
             connection.commit()

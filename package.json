@@ -24,6 +24,7 @@
     "clockwork": "^0.1.4",
     "compression": "^1.7.4",
     "connect-mongo": "^3.0.0",
+    "cookie-parser": "^1.4.5",
     "csv-write-stream": "^2.0.0",
     "csvtojson": "^2.0.8",
     "dotenv": "^8.0.0",

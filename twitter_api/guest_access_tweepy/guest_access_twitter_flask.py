@@ -46,28 +46,58 @@ def config(filename,section):
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
 	
-	test = False
-	cookies = requests.get('http://127.0.0.1:5000/get-cookie')
-	print("COOKIE : "+str(cookies)) # based on how it prints we can fine tune the logic below. As of now I have no idea.
-	if cookies != "Failed":
-		test = True
-	print("TESTT : "+str(test))
-	if not test:
-		requests.get('http://127.0.0.1:5000/cookie')
+	#test = False
+	#cookies = requests.get('http://127.0.0.1:5000/cookie')
+	#print("COOKIE : "+str(cookies)) # based on how it prints we can fine tune the logic below. As of now I have no idea.
+	#if cookies != "Failed":
+	#	test = True
+	#print("TESTT : "+str(test))
+	#if not test:
+	#	requests.get('http://127.0.0.1:5000/cookie')
 
+	access_token = request.args.get('access_token')
+	access_token_secret = request.args.get('access_token_secret')
+	cred = config('../../config.ini','twitterapp')
+	cred['token'] = access_token.strip()
+	cred['token_secret'] = access_token_secret.strip()
+	oauth = OAuth1Session(cred['key'],
+						client_secret=cred['key_secret'],
+						resource_owner_key=cred['token'],
+						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
 	public_tweets = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
-	public_tweets = None
-	if(public_tweets is None):
-		access_token = request.args.get('access_token')
-		access_token_secret = request.args.get('access_token_secret')
-		cred = config('../../config.ini','twitterapp')
-		resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
-		session_id = resp_session_id.json()["data"]
-
-		cred['token'] = access_token.strip()
-		cred['token_secret'] = access_token_secret.strip()
+	data_db = public_tweets.json()['data']
+	refresh = 0
+	#a_session = requests.Session()
+	#a_session.get('https://127.0.0.1:3000/')
+	#session_cookies = a_session.cookies
+	#cookies_dictionary = session_cookies.get_dict()
+	print("Cookies Dictionary ::: ")
+	print(cookies_dictionary)
+	if data_db != 'NEW':
+		tweet_ids = [d[0] for d in data_db]
+		min_ids = [d[1] for d in data_db]
+		max_ids = [d[2] for d in data_db]
+		refresh = data_db[0][3] + 1
+		max_tweet_id = tweet_ids[max_ids.index(True)]
+		min_tweet_id = tweet_ids[min_ids.index(True)]
+		params = {"since_id": str(min_tweet_id-1),"tweet_mode": "extended"}
+		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
+		all_tweets = json.loads(response.text)
+		new_tweet_ids = []
+		for tweet in all_tweets:
+			new_tweet_ids.append(tweet["id"])
+		deleted_tweet_ids = list(set(tweet_ids) - set(new_tweet_ids))
+		deleted_tweet_payload = []
+		for del_tweet in deleted_tweet_ids:
+			deleted_tweet_payload.append({'del_tweet':str(del_tweet)})
+		if deleted_tweet_payload:
+			requests.post('http://127.0.0.1:5052/set_deleted_tweets',json=deleted_tweet_payload)
+		public_tweets = all_tweets[:20]
+	if data_db == 'NEW':
+		#resp_session_id = requests.get('http://127.0.0.1:5052/insert_session?worker_id='+str(worker_id))
+		#session_id = resp_session_id.json()["data"]
 
 		'''	auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
 		auth.set_access_token(cred["token"], cred["token_secret"])
@@ -77,10 +107,6 @@ def get_feed():
 
 		public_tweets = api.home_timeline(count=countt,tweet_mode='extended')
 		'''
-		oauth = OAuth1Session(cred['key'],
-						client_secret=cred['key_secret'],
-						resource_owner_key=cred['token'],
-						resource_owner_secret=cred['token_secret'])
 		#response = oauth.get("https://api.twitter.com/labs/2/tweets", params = params)
 		params = {"count": "20","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
@@ -101,8 +127,11 @@ def get_feed():
 	db_tweet_payload = []
 	db_tweet_session_payload = []
 	tweet_ids_seen = []
-	i = 1
-	ff = open('tweets_full_text.txt','w')
+	rankk = 1
+
+	all_tweet_ids = [tweet['id'] for tweet in public_tweets]
+	min_tweet_id = min(all_tweet_ids)
+	max_tweet_id = max(all_tweet_ids)
 	#print(json.dumps(public_tweets[0], indent=4, sort_keys=True))
 
 	for tweet in public_tweets: # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
@@ -113,6 +142,14 @@ def get_feed():
 		# Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
 		actor_name = tweet["user"]["name"]
 		#tweet_id = str(tweet.id)
+		
+		if_min_tweet_id = False
+		if tweet["id"] == min_tweet_id:
+			if_min_tweet_id = True
+		if_max_tweet_id = False
+		if tweet["id"] == max_tweet_id:
+			if_max_tweet_id = True
+
 		db_tweet = {
 			'tweet_id':tweet["id"],
 			'tweet_json':tweet
@@ -120,14 +157,16 @@ def get_feed():
 		db_tweet_payload.append(db_tweet)
 		db_tweet_session = {
 			'fav_before':str(tweet['favorited']),
-			'sid':str(session_id),
 			'tid':str(tweet["id"]),
 			'rtbefore':str(tweet['retweeted']),
-			'rank':str(i)
+			'rank':str(rankk),
+			'tweet_min':str(if_min_tweet_id),
+			'tweet_max':str(if_max_tweet_id),
+			'refresh':str(refresh)
 		}
 		db_tweet_session_payload.append(db_tweet_session)
 		#requests.post('http://127.0.0.1:5052/insert_tweet?tweet_id='+str(tweet["id"]))
-		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(i))
+		#requests.post('http://127.0.0.1:5052/insert_tweet_session?fav_before='+str(tweet['favorited'])+'&sid='+str(session_id)+'&tid='+str(tweet["id"])+'&rtbefore='+str(tweet['retweeted'])+'&rank='+str(rankk))
 		#print("Response : ")sid
 		#print(res)
 
@@ -160,17 +199,13 @@ def get_feed():
 			for i in range(len(url_start)):
 				url_idx_start = url_start[i]
 				full_text_json.append({"text":full_text[normal_idx:url_idx_start],"url":""})
-				full_text_json.append({"text":url_display[i],"url":url_extend[i]})
+				full_text_json.append({"text":url_extend[i],"url":url_extend[i]})
 				normal_idx = url_end[i]
 			if normal_idx < len(full_text):
 				full_text_json.append({"text":full_text[normal_idx:len(full_text)],"url":""})
 		else:
 			full_text_json.append({"text":full_text,"url":""})
 		
-		ff.write(full_text)
-		ff.write("\n")
-		ff.write("\n".join(json.dumps(ffjson) for ffjson in full_text_json))
-		ff.write("\n")
 		isRetweet = False 
 		retweeted_by = ""
 		actor_picture = tweet["user"]["profile_image_url"]
@@ -381,9 +416,9 @@ def get_feed():
 			'urls':urls,
 			'expanded_urls':expanded_urls,
 			'experiment_group':'var1',
-			'post_id':i,
+			'post_id':rankk,
 			'tweet_id':str(tweet["id"]),
-			'session_id':str(session_id),
+			'worker_id':str(worker_id),
 			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
@@ -403,7 +438,7 @@ def get_feed():
 			'quoted_by_actor_picture' : quoted_by_actor_picture
 		}
 		feed_json.append(feed)
-		i = i + 1
+		rankk = rankk + 1
 	finalJson = []
 	finalJson.append(db_tweet_payload)
 	finalJson.append(db_tweet_session_payload)
