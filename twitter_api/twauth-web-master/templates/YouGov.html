@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<p>If you are willing, we ask that you please click the button below so that we can obtain your Twitter username. This ensures that we get an authentic username. The button will briefly redirect you to Twitter and ask you to allow the Volunteer Science application to fetch your username only. <b>(If you are on a mobile device, you might receive a pop-up warning.)</b> Volunteer Science is an academic research platform developed by researchers at Northeastern University.</p>
+
+<p><b>You might receive a pop-up warning and/or need to authorize your computer or device to allow the pop-up to be displayed. Please accept this pop-up.</b></p>
+
+<p><b>If you are using Safari on iOS (iPhone or iPad), before you click on the button, click on the settings button on your device. Then click on Safari and unselect "Block Pop-ups" </b></p>
+
+<p>Please click the button below. After logging in, your Twitter username will appear in the box below the button so that you can confirm it is correct. You will not be able to edit the text in this box.</p>
+
+<p><b>Please log in with Twitter so we can fetch your Twitter handle.</b><br>
+<button type="button" id="twitter-login-btn" onclick="start('{{ start_url }}')">Fetch handle</button></p>
+<input type="text" id="fname" name="fname" disabled><br>
+<p><button type="button" id="loadfeed" onclick="load_feed('{{ truman_url }}')" style="display: none;">Load Feed</button></p>
+<p id="loader" style="display: none;">Please wait while your feed loads.....</p> 
+
+<script type="text/javascript">
+    var inputF = document.getElementById("fname");
+    var load_feed_button = document.getElementById("loadfeed");
+    if ('{{screenname}}' != "###"){
+        inputF.setAttribute('value', '{{screenname}}');
+        load_feed_button.style.display = "block";
+    }
+    function start(url){
+        //popup = window.open(url);
+        window.location.href = url;
+    }
+    function load_feed(url){
+        var p_loader = document.getElementById("loader");
+        p_loader.style.display = "block";
+        location.replace(url);
+    }
+</script>
+
+</html>

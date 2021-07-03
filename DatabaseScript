@@ -3,7 +3,8 @@ CREATE TABLE truman_user (
    assignment_id VARCHAR(80) NOT NULL,
    twitter_id bigint NOT NULL,
    session_start TIME NOT NULL,
-   session_end TIME NOT NULL
+   session_end TIME NOT NULL,
+   account_settings JSON
 );
 
 CREATE TABLE tweet (

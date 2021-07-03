@@ -1,9 +1,18 @@
 var furthestSeen = 0;
 var worker_id = 0;
+var refreshh = 0;
+var retweet_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var like_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var seen_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var click_map = [];
 
-function set_session_id(sid) {
-  console.log("Setting Session ID : "+wid);
+function set_session_id(wid,r) {
   worker_id = wid;
+  refreshh = r;
+  localStorage.setItem("retweet_map_"+String(refreshh), retweet_map);
+  localStorage.setItem("like_map_"+String(refreshh), like_map);
+  localStorage.setItem("seen_map_"+String(refreshh), seen_map);
+  localStorage.setItem("click_map_"+String(refreshh), seen_map);
 }
 
 function retweet_clicked(btn,arguments) {
@@ -23,7 +32,10 @@ function retweet_clicked(btn,arguments) {
     btn.innerHTML='Retweeted';
     btn.style.color = 'red';
     var tweet_id = arguments.split(',')[0].trim();
+    var rank = arguments.split(',')[1].trim();
     document.getElementById('retweet_counter_'+tweet_id).innerHTML = parseInt(document.getElementById('retweet_counter_'+tweet_id).innerHTML) + 1
+    retweet_map[rank-1] = 1; 
+    localStorage.setItem("retweet_map_"+String(refreshh), retweet_map);
     $.ajax({
             url: "http://127.0.0.1:5050/retweet",
             type: "POST",
@@ -53,7 +65,10 @@ function like_clicked(btn,arguments) {
     btn.innerHTML='Liked';
     btn.style.color = 'red';
     var tweet_id = arguments.split(',')[0].trim();
+    var rank = arguments.split(',')[1].trim();
     document.getElementById('like_counter_'+tweet_id).innerHTML = parseInt(document.getElementById('like_counter_'+tweet_id).innerHTML) + 1
+    like_map[rank-1] = 1;
+    localStorage.setItem("like_map_"+String(refreshh), like_map);
     $.ajax({
             url: "http://127.0.0.1:5050/like",
             type: "POST",
@@ -65,7 +80,7 @@ function like_clicked(btn,arguments) {
   }    
 }
 
-function link_clicked(arguments) {
+function link_clicked(link_arguments) {
 
   //var spawn = require("child_process").spawn;
   //const { spawn } = require('child_process');
@@ -80,14 +95,23 @@ function link_clicked(arguments) {
     // ... use spawn()
   //});
   console.log("In Link Clicked");
-  $.ajax({
-            url: "http://127.0.0.1:5050/link",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({"arguments": String(arguments)})        
-        }).done(function(data) {
-            console.log(data);
-        });    
+  var tweet_id = link_arguments.split(',')[0].trim();
+  var url = link_arguments.split(',')[1].trim();
+  var is_card = link_arguments.split(',')[2].trim();
+  var date = new Date();
+  date = date.toLocaleString('en-US', { timeZone: 'America/New_York' });
+  date = date.replace(","," ");
+  click_map_url_in = tweet_id+";"+url+";"+is_card+";"+String(date);
+  click_map.push(click_map_url_in);
+  localStorage.setItem("click_map_"+String(refreshh), click_map);
+  // $.ajax({
+  //           url: "http://127.0.0.1:5050/link",
+  //           type: "POST",
+  //           contentType: "application/json",
+  //           data: JSON.stringify({"arguments": String(arguments)})        
+  //       }).done(function(data) {
+  //           console.log(data);
+  //       });    
 }
 
 // Function to monitor tweets seen based on the screen position. Whole function works in pixels
@@ -150,6 +174,8 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
    }
   
   furthestSeen = countScrollBased;
+  seen_map[furthestSeen] = 1;
+  localStorage.setItem("seen_map_"+String(refreshh), seen_map); 
   console.log("COUNT SCROLL BASED : "+countScrollBased);
 // Also must consider whether or not we must update the data base. I propose another function here below
 // That is called prior to valid return statements where read status must be updated. This function may need an array with the 
@@ -157,16 +183,35 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
 }
 
 function logout_send_data(){
+  console.log(localStorage.getItem("seen_map_"+String(refreshh)));
+  console.log(localStorage.getItem("click_map_"+String(refreshh)));
+  retweet_map_all = [];
+  like_map_all = [];
+  seen_map_all = [];
+  click_map_all = [];
+  for(i = 0;i<=refreshh;i++){
+    retweet_map_all.push(localStorage.getItem("retweet_map_"+String(i)));
+    like_map_all.push(localStorage.getItem("like_map_"+String(i)));
+    seen_map_all.push(localStorage.getItem("seen_map_"+String(i)));
+    click_map_all.push(localStorage.getItem("click_map_"+String(i)))
+  }  
   $.ajax({
-            url: "http://127.0.0.1:5050/tracking",
+            url: "http://127.0.0.1:5052/engagements_save",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({"session_id": String(worker_id),"furthestSeen": String(furthestSeen)})        
+            data: JSON.stringify({"worker_id": String(worker_id),
+              "retweet_map": retweet_map_all,
+              "like_map": like_map_all,
+              "seen_map": seen_map_all,
+              "click_map": click_map_all
+            })        
         }).done(function(data) {
             console.log(data);
+            for(i = 0;i<=refreshh;i++){
+              localStorage.removeItem("retweet_map_"+String(i));
+              localStorage.removeItem("like_map_"+String(i));
+              localStorage.removeItem("seen_map_"+String(i));
+              localStorage.removeItem("click_map_"+String(i));
+            }
         });
-}
-
-function test_function_sending_data(){
-  console.log("CALLED!!!!!");
 }

@@ -63,6 +63,8 @@ exports.getScript = (req, res, next) => {
                       post_id: feed[i].post_id,
                       tweet_id: feed[i].tweet_id,
                       worker_id: feed[i].worker_id,
+                      refreshh:feed[i].refreshh,
+                      rank:feed[i].rank,
                       class: "cohort",
                       picture: feed[i].picture,
                       picture_heading: feed[i].picture_heading,

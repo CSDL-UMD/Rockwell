@@ -49,7 +49,7 @@ def retweet():
         #api.retweet(int(tweet_id))
         #params = {"id": int(tweet_id)}
         response_retweet = oauth.post("https://api.twitter.com/1.1/statuses/retweet/"+tweet_id+".json")
-        requests.post('http://127.0.0.1:5052/update_tweet_retweet?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
+        #requests.post('http://127.0.0.1:5052/update_tweet_retweet?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
@@ -76,7 +76,7 @@ def like():
         #tweet = api.get_status(int(tweet_id))
         #tweet.favorite()
         response_like = oauth.post("https://api.twitter.com/1.1/favorites/create.json",params = {"id":int(tweet_id)})
-        requests.post('http://127.0.0.1:5052/update_tweet_like?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
+        #requests.post('http://127.0.0.1:5052/update_tweet_like?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
