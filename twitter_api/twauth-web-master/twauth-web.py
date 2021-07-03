@@ -26,6 +26,7 @@ access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
 truman_url = 'http://127.0.0.1:3000'
+account_settings_url = 'https://api.twitter.com/1.1/account/settings.json'
 
 # Support keys from environment vars (Heroku).
 #app.config['APP_CONSUMER_KEY'] = os.getenv(
@@ -128,7 +129,9 @@ def start():
     # End of cookie code
     """
     oauth_store[oauth_token] = oauth_token_secret
-    res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
+    start_url = authorize_url+"?oauth_token="+oauth_token
+    #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
+    res = make_response(render_template('YouGov.html', start_url=start_url, screenname="###", truman_url="###"))
     res.set_cookie('exp','infodiversity',max_age=120)
     return res
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
@@ -205,14 +208,21 @@ def callback():
     user_id = access_token[2].split("=")[1]
     screen_name = access_token[3].split("=")[1]
 
-    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id))
+    oauth_account_settings = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'],resource_owner_key=real_oauth_token,resource_owner_secret=real_oauth_token_secret)
+    response = oauth_account_settings.get(account_settings_url)
+    account_settings_user = json.dumps(json.loads(response.text))
+    
+    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
     worker_id = resp_worker_id.json()["data"]
+
+    truman_url_agg = 'http://127.0.0.1:3000?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id)
 
     del oauth_store[oauth_token]
 
     #redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
 
-    return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
+    #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
+    return render_template('YouGov.html', start_url="###", screenname=screen_name, truman_url=truman_url_agg)
 
 @app.errorhandler(500)
 def internal_server_error(e):

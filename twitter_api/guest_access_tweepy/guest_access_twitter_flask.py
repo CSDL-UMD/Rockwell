@@ -15,8 +15,10 @@ import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
+from pycookiecheat import chrome_cookies
 import xml
 import xml.sax.saxutils
+
 #import requests as rq
 
 app = Flask(__name__)
@@ -69,12 +71,8 @@ def get_feed():
 	public_tweets = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
 	data_db = public_tweets.json()['data']
 	refresh = 0
-	#a_session = requests.Session()
-	#a_session.get('https://127.0.0.1:3000/')
-	#session_cookies = a_session.cookies
-	#cookies_dictionary = session_cookies.get_dict()
-	print("Cookies Dictionary ::: ")
-	print(cookies_dictionary)
+	#req = requests.get('http://127.0.0.1:5000/').cookies
+	#print(req)
 	if data_db != 'NEW':
 		tweet_ids = [d[0] for d in data_db]
 		min_ids = [d[1] for d in data_db]
@@ -419,6 +417,8 @@ def get_feed():
 			'post_id':rankk,
 			'tweet_id':str(tweet["id"]),
 			'worker_id':str(worker_id),
+			'refreshh':str(refresh),
+			'rank':str(rankk),
 			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,

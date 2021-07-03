@@ -280,6 +280,63 @@ def set_deleted_tweets():
 #        print(error)
 #    return "Done!"
 
+@app.route('/engagements_save', methods=['POST']) # Should the method be GET?
+def save_all_engagements():
+    tries = 5
+    connection = None
+    worker_id = ''
+    refreshh = ''
+    retweet_map = ''
+    like_map = ''
+    seen_map = ''
+    click_map_url = ''
+    try:
+        #Getting connection from pool
+        payload = request.get_json()
+        worker_id = payload['worker_id']
+        retweet_map = payload['retweet_map']
+        like_map = payload['like_map']
+        seen_map = payload['seen_map']
+        click_map_url = payload['click_map']
+        print("seen_map")
+        print(seen_map)
+        print(click_map_url)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        sql = """UPDATE user_tweet_ass 
+        SET tweet_seen = %s, tweet_retweeted = %s, tweet_favorited = %s 
+        WHERE worker_id = %s and refreshh = %s and rank = %s"""
+        for refreshh in range(len(retweet_map)):
+            retweet_map_int = retweet_map[refreshh].split(',')
+            like_map_int = like_map[refreshh].split(',')
+            seen_map_int = seen_map[refreshh].split(',')
+            for rank in range(len(retweet_map_int)):
+                conn_cur.execute(sql,(bool(int(seen_map_int[rank])),bool(int(retweet_map_int[rank])),bool(int(like_map_int[rank])),worker_id,refreshh,rank+1))
+        sql_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,worker_id)
+        VALUES(%s,%s,%s,%s,%s);"""     
+        for clickk_each in click_map_url:
+            clickk = clickk_each.split(",")
+            for cc in clickk:
+                cc_comp = cc.split(";")
+                click_timestamp = cc_comp[3]
+                formatt = '%m/%d/%Y  %I:%M:%S %p'
+                click_datetime = datetime.datetime.strptime(click_timestamp,formatt)
+                conn_cur.execute(sql_click,(cc_comp[0],cc_comp[1],cc_comp[2],click_timestamp,worker_id)) 
+        connection.commit()
+    except Exception as error:
+        print(error)
+    return "Done!"
+
 @app.route('/update_tweet_retweet', methods=['POST'])
 def update_tweet_retweet():
     connection = None
@@ -326,33 +383,11 @@ def insert_user():
         connection = accessPool.getconn()
         if connection is not False: 
             twitter_id = request.args.get('twitter_id')
+            account_settings_json = request.args.get('account_settings')
             now_session_start = datetime.datetime.now()
             session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             cursor = connection.cursor()
             cursor.execute(sql, ("BETA",twitter_id,session_start,session_start,))
-            retVal123 = cursor.fetchall()[0][0]
-            cursor.close()
-            connection.commit()
-            accessPool.putconn(connection)
-            return jsonify(data=retVal123)
-    except (Exception, psycopg2.DatabaseError) as error:
-        print("ERROR!!!!",error)
-    return retVal123
-
-@app.route('/insert_session', methods=['GET']) # Also must return session ID. We might want the date also..
-def insert_session():
-    retVal123 = -1
-    try:
-        #Getting connection from pool
-        connection = accessPool.getconn()
-        if connection is not False:
-            now_session_start = datetime.datetime.now()
-            session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
-            worker_id = request.args.get('worker_id')
-            sql = """INSERT INTO session(session_start,session_end,worker_id)
-                VALUES(%s,%s,%s) RETURNING session_id;"""
-            cursor = connection.cursor()
-            cursor.execute(sql,(session_start,session_start,worker_id,))
             retVal123 = cursor.fetchall()[0][0]
             cursor.close()
             connection.commit()
@@ -381,50 +416,6 @@ def insert_session():
 #            accessPool.putconn(connection)
 #    except (Exception, psycopg2.DatabaseError) as error:
 #        print("ERROR!!!!",error)
-
-@app.route('/insert_click', methods=['POST'])
-def insert_click(): # This will take many arguments and takes logic in the guest access twitter to work
-    connection = None
-    try:
-        #Getting connection from pool
-        connection = accessPool.getconn()
-        if connection is not False:
-            timestamp = datetime.datetime.now()
-            timestamp_str = str(timestamp.year) + '-' + str(timestamp.month) + '-' + str(timestamp.day) + ' ' + str(timestamp.hour) + ':' + str(timestamp.minute) + ':' + str(timestamp.second)
-            tweet_id = request.args.get('tweet_id')
-            session_id = request.args.get('session_id')
-            urll = request.args.get('urll')
-            iscard = request.args.get('iscard')
-            sql = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id)
-            VALUES(%s,%s,%s,%s,%s);"""
-            cursor = connection.cursor()
-            cursor.execute(sql,(tweet_id,urll,iscard,timestamp_str,session_id,)) # could pass False directly maybe? not sure if it will translate right
-            #returnData = cursor.fetchall()
-            cursor.close()
-            connection.commit()
-            accessPool.putconn(connection) #closing the connection
-    except Exception as error:
-        print(error)
-    return "Done!"
-
-@app.route('/insert_tracking', methods=['POST'])
-def insert_tracking():
-    connection = None
-    try:
-        connection = accessPool.getconn()
-        if connection is not False:
-            session_id = request.args.get('session_id')
-            furthestSeen = int(request.args.get('furthestSeen'))
-            sql = """UPDATE tweet_in_session SET tweet_seen = %s WHERE session_id = %s and rank = %s"""
-            cursor = connection.cursor()
-            for rank_seen in range(1,furthestSeen+1):
-                cursor.execute(sql,(str(True),session_id,rank_seen,))
-            cursor.close()
-            connection.commit()
-            accessPool.putconn(connection)
-    except Exception as error:
-        print(error)
-    return "Done!"
 
 @app.after_request
 def add_headers(response):
