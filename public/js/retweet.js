@@ -1,6 +1,7 @@
 var furthestSeen = 0;
 var worker_id = 0;
 var refreshh = 0;
+var slideIndex = 1;
 var retweet_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var like_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var seen_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -177,9 +178,41 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
   seen_map[furthestSeen] = 1;
   localStorage.setItem("seen_map_"+String(refreshh), seen_map); 
   console.log("COUNT SCROLL BASED : "+countScrollBased);
+  if(furthestSeen == 10){
+    document.getElementById('myModal').style.display = "block";
+    showSlides(slideIndex);
+  }
 // Also must consider whether or not we must update the data base. I propose another function here below
 // That is called prior to valid return statements where read status must be updated. This function may need an array with the 
 // appropriate data like tweet id to find the right row in the data tables.
+}
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  var modal = document.getElementById("myModal");
+  if (n > slides.length) {
+    modal.style.display = "none";
+  }
+  else{
+    for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+    }
+    for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+    }
+    slides[slideIndex-1].style.display = "block";  
+    dots[slideIndex-1].className += " active";
+  }
 }
 
 function logout_send_data(){
