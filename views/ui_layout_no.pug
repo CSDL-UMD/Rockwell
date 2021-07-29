@@ -220,6 +220,19 @@ html
         from {opacity: .4} 
         to {opacity: 1}
       }
+
+      .footernew {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: white;
+        border: 1px solid rgba(34,36,38,.15);
+        color: black;
+        text-align: right;
+        z-index: 1000;
+        padding-right: 18%;
+      }
       
   script.
     if ('serviceWorker' in navigator) {
@@ -254,7 +267,7 @@ html
       include partials/ui_flash
       block content
 
-    //include partials/ui_footer
+    include partials/ui_footer
     //- New Post Modal
     //-
       var nudge = "no";
