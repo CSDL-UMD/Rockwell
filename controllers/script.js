@@ -104,7 +104,7 @@ exports.getScript = (req, res, next) => {
                   script_feed.push(feed_json);
               }
               //console.log("Script_Feed : "+script_feed);
-              res.cookie('exp', 'infodiversity', { maxAge: 120*1000, httpOnly: true });
+              res.cookie('exp', 'infodiversity', { maxAge: 120*1000, httpOnly: true, samesite: "none", secure: true });
               res.render('script', { script: script_feed});
             }, 
             (error) => { // here we had an error calling guest access twitter.
@@ -129,6 +129,8 @@ exports.getScript = (req, res, next) => {
           oauthAccessToken = req.query.access_token
           oauthAccessTokenSecret = req.query.access_token_secret
           workerid = req.query.worker_id
+          console.log("COOKIES");
+          console.log(req.cookies);
           makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid,oauthAccessToken,oauthAccessTokenSecret);
         } catch (err) {
           log_error(err, ["accesstoken: ",oauthAccessToken, " tokensecret: ",oauthAccessTokenSecret, " workerid: ",workerid]);
