@@ -83,7 +83,7 @@ def insert_tweet():
                 conn_cur.execute(sql, (tweet_id,tweet_json,False))
             connection.commit()
 
-            worker_id = payload[2]
+            worker_id = payload[3]
 
             for obj in payload[1]: # Take care of tweet in session here.
                 fav_before = obj['fav_before']
@@ -96,6 +96,13 @@ def insert_tweet():
                 sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id,is_favorited_before,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,tweet_min,tweet_max,refreshh,rank)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
                 conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,tweet_seen,retweet_now,favorite_now,tweet_min,tweet_max,refreshh,rank,))
+            connection.commit()
+
+            for obj in payload[2]: # Take care of tweet in attention here.
+                tweet_id = obj['tweet_id']
+                rank = obj['rank']
+                sql = """INSERT INTO user_tweet_attn(tweet_id,worker_id,rank) VALUES(%s,%s,%s);"""
+                conn_cur.execute(sql,(tweet_id,worker_id,rank,))
             connection.commit()
 
             conn_cur.close()
@@ -221,6 +228,44 @@ def get_worker_tweet():
             return jsonify(data="NEW") #Meaning we need to fetch new tweets.
     except Exception as error:
         print(error)
+    return "Done!"
+
+@app.route('/get_existing_attn_tweets', methods=['GET','POST']) # Should the method be GET?
+def get_worker_attention_tweet():
+    tries = 5
+    connection = None
+    worker_id = ''
+    try:
+        #Getting connection from pool
+        worker_id = request.args.get('worker_id').strip()
+        print("Worker ID : "+worker_id)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    #try:
+    conn_cur = connection.cursor()
+    sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_attn UA,tweet T 
+    WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s"""
+    conn_cur.execute(sql, (worker_id,))     
+    if conn_cur.rowcount > 0:
+        ret = conn_cur.fetchall()
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data=ret)
+    else:
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data="NEW") #Meaning we need to fetch new tweets.
+    #except Exception as error:
+    #    print("Error in get existing tweets!!!")
+    #    print(error)
     return "Done!"
 
 @app.route('/set_deleted_tweets', methods=['POST']) # Should the method be GET?

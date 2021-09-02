@@ -66,6 +66,7 @@ def config(filename,section):
 
 @app.route('/')
 def start():
+    print("IN START")
     # note that the external callback URL must be added to the whitelist on
     # the developer.twitter.com portal, inside the app settings
     app_callback_url = url_for('callback', _external=True)
@@ -84,6 +85,7 @@ def start():
         content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url})
         logging.info('Twitter access successfull')
     except Exception as error:
+        print('Twitter access failed with error : '+str(error))
         logging.error('Twitter access failed with error : '+str(error))
     
     #if resp['status'] != '200':
@@ -132,7 +134,7 @@ def start():
     start_url = authorize_url+"?oauth_token="+oauth_token
     #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
     res = make_response(render_template('YouGov.html', start_url=start_url, screenname="###", truman_url="###"))
-    res.set_cookie('exp','infodiversity',max_age=120)
+    res.set_cookie('exp','infodiversity',max_age=1800)
     return res
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
@@ -163,6 +165,7 @@ def get_cookie():
 
 @app.route('/callback')
 def callback():
+    print("IN CALLBACK")
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
@@ -215,7 +218,10 @@ def callback():
     resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
     worker_id = resp_worker_id.json()["data"]
 
-    truman_url_agg = 'http://127.0.0.1:3000?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id)
+    attn = 0
+    page = 0
+
+    truman_url_agg = 'http://127.0.0.1:3000?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page)
 
     del oauth_store[oauth_token]
 
