@@ -1,15 +1,24 @@
 var furthestSeen = 0;
 var worker_id = 0;
 var refreshh = 0;
+var attn = 0;
+var page = 0;
+var access_token = "";
+var access_token_secret = "";
 var slideIndex = 1;
 var retweet_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var like_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 var seen_map = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var attn_map = [0,0,0];
 var click_map = [];
 
-function set_session_id(wid,r) {
+function set_session_id(wid,r,a,p,acc,acc_secret) {
   worker_id = wid;
   refreshh = r;
+  attn = a;
+  page = p;
+  access_token = acc;
+  access_token_secret = acc_secret;
   localStorage.setItem("retweet_map_"+String(refreshh), retweet_map);
   localStorage.setItem("like_map_"+String(refreshh), like_map);
   localStorage.setItem("seen_map_"+String(refreshh), seen_map);
@@ -115,6 +124,47 @@ function link_clicked(link_arguments) {
   //       });    
 }
 
+function attn_clicked(n) {
+  console.log(n);
+  attn_map[n] = 1;
+  var tot = attn_map.reduce((a, b) => a + b, 0)
+  if(tot == 3){
+      document.getElementById('nextarrow').style.color = "green";
+      document.getElementById('nextarrow').style.cursor = "pointer";
+      document.getElementById('nextarrow').onclick = function() { next_arrow(); };
+  }
+}
+
+function yesclicked(n) {
+  yesbtn = document.getElementById('yesbtn_'+n);
+  nobtn = document.getElementById('nobtn_'+n);
+  if(nobtn.style.background == 'yellow')
+    nobtn.style.background = 'white'
+  yesbtn.style.background = 'yellow'
+  attn_map[n] = 1;
+  var tot = attn_map.reduce((a, b) => a + b, 0)
+  if(tot == 3){
+      document.getElementById('nextarrow').style.color = "green";
+      document.getElementById('nextarrow').style.cursor = "pointer";
+      document.getElementById('nextarrow').onclick = function() { next_arrow(); };
+  }  
+}
+
+function noclicked(n) {
+  yesbtn = document.getElementById('yesbtn_'+n);
+  nobtn = document.getElementById('nobtn_'+n);
+  if(yesbtn.style.background == 'yellow')
+    yesbtn.style.background = 'white'
+  nobtn.style.background = 'yellow'
+  attn_map[n] = 1;
+  var tot = attn_map.reduce((a, b) => a + b, 0)
+  if(tot == 3){
+      document.getElementById('nextarrow').style.color = "green";
+      document.getElementById('nextarrow').style.cursor = "pointer";
+      document.getElementById('nextarrow').onclick = function() { next_arrow(); };
+  }
+}
+
 // Function to monitor tweets seen based on the screen position. Whole function works in pixels
 function viewCountScrollBased(sizeList,curPos,topPadding) {
   // sizeLIst is the array of all the "tweet" container sizes
@@ -178,13 +228,46 @@ function viewCountScrollBased(sizeList,curPos,topPadding) {
   seen_map[furthestSeen] = 1;
   localStorage.setItem("seen_map_"+String(refreshh), seen_map); 
   console.log("COUNT SCROLL BASED : "+countScrollBased);
-  if(furthestSeen == 10){
-    document.getElementById('myModal').style.display = "block";
-    showSlides(slideIndex);
+
+  if(furthestSeen == sizeList.length){
+    if(attn == 0){
+      setTimeout(function(){
+        document.getElementById('nextarrow').style.color = "green";
+        document.getElementById('nextarrow').style.cursor = "pointer";
+        document.getElementById('nextarrow').onclick = function() { next_arrow(); };
+        //showSlides(slideIndex);
+      },30000);
+    }
   }
+  //if(furthestSeen == sizeList.length)
 // Also must consider whether or not we must update the data base. I propose another function here below
 // That is called prior to valid return statements where read status must be updated. This function may need an array with the 
 // appropriate data like tweet id to find the right row in the data tables.
+}
+
+function next_arrow_activate(){
+  document.getElementById('nextarrow').style.color = "green";
+  document.getElementById('nextarrow').style.cursor = "pointer";
+  document.getElementById('nextarrow').onclick = function() { next_arrow(); };
+}
+
+function next_arrow() {
+  if (attn == 0){
+    attn = 1;
+  }
+  else{
+    attn = 0;
+    page = parseInt(page) + 1;
+  }
+  urll = 'http://127.0.0.1:3000?access_token=' + String(access_token) + '&access_token_secret=' + String(access_token_secret) + '&worker_id=' + String(worker_id) + '&attn=' + String(attn) + '&page=' + String(page)
+  location.replace(urll);
+  //$.ajax({
+  //          url: urll,
+  //          type: "POST",
+  //          contentType: "application/json"        
+  //      }).done(function(data) {
+  //          console.log(data);
+  //      });
 }
 
 function plusSlides(n) {

@@ -40,3 +40,12 @@ CREATE TABLE user_tweet_ass (
    FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
    PRIMARY KEY (worker_id,tweet_id,refreshh)
 );
+
+CREATE TABLE user_tweet_attn (
+   tweet_id bigint,
+   worker_id bigint NOT NULL,
+   rank smallint NOT NULL,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
+   PRIMARY KEY (worker_id,tweet_id)
+);

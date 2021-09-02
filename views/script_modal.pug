@@ -3,6 +3,81 @@ block content
 
   //-Change this URI to a CDN you are using for Photos
   -var cdn = "";
+
+  #myModal.modal(style="display:none;")
+    .modal-content
+      div(style='text-align:center')
+      each val in script
+        span.dot
+      each val in script
+        .mySlides.fade
+          .ui.fluid.card.dim(id="tweet_attention_"+val.post_id,style="display:block; margin-top:28px;height:90%;margin-bottom:28px",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
+            //- Normal Base Post
+            if val.retweeted_by.length > 0
+              .content
+                img.ui.avatar.image(src=cdn+'/profile_pictures/retweet.png', style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+                span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.retweeted_by + " Retweeted"
+            if val.quoted_by.length > 0
+              .content
+                div(style="display: flex;align-items: center; margin-left: 30px;")
+                  div
+                    img.ui.avatar.image.lazyload(data-src=val.quoted_by_actor_picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+                  div(style="display: inline-grid;")
+                    div(style="margin-left: 4px; margin-top: 0px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")=val.quoted_by
+                    div(style="margin-left: 4px; margin-top: 3px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")="@"+val.quoted_by_actor_username
+              if val.quoted_by_text.length > 0
+                .content
+                  .description(style="color: #000000;")=val.quoted_by_text
+            .content
+              .right.floated.time.meta= (Date.now() + val.time)
+              |  
+              //-a(href='/user/'+val.actor.username)
+                img.ui.avatar.image(src=cdn+'/profile_pictures/'+val.actor.profile.picture, style="margin-left: -1px; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+                span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.actor.profile.name
+                span(style="margin-left: 4px; margin-top: 19px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090;")="@"+val.actor.username
+              div(style="display: flex;align-items: center")
+                div
+                  img.ui.avatar.image.lazyload(data-src=val.actor.profile.picture, style="margin-left: -1x; margin-top: -5px; border-radius: 50%; width: 48px; height: 48px;")
+                div(style="display: inline-grid;")
+                  div(style="margin-left: 4px; margin-top: 0px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")=val.actor.profile.name
+                  div(style="margin-left: 4px; margin-top: 3px; min-width: 85px; height: 17px; font-family: HelveticaNeue; font-size: 16px; font-weight: 500; font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #909090; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;")="@"+val.actor.username
+            //-div(style="position: relative; z-index: 1;")
+              img(src="image.png" style="position: absolute; z-index: 2;")
+              span#overlay_text(style="position: relative; top: -10px; z-index: 3;") OVERLAY
+            .content
+              //.description(style="margin-left: -8px; margin-bottom: -24px; width: 445px; height: 88px; font-family: HelveticaNeue; font-size: 16px; font-weight: 300;font-style: normal; font-stretch: normal; line-height: normal; letter-spacing: -0.6px; color: #000000;")=val.body
+              each body_comp in val.body_json
+                if body_comp.url.length > 0
+                  //.description(style="color: #000000;")
+                  a(href=body_comp.url,target="_blank",onclick='link_clicked(\'' + val.tweet_id + ',' + body_comp.url + ', False \')')=body_comp.text
+                else
+                  .description(style="color: #000000;")=body_comp.text
+            if val.embedded_images.length > 0
+              img(src=val.embedded_images, style="width:40%;display:block;margin-left:auto;margin-right:auto;margin-bottom:20px;")
+            if val.picture.length > 0
+              if val.picture_heading.length > 3
+                a(href=val.urls,target="_blank",onclick='link_clicked(\'' + val.tweet_id + ',' + val.urls + ', True \')')
+                  img(src=val.picture, style="width:40%;display:block;margin-left:auto;margin-right:auto;margin-bottom:20px;")
+                if val.picture_heading.length > 0
+                  .content
+                    .description(style="font-weight: 1000; text-align: center")=val.picture_heading
+                if val.picture_description.length > 0
+                  .content
+                    .description=val.picture_description
+          a.next(onclick='plusSlides(1)') &#10095;
+          .containerradio
+            p Did you see this tweet in your news feed:
+            form
+              label.radio-inline
+                input(type='radio' name='optradio' checked='')
+                | Yes
+              label.radio-inline
+                input(type='radio' name='optradio')
+                | No
+      //a.prev(onclick='plusSlides(-1)') &#x276E;
+      //br
+
+  
   //.computer.only.tablet.only.four.wide.column 
   //  .ui.card
   //    .image
@@ -21,7 +96,10 @@ block content
   //    .one.ui.bottom.attached.icon.buttons
   //        button.ui.editprofile.button(data-tooltip='Update Your Profile', data-position='bottom left')
   //          i.write.icon
-  #content.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column(style="margin:auto;")
+
+  #loading.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column
+    img.ui.centered.small.image(src='/public/heart.svg')
+  #content.eight.wide.computer.ten.wide.tablet.sixteen.wide.mobile.column
     //-.ui.active.dimmer.feed
       .ui.large.text.loader Loading
     //- Input for creating new post at top of feed
@@ -33,51 +111,16 @@ block content
     //      img.ui.avatar.image(src=user.gravatar(60))
     //  input(type='text', placeholder='Share your meal')
     //  i.big.photo.link.icon
-
-    .ui.fluid.card
-      .content(id='message_top')
-        .description
-        |
     
     -var ii = 0;
     input(type='hidden', id='session_input', name=script[0].worker_id, value=_csrf)
     input(type='hidden', id='refreshh_input', name=script[0].refreshh, value=_csrf)
-    input(type='hidden', id='attn', name=script[0].attn, value=_csrf)
-    input(type='hidden', id='page', name=script[0].page, value=_csrf)
-    input(type='hidden', id='access_token', name=script[0].access_token, value=_csrf)
-    input(type='hidden', id='access_token_secret', name=script[0].access_token_secret, value=_csrf)
     each val in script
       -ii = ii + 1
       -console.log(ii)
-      //if val.attn == 1
-      //  .containerradio
-      //    p Did you see the following tweet in your news feed:
-      //    form
-      //      label.radio-inline
-      //        input(type='radio' name='optradio' onclick='attn_clicked(\'' + val.rank + '\')')
-      //        | Yes
-      //      label.radio-inline
-      //        input(type='radio' name='optradio' onclick='attn_clicked(\'' + val.rank + '\')')
-      //        | No
-      //if val.attn == 1
-      //  div
-      //    p Did you see the following tweet in your news feed:
-      //    ul.donate-now
-      //      li
-      //        input#a25(type='radio' name='amount')
-      //        label(for='a25') Yes
-      //      li
-      //        input#a50(type='radio' name='amount')
-      //        label(for='a50') No
-      if val.attn == 1
-        p Did this tweet appear on the previous screen?
-        .buttons
-          .action_btn
-            button.action_btn.submit(id='yesbtn_'+val.rank name='submit' type='submit' value='Save' onclick='yesclicked(\'' + val.rank + '\')') Yes
-            button.action_btn.cancel(id='nobtn_'+val.rank name='submit' type='submit' value='Cancel' style='margin-left: 50px;' onclick='noclicked(\'' + val.rank + '\')') No
       //- create a card for each post in val (if by user make the card a little different)
       //- if val.relativeTime - then post came from user_post (so user post, user reply to actor reply to user post)
-      .ui.fluid.card.dim(id="tweet_"+val.post_id,style="display:block;",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
+      .ui.fluid.card.dim.mainfeed(id="tweet_"+val.post_id,style="display:block;",postID=val.id, state=val.state || 'unread', type='actor', actor_un = val.actor.username, actor_name = val.actor.profile.name, actor_pic = val.actor.profile.picture)
         //- dimmer DIV for flagging
         .ui.dimmer.flag
               .content
@@ -178,30 +221,21 @@ block content
             i.reply.icon
             |  Like
           a.ui.basic.red.left.pointing.label.count(id="like_counter_"+val.tweet_id,onload="userlike(this,val.user_fav)")=val.likes
-      if val.attn == 1
-        hr(style="border: 2px solid grey; margin-bottom: 70px; margin-top: 30px;")
 
-      
+
+
     .ui.fluid.card
       .content
         .description
-        |  Once you are done reading the tweets, click on the arrow below.
+        |  End of Posts for the last 48 hours.
 
     script.
-      var attn = document.getElementById('attn').getAttribute("name");
-      var page = parseInt(document.getElementById('page').getAttribute("name")) + 1;
-      if(attn == 0){
-        document.getElementById('message_top').innerHTML = document.getElementById('message_top').innerHTML + 'Feed ' + page + ' of 5: Please read the following tweets the way you normally would on Twitter.';
-      }
-      else{
-        document.getElementById('message_top').innerHTML = document.getElementById('message_top').innerHTML + 'Please indicate whether the tweets below appeared on the previous screen of the survey:';
-      }
-      set_session_id(document.getElementById('session_input').getAttribute("name"),document.getElementById('refreshh_input').getAttribute("name"),document.getElementById('attn').getAttribute("name"),document.getElementById('page').getAttribute("name"),document.getElementById('access_token').getAttribute("name"),document.getElementById('access_token_secret').getAttribute("name"));
+      set_session_id(document.getElementById('session_input').getAttribute("name"),document.getElementById('refreshh_input').getAttribute("name"));
       function calSizeList(onresize){
         //sizeList.length = 0;
         sizeList = [];
         topPadding = 0;
-        var all_elements = document.getElementsByClassName("fluid");
+        var all_elements = document.getElementsByClassName("mainfeed");
         //var lennn = 0;
         var lennn = all_elements.length-2;
         //if(onresize == 0){

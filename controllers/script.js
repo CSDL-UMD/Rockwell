@@ -50,6 +50,8 @@ exports.getScript = (req, res, next) => {
                   { 
                       access_token: access_token,
                       access_token_secret: access_token_secret,
+                      attn: attn,
+                      page: page,
                       body: feed[i].body,
                       body_json: feed[i].body_json,
                       _id: '5fd46dd1050d402e5a3bb986',
@@ -104,7 +106,7 @@ exports.getScript = (req, res, next) => {
                   script_feed.push(feed_json);
               }
               //console.log("Script_Feed : "+script_feed);
-              res.cookie('exp', 'infodiversity', { maxAge: 120*1000, httpOnly: true, samesite: "none", secure: true });
+              res.cookie('exp', 'infodiversity', { maxAge: 1800*1000, httpOnly: true, samesite: "none", secure: true });
               res.render('script', { script: script_feed});
             }, 
             (error) => { // here we had an error calling guest access twitter.
@@ -126,12 +128,26 @@ exports.getScript = (req, res, next) => {
         //console.log(req);
         // The lines below mean we had an error gettings these from the authorizer/guest access
         try {
-          oauthAccessToken = req.query.access_token
-          oauthAccessTokenSecret = req.query.access_token_secret
-          workerid = req.query.worker_id
-          console.log("COOKIES");
-          console.log(req.cookies);
-          makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid,oauthAccessToken,oauthAccessTokenSecret);
+          oauthAccessToken = req.query.access_token;
+          oauthAccessTokenSecret = req.query.access_token_secret;
+          workerid = req.query.worker_id;
+          attn = req.query.attn;
+          page = req.query.page;
+          cookiee = "NO";
+          if(req.hasOwnProperty('headers')){
+            if(req.headers.hasOwnProperty('cookie')){
+              req_cookies = req.headers.cookie.split(";");
+              for(var i=0;i<req_cookies.length;i++){
+                console.log(req_cookies[i]);
+                if(req_cookies[i].trim() == 'exp=infodiversity'){
+                  cookiee = "YES"
+                }
+              }
+            }
+          }
+          //console.log("COOKIES");
+          //console.log(req.cookies);
+          makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
         } catch (err) {
           log_error(err, ["accesstoken: ",oauthAccessToken, " tokensecret: ",oauthAccessTokenSecret, " workerid: ",workerid]);
         }
