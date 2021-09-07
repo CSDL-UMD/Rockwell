@@ -1,6 +1,0 @@
-
-2021-6-15 13:14:41 Relevant information: 
-Error: Request failed with status code 500
-
-2021-6-15 13:14:41 Relevant information: 
-Error: Request failed with status code 500
