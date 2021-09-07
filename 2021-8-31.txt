@@ -1,3 +1,0 @@
-
-2021-8-31 8:20:23 Relevant information: accesstoken: ,4659328459-PdqhUuv8F1ZwRN9lTjTcPAtIk4sYUwD9zHRXFSv, tokensecret: ,8UyXMXEouZNQbLw0nbaDcdtMXaMvseofIURpdzlasToBt, workerid: ,235
-TypeError: Cannot read property 'cookie' of undefined

@@ -1,9 +1,0 @@
-
-2021-6-2 12:6:38 Relevant information: 
-Error: socket hang up
-
-2021-6-2 12:6:38 Relevant information: 
-Error: connect ECONNREFUSED 127.0.0.1:5051
-
-2021-6-2 12:6:38 Relevant information: 
-Error: connect ECONNREFUSED 127.0.0.1:5051
