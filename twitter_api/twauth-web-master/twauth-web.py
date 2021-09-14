@@ -71,13 +71,6 @@ def start():
     # the developer.twitter.com portal, inside the app settings
     app_callback_url = url_for('callback', _external=True)
     # Generate the OAuth request tokens, then display them
-    """
-    consumer = oauth.Consumer(
-        app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-    client = oauth.Client(consumer)
-    resp, content = client.requests(request_token_url, "POST", body=urllib.parse.urlencode({
-                                   "oauth_callback": app_callback_url}))
-    """
     cred = config('../../config.ini','twitterapp')
 
     try:
@@ -101,39 +94,11 @@ def start():
 
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
-    # Trying to add a browser cookie
-    """
-    test = False
-    #cookies = get_cookie()
-    cookies = requests.get('http://127.0.0.1:5000/get-cookie')
-    print("COOKIE : "+str(cookies)) # based on how it prints we can fine tune the logic below. As of now I have no idea.
-    if cookies is not None:
-        test = True
-
-    print("TESTT : "+str(test))
-    '''try:
-            if(cookies): # needs to be worked on
-                test = True
-    except:
-        test = False # No cookies
-    if(test): # If the cookie exists do nothing, else make it.
-        print("No need to make a cookie we have one.")
-    else:
-        print("Making a cookie")
-        cookie = {
-            "name": 'Exp',
-            "expires": (datetime.datetime.now()+datetime.timedelta(minutes = 10)).isoformat() # use datetime.timedelta (may have to cast this to a datetime object in guest access) https://docs.python.org/3/library/datetime.html
-        }
-        s.get('https://http://infodiversity.cse.usf.edu/cookies', cookies=cookie) # post the cookie'''
-    if not test:
-        #index() # This alone should create and store the cookie, not sure if i need to call them a flask way or not.
-        requests.get('http://127.0.0.1:5000/cookie')
-    # End of cookie code
-    """
     oauth_store[oauth_token] = oauth_token_secret
     start_url = authorize_url+"?oauth_token="+oauth_token
     #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
     res = make_response(render_template('YouGov.html', start_url=start_url, screenname="###", truman_url="###"))
+    # Trying to add a browser cookie
     res.set_cookie('exp','infodiversity',max_age=1800)
     return res
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
