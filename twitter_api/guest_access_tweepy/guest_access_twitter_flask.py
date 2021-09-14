@@ -1,25 +1,16 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
 import re
-#import random
-#import string
-#import glob
-#import tweepy
-#import pandas as pd # No longer needed?
-#import ../database_access/access_object.py
 import datetime
 import json
 import Cardinfo
 import requests
-#import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
 from pycookiecheat import chrome_cookies
 import xml
 import xml.sax.saxutils
-
-#import requests as rq
 
 app = Flask(__name__)
 
@@ -46,6 +37,7 @@ def config(filename,section):
 
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
+	webInformation = config('../../config.ini','webconfiguration')
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
 
 	access_token = request.args.get('access_token')
@@ -77,7 +69,6 @@ def get_feed():
 		params = {"count": "30","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
 		public_tweets = json.loads(response.text)
-		#print(tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
 		db_tweet_payload = []
@@ -121,16 +112,16 @@ def get_feed():
 		finalJson.append(db_tweet_session_payload)
 		finalJson.append(db_tweet_attn_payload)
 		finalJson.append(worker_id)
-		requests.post('http://127.0.0.1:5052/insert_tweet',json=finalJson)
+		requests.post('http://' + str(webInformation["localhost"]) + ':5052/insert_tweet',json=finalJson)
 		public_tweets = public_tweets[0:10]
 	else:
 		if attn == 1:
-			db_response = requests.get('http://127.0.0.1:5052/get_existing_attn_tweets?worker_id='+str(worker_id))
+			db_response = requests.get('http://' + str(webInformation["localhost"]) + ':5052/get_existing_attn_tweets?worker_id='+str(worker_id))
 			db_response = db_response.json()['data']
 			public_tweets = [d[1] for d in db_response]
 			public_tweets = public_tweets[page*3:(page+1)*3]
 		else:	
-			db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
+			db_response = requests.get('http://' + str(webInformation["localhost"]) + ':5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
 			db_response = db_response.json()['data']
 			public_tweets = [d[4] for d in db_response]
 			public_tweets = public_tweets[page*10:(page+1)*10]
@@ -286,23 +277,6 @@ def get_feed():
 			if "urls" in entities_keys:
 				all_urls = tweet["entities"]["urls"]
 
-			# Redesigned block to retrieve the Cardinfo data. Old placement and OG version.
-		#if "urls" in entities_keys:
-		#	for each_url in all_urls:
-		#		urls_list.append(each_url["url"])
-		#		expanded_urls_list.append(each_url["expanded_url"])
-		#	urls = ",".join(urls_list)
-		#	expanded_urls = ",".join(expanded_urls_list)
-		#if len(expanded_urls_list) > 0 and not isQuote: # not isQuote is to save time in the case of a quote. no card needed
-		#	card_url = expanded_urls_list[0]
-		#	card_data = Cardinfo.getCardData(card_url)
-		#	if "image" in card_data.keys():
-		#		image_raw = card_data['image']
-		#		picture_heading = card_data["title"]
-		#		picture_description = card_data["description"]
-
-
-
 		# Embedded image retrieval (edited to handle retweets also now)
 		hasEmbed = False
 		eimage = []
@@ -351,12 +325,9 @@ def get_feed():
 					image_raw = card_data['image']
 					picture_heading = card_data["title"]
 					picture_description = card_data["description"]
-		#if isRetweet:
-			#print("Is a retweet.")
 
 		for urll in urls_list:
 			full_text = full_text.replace(urll,"")
-		#print(full_text)
 		full_text = xml.sax.saxutils.unescape(full_text)
 
 		body = full_text
@@ -370,8 +341,6 @@ def get_feed():
 			time = "-00:0"+str(minutes)
 		else:
 			time = "-00:"+str(minutes)
-		#time.append(td.seconds)
-		# Fixing the like system
 		finalLikes = ""
 		if (tempLikes <= 999):
 			finalLikes = str(tempLikes)
@@ -403,8 +372,7 @@ def get_feed():
 		profile_link = ""
 		if tweet["user"]["url"]:
 			profile_link = tweet["user"]["url"]
-		#print("PROFILE LINK: " + tweet["user"]["url"])
-		
+
 		feed = {
 			'body':body,
 			'body_json':full_text_json,
@@ -437,7 +405,7 @@ def get_feed():
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
-	return jsonify(feed_json) # What is this doing?? Is this where we are sending the json of our feed_json to the other script?
+	return jsonify(feed_json)
 
 @app.after_request
 def add_headers(response):
