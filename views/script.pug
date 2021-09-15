@@ -185,13 +185,13 @@ block content
     .ui.fluid.card
       .content
         .description
-        |  Once you are done reading the tweets, click on the arrow below.
+        |  <h4>Once you are done, click on the button below.</h4>
 
     script.
       var attn = document.getElementById('attn').getAttribute("name");
       var page = parseInt(document.getElementById('page').getAttribute("name")) + 1;
       if(attn == 0){
-        document.getElementById('message_top').innerHTML = document.getElementById('message_top').innerHTML + 'Feed ' + page + ' of 5: Please read the following tweets the way you normally would on Twitter.';
+        document.getElementById('message_top').innerHTML = document.getElementById('message_top').innerHTML + '<h4>Feed ' + page + ' of 5: Please read the following tweets the way you normally would on Twitter.</h4>';
       }
       else{
         document.getElementById('message_top').innerHTML = document.getElementById('message_top').innerHTML + 'Please indicate whether the tweets below appeared on the previous screen of the survey:';
