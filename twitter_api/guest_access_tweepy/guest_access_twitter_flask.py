@@ -112,16 +112,16 @@ def get_feed():
 		finalJson.append(db_tweet_session_payload)
 		finalJson.append(db_tweet_attn_payload)
 		finalJson.append(worker_id)
-		requests.post('http://' + str(webInformation["localhost"]) + ':5052/insert_tweet',json=finalJson)
+		requests.post('https://' + str(webInformation["localhost"]) + ':5052/insert_tweet',json=finalJson)
 		public_tweets = public_tweets[0:10]
 	else:
 		if attn == 1:
-			db_response = requests.get('http://' + str(webInformation["localhost"]) + ':5052/get_existing_attn_tweets?worker_id='+str(worker_id))
+			db_response = requests.get('https://' + str(webInformation["localhost"]) + ':5052/get_existing_attn_tweets?worker_id='+str(worker_id))
 			db_response = db_response.json()['data']
 			public_tweets = [d[1] for d in db_response]
 			public_tweets = public_tweets[page*3:(page+1)*3]
 		else:	
-			db_response = requests.get('http://' + str(webInformation["localhost"]) + ':5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
+			db_response = requests.get('https://' + str(webInformation["localhost"]) + ':5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
 			db_response = db_response.json()['data']
 			public_tweets = [d[4] for d in db_response]
 			public_tweets = public_tweets[page*10:(page+1)*10]

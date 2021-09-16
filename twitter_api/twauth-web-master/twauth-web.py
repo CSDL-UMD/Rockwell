@@ -40,7 +40,7 @@ request_token_url = webInformation['request_token_url']
 access_token_url = webInformation["access_token_url"]
 authorize_url = webInformation["authorize_url"]
 show_user_url = webInformation["show_user_url"]
-truman_url = str(webInformation['ip']) + ':3000'
+truman_url = str(webInformation['app_route'])
 account_settings_url = webInformation["account_settings_url"]
 
 @app.route('/')
@@ -136,7 +136,7 @@ def callback():
     attn = 0
     page = 0
 
-    truman_url_agg = 'http://' + str(webInformation['ip']) + ':3000?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page)
+    truman_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page)
 
     del oauth_store[oauth_token]
 

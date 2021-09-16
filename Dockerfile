@@ -62,6 +62,8 @@ RUN conda install -y python=3.7.5\
         gxx_linux-64 \
         make
 
+RUN conda install -c conda-forge demjson
+
 WORKDIR /usr/src/pylucene
 
 RUN apk add --no-cache --no-progress nano htop jq ca-certificates curl libssl1.1 apache-ant openssl openssl-dev g++ gcc bash git
