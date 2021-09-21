@@ -19,15 +19,6 @@ print(accessPool)
 app = Flask(__name__)
 
 app.debug = False
-"""
-Could do one main flask function here and then sub functions.
-Each call will be put on a (global) queue with the function and the arguments.
-The function would constantly add to the queue as requests come.
-Then we would have a system that calls the function and passes the arguments when there is pool openings. 
-We would then have a constantly running dequeue function that makes the calls unloading the queue untill it hits a limit, 
-(functions would throw the error before popping the queue so its not deleted) then it waits a few seconds and begins calling again.
-All of this should be done in this file. (async function called on start with a main loop.)
-"""
 
 # Is full Universal to check when function calls, if is full is true our buffer is being used (push package immediately), if not continue as normal
 # WINNER:::I should make it normal where we can call them all but on overflow it is pushed to queue here and then the loop function is called, now on empty terminate. (if it keeps being added to it keeps going)
