@@ -12,7 +12,7 @@ pool_is_full = False
 MIN = 5
 MAX = 100
 universal_buffer = []
-params = config('../../config.ini','postgresql')
+params = config('/home/saumya/Documents/USF/Project/ASD/mock_social_media_platform/config.ini','postgresql')
 accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host=params["host"],database=params["database"],user=params["user"],password=params["password"],port=params["port"])# Maybe make 2 pools and half the functions use each or make this one huge.
 print("Access Pool object")
 print(accessPool)
@@ -105,6 +105,53 @@ def insert_tweet():
                 conn_cur.execute(sql,(tweet_id,worker_id,rank,))
             connection.commit()
 
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
+@app.route('/insert_prereg', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_prereg():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+            # We can also async all 3 of these 
+            for obj in payload[0]:
+                tweet_id = obj['tweet_id']
+                tweet_json = json.dumps(obj['tweet_json'])
+                sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json,False))
+            connection.commit()
+
+            worker_id = payload[4]
+
+            for i in range(1,4):
+                for obj in payload[i]: # Take care of tweet in session here.
+                    tweet_id = obj['tweet_id']
+                    rank = obj['rank']
+                    attnlevel = obj['attnlevel']
+                    present = obj['present']
+                    sql = """INSERT INTO prereg_attn(tweet_id,worker_id,rank,attnlevel,present) VALUES(%s,%s,%s,%s,%s);"""
+                    conn_cur.execute(sql,(tweet_id,worker_id,rank,attnlevel,present,))
+                connection.commit()
             conn_cur.close()
             accessPool.putconn(connection) #closing the connection
         except Exception as error:
@@ -254,6 +301,46 @@ def get_worker_attention_tweet():
     sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_attn UA,tweet T 
     WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s"""
     conn_cur.execute(sql, (worker_id,))     
+    if conn_cur.rowcount > 0:
+        ret = conn_cur.fetchall()
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data=ret)
+    else:
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data="NEW") #Meaning we need to fetch new tweets.
+    #except Exception as error:
+    #    print("Error in get existing tweets!!!")
+    #    print(error)
+    return "Done!"
+
+@app.route('/get_prereg_tweets', methods=['GET','POST']) # Should the method be GET?
+def get_prereg_tweets():
+    tries = 5
+    connection = None
+    worker_id = ''
+    try:
+        #Getting connection from pool
+        worker_id = request.args.get('worker_id').strip()
+        attnlevel = request.args.get('attnlevel').strip()
+        print("Worker ID : "+worker_id)
+        print("attnlevel : "+attnlevel)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    #try:
+    conn_cur = connection.cursor()
+    sql = """SELECT UA.tweet_id,UA.present,T.tweet_json FROM prereg_attn UA,tweet T 
+    WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s AND UA.attnlevel=%s"""
+    conn_cur.execute(sql, (worker_id,attnlevel,))     
     if conn_cur.rowcount > 0:
         ret = conn_cur.fetchall()
         conn_cur.close()

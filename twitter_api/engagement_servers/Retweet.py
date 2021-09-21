@@ -114,6 +114,28 @@ def tracking():
         print(e)
         return jsonify({"success":0}) # Retweet failed
 
+@app.route('/check_attn', methods=['GET','POST'])
+def check_attn():
+    data = request.get_json()
+    worker_id = data['worker_id']
+    page = int(data['page'])
+    attn_map = data['attn_map']
+    print(attn_map)
+    try:
+        db_response = requests.get('http://127.0.0.1:5052/get_prereg_tweets?worker_id='+str(worker_id)+'&attnlevel='+str(page+1))
+        db_response = db_response.json()['data']
+        actual_ans = [d[1] for d in db_response]
+        print(actual_ans)
+        check = "Correct"
+        for i in range(4):
+            if bool(attn_map[i]) != actual_ans[i]:
+                check = "Incorrect"
+                break
+        return jsonify({"check":check})
+    except Exception as e:
+        print(e)
+        return jsonify({"success":0}) # Retweet failed
+
 @app.after_request
 def add_headers(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
