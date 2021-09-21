@@ -1,16 +1,10 @@
 import os
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
-#from flask.helpers import make_response
-#import oauth2 as oauth
-#import urllib.request
 import requests
 import datetime
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
 import logging
-#import requests
-#import urllib.parse
-#import urllib.error
 import json
 
 app = Flask(__name__)
@@ -19,27 +13,6 @@ app.debug = False
 
 log_level = logging.DEBUG
 logging.basicConfig(filename='authorizer.log', level=log_level)
-
-
-request_token_url = 'https://api.twitter.com/oauth/request_token'
-access_token_url = 'https://api.twitter.com/oauth/access_token'
-authorize_url = 'https://api.twitter.com/oauth/authorize'
-show_user_url = 'https://api.twitter.com/1.1/users/show.json'
-#truman_url = str(webInformation['app_route'])
-account_settings_url = 'https://api.twitter.com/1.1/account/settings.json'
-
-# Support keys from environment vars (Heroku).
-#app.config['APP_CONSUMER_KEY'] = os.getenv(
-#    'TWAUTH_APP_CONSUMER_KEY', 'API_Key_from_Twitter')
-#app.config['APP_CONSUMER_SECRET'] = os.getenv(
-#    'TWAUTH_APP_CONSUMER_SECRET', 'API_Secret_from_Twitter')
-
-# alternatively, add your key and secret to config.cfg
-# config.cfg should look like:
-# APP_CONSUMER_KEY = 'API_Key_from_Twitter'
-# APP_CONSUMER_SECRET = 'API_Secret_from_Twitter'
-
-oauth_store = {}
 
 def config(filename,section):
     # create a parser
@@ -59,18 +32,31 @@ def config(filename,section):
 
     return db
 
-#@app.route('/')
-#def hello():
- #   return render_template('index.html')
+webInformation = config('../../config.ini','webconfiguration')
 
+request_token_url = str(webInformation['request_token_url'])
+access_token_url = str(webInformation['access_token_url'])
+authorize_url = str(webInformation['authorize_url'])
+show_user_url = str(webInformation['show_user_url'])
+truman_url = str(webInformation['app_route'])
+account_settings_url = str(webInformation['account_settings_url'])
+
+# Support keys from environment vars (Heroku).
+#app.config['APP_CONSUMER_KEY'] = os.getenv(
+#    'TWAUTH_APP_CONSUMER_KEY', 'API_Key_from_Twitter')
+#app.config['APP_CONSUMER_SECRET'] = os.getenv(
+#    'TWAUTH_APP_CONSUMER_SECRET', 'API_Secret_from_Twitter')
+
+# alternatively, add your key and secret to config.cfg
+# config.cfg should look like:
+# APP_CONSUMER_KEY = 'API_Key_from_Twitter'
+# APP_CONSUMER_SECRET = 'API_Secret_from_Twitter'
+
+oauth_store = {}
 
 @app.route('/')
 def start():
-    print("IN START")
-    # note that the external callback URL must be added to the whitelist on
-    # the developer.twitter.com portal, inside the app settings
     app_callback_url = url_for('callback', _external=True)
-    # Generate the OAuth request tokens, then display them
     cred = config('../../config.ini','twitterapp')
 
     try:
@@ -80,11 +66,6 @@ def start():
     except Exception as error:
         print('Twitter access failed with error : '+str(error))
         logging.error('Twitter access failed with error : '+str(error))
-    
-    #if resp['status'] != '200':
-    #    error_message = 'Invalid response, status {status}, {message}'.format(
-    #        status=resp['status'], message=content.decode('utf-8'))
-     #   return render_template('error.html', error_message=error_message)
 
     #request_token = dict(urllib.parse.parse_qsl(content))
     #oauth_token = request_token[b'oauth_token'].decode('utf-8')
@@ -107,9 +88,6 @@ def start():
 @app.route('/cookie', methods=['GET']) # This is a function to set a flask cookie
 def index():
     print("Creating cookie")
-    #resp = make_response("Setting a cookie")
-    #resp.set_cookie("Exp",str((datetime.datetime.now() + datetime.timedelta(minutes=10)).isoformat()))
-    #return resp
     res = make_response("<h1>cookie is set</h1>")  
     res.set_cookie('foo1','bar1')
     return res
@@ -117,10 +95,7 @@ def index():
 @app.route('/get-cookie', methods=['GET'])
 def get_cookie():
     #return request.cookies.get("Exp")
-    print("In Get Cookie")
     if not request.cookies.get('Exp'):
-        #res = make_response("Setting a cookie")
-        #res.set_cookie('foo', 'bar', max_age=60*60*24*365*2)
         print("No cookie found!")
     else:
         res = make_response("Value of cookie Exp is {}".format(request.cookies.get('Exp')))
@@ -135,8 +110,6 @@ def callback():
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
 
-    # if the OAuth request was denied, delete our local token
-    # and show an error message
     if oauth_denied:
         if oauth_denied in oauth_store:
             del oauth_store[oauth_denied]
@@ -180,19 +153,19 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
     
-    resp_worker_id = requests.get('http://127.0.0.1:5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
+    resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
     worker_id = resp_worker_id.json()["data"]
 
     attn = 0
     page = 0
     pre_attn_check = 1
 
-    #truman_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) 
-    truman_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
+    truman_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) 
+    #truman_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
 
     del oauth_store[oauth_token]
 
-    #redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+    redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
 
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
     return render_template('YouGov.html', start_url="###", screenname=screen_name, truman_url=truman_url_agg)
