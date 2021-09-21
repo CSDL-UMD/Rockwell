@@ -52,6 +52,7 @@ exports.getScript = (req, res, next) => {
                       access_token_secret: access_token_secret,
                       attn: attn,
                       page: page,
+                      pre_attn_check: pre_attn_check,
                       body: feed[i].body,
                       body_json: feed[i].body_json,
                       _id: '5fd46dd1050d402e5a3bb986',
@@ -133,6 +134,7 @@ exports.getScript = (req, res, next) => {
           workerid = req.query.worker_id;
           attn = req.query.attn;
           page = req.query.page;
+          pre_attn_check = req.query.pre_attn_check;
           cookiee = "NO";
           if(req.hasOwnProperty('headers')){
             if(req.headers.hasOwnProperty('cookie')){
@@ -147,7 +149,7 @@ exports.getScript = (req, res, next) => {
           }
           //console.log("COOKIES");
           //console.log(req.cookies);
-          makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
+          makeGetRequest('http://127.0.0.1:5051/getfeedprereg?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
         } catch (err) {
           log_error(err, ["accesstoken: ",oauthAccessToken, " tokensecret: ",oauthAccessTokenSecret, " workerid: ",workerid]);
         }
@@ -545,10 +547,10 @@ exports.getScript_prev = (req, res, next) => {
 
 exports.getScriptPost = (req, res) => {
 
-	Script.findOne({ _id: req.params.id}, (err, post) => {
-		console.log(post);
-		res.render('script_post', { post: post });
-	});
+  Script.findOne({ _id: req.params.id}, (err, post) => {
+    console.log(post);
+    res.render('script_post', { post: post });
+  });
 };
 
 /**
@@ -1170,4 +1172,3 @@ exports.postUpdateUserPostFeedAction = (req, res, next) => {
     });
   });
 }
-
