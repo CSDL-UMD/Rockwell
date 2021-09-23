@@ -11,7 +11,7 @@ const chalk = require('chalk');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
 const dotenv = require('dotenv');
-const MongoStore = require('connect-mongo')(session); // This can go??????
+const MongoStore = require('connect-mongo')(session); // This can go?
 const flash = require('express-flash');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -159,7 +159,7 @@ var j3 = schedule.scheduleJob(rule3, function(){
 
 
 /**
- * Express configuration. Can we remove the mongo parts from this? _________-----------_________---------__________-------________---------_______------
+ * Express configuration. Can we remove the mongo parts from this?
  */
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));

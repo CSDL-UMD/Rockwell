@@ -41,17 +41,6 @@ show_user_url = str(webInformation['show_user_url'])
 truman_url = str(webInformation['app_route'])
 account_settings_url = str(webInformation['account_settings_url'])
 
-# Support keys from environment vars (Heroku).
-#app.config['APP_CONSUMER_KEY'] = os.getenv(
-#    'TWAUTH_APP_CONSUMER_KEY', 'API_Key_from_Twitter')
-#app.config['APP_CONSUMER_SECRET'] = os.getenv(
-#    'TWAUTH_APP_CONSUMER_SECRET', 'API_Secret_from_Twitter')
-
-# alternatively, add your key and secret to config.cfg
-# config.cfg should look like:
-# APP_CONSUMER_KEY = 'API_Key_from_Twitter'
-# APP_CONSUMER_SECRET = 'API_Secret_from_Twitter'
-
 oauth_store = {}
 
 @app.route('/')
