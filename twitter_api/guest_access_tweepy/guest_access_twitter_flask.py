@@ -2,16 +2,10 @@
 import os
 import re
 import numpy as np
-#import string
-#import glob
-#import tweepy
-#import pandas as pd # No longer needed?
-#import ../database_access/access_object.py
 import datetime
 import json
 import Cardinfo
 import requests
-#import TweetObject
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser

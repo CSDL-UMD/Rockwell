@@ -36,3 +36,9 @@ bower_components
 Thumbs.db
 
 config.ini
+
+package-lock.json
+
+twitter_api/Pipfile
+
+twitter_api/Pipfile.lock
