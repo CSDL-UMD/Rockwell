@@ -1,4 +1,1 @@
-infodiversity-mock-social-media
-===============================
-
-Mock social media app for InfoDiversity project.
+This branch contains our new version with Pug removed.
