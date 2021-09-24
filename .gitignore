@@ -50,3 +50,9 @@ twitter_api/twauth-web-master/Pipfile
 backend/Pipfile
 
 backend/Pipfile.lock
+
+backend/Rockwell.egg-info/dependency_links.txt
+
+backend/Rockwell.egg-info/
+
+backend/pyproject.toml
