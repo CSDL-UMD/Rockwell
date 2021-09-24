@@ -46,3 +46,7 @@ twitter_api/Pipfile.lock
 twitter_api/twauth-web-master/Pipfile.lock
 
 twitter_api/twauth-web-master/Pipfile
+
+backend/Pipfile
+
+backend/Pipfile.lock
