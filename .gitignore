@@ -42,3 +42,7 @@ package-lock.json
 twitter_api/Pipfile
 
 twitter_api/Pipfile.lock
+
+twitter_api/twauth-web-master/Pipfile.lock
+
+twitter_api/twauth-web-master/Pipfile
