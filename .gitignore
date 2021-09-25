@@ -56,3 +56,5 @@ backend/Rockwell.egg-info/dependency_links.txt
 backend/Rockwell.egg-info/
 
 backend/pyproject.toml
+
+frontend/yarn.lock
