@@ -2,11 +2,16 @@ import './App.css';
 import Tweet from './components/Tweet';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        Rockwell Mock up
-      </header>
-      <Tweet />
+    <div>
+      <div className="Title">
+        <h1 style={{margin: '0'}}>Infodiversity</h1>
+      </div>
+      <div className="TopInstructions">
+      <h3 style={{margin: '0'}}>Feed {1} out of 5, please read it like your regular feed.</h3>
+      </div>
+      <div className="Feed">
+        <Tweet />
+      </div>
     </div>
   );
 }
