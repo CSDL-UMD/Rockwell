@@ -16,12 +16,9 @@
 }
 
 .TopInstructions {
-  padding: 1%;
   border-style: solid;
-  border-radius: 5px;
+  border-radius: 1%;
   border-color: black;
   text-align: center;
-  width: 50%;
-  margin-left: 25%;
   margin-bottom: 1%;
 }

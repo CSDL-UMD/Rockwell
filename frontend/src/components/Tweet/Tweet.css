@@ -1,0 +1,15 @@
+.completeTweet {
+    color: black;
+    border-radius: 1%;
+    border-style: solid;
+    border-color: black;
+    background-color:antiquewhite;
+    margin-bottom: 1%;
+}
+
+.TweetTitle {
+    border-bottom: 1%;
+    border-style: solid;
+    border-color: grey;
+
+}
