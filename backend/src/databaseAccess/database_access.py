@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, jsonify
 import json
-from src.databaseAccess.database_access import config
+from src.databaseAccess.database_config import config
 import psycopg2
 from psycopg2 import pool
 import datetime
@@ -12,7 +12,7 @@ pool_is_full = False
 MIN = 5
 MAX = 100
 universal_buffer = []
-params = config('../../config.ini','postgresql')
+params = config('../config.ini','postgresql')
 accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host=params["host"],database=params["database"],user=params["user"],password=params["password"],port=params["port"])# Maybe make 2 pools and half the functions use each or make this one huge.
 print("Access Pool object")
 print(accessPool)
