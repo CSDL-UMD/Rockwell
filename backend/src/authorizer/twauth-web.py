@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, mak
 import requests
 import datetime
 from requests_oauthlib import OAuth1Session
+from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -14,25 +15,7 @@ app.debug = True
 log_level = logging.DEBUG
 logging.basicConfig(filename='authorizer.log', level=log_level)
 
-def config(filename,section):
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
-
-    # get section, default to postgresql
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        logging.error('Error in reading config file : Section {0} not found in the {1} file'.format(section, filename))
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
-
-webInformation = config('../../config.ini','webconfiguration')
+webInformation = config('../configuration/config.ini','webconfiguration')
 
 request_token_url = str(webInformation['request_token_url'])
 access_token_url = str(webInformation['access_token_url'])

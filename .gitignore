@@ -58,3 +58,5 @@ backend/Rockwell.egg-info/
 backend/pyproject.toml
 
 frontend/yarn.lock
+
+backend/src/databaseAccess/__pycache__/
