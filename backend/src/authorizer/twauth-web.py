@@ -29,7 +29,7 @@ oauth_store = {}
 @app.route('/')
 def start():
     app_callback_url = url_for('callback', _external=True)
-    cred = config('../../config.ini','twitterapp')
+    cred = config('../configuration/config.ini','twitterapp')
 
     try:
         request_token = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'])
@@ -107,7 +107,7 @@ def callback():
 
     #resp, content = client.request(access_token_url, "POST")
     
-    cred = config('../../config.ini','twitterapp')
+    cred = config('../configuration/config.ini','twitterapp')
     oauth_access_tokens = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'],resource_owner_key=oauth_token,resource_owner_secret=oauth_token_secret,verifier=oauth_verifier)
     content = oauth_access_tokens.post(access_token_url)  
 

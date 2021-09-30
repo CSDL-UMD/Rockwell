@@ -1,8 +1,8 @@
-import Tweet from './components/Tweet/Tweet';
-import CarouselModal from './components/Carousel/CarouselModal';
+import Tweet from '../Tweet/Tweet';
+import CarouselModal from '../Carousel/CarouselModal';
 import { useEffect, useState } from 'react';
-import './App.css';
-function App() {
+import './MainFeed.css';
+function MainFeed(props) {
   let names = ["Tommy", "Tony", "Robert"];
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   useEffect(() => {
@@ -26,10 +26,11 @@ function App() {
       <div className="Feed">
         <div className="TopInstructions">
           <h3 style={{ margin: '0' }}>Feed {1} out of 5, please read it like your regular feed.</h3>
+          {JSON.stringify(props.location.search)}
         </div>
         {
           names.map(name => (
-            <Tweet key={name} name={name} content1="This is some text" content2="Alternative text" />
+            <Tweet key={name} name={name} content="This is some text"/>
           ))
         }
         <button onClick={handleShowInstructionCarousel}>Show Carousel</button>
@@ -39,4 +40,4 @@ function App() {
   );
 }
 
-export default App;
+export default MainFeed;
