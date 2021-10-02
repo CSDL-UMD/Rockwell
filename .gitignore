@@ -37,26 +37,13 @@ Thumbs.db
 
 config.ini
 
+# Node.JS
+yarn.lock
 package-lock.json
 
-twitter_api/Pipfile
-
-twitter_api/Pipfile.lock
-
-twitter_api/twauth-web-master/Pipfile.lock
-
-twitter_api/twauth-web-master/Pipfile
-
-backend/Pipfile
-
-backend/Pipfile.lock
-
-backend/Rockwell.egg-info/dependency_links.txt
-
-backend/Rockwell.egg-info/
-
-backend/pyproject.toml
-
-frontend/yarn.lock
-
-backend/src/databaseAccess/__pycache__/
+# Python
+Pipfile
+Pipfile.lock
+*.egg-info/
+pyproject.toml
+__pycache__/
