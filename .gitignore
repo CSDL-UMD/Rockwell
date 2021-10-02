@@ -1,49 +1,25 @@
-lib-cov
-*.seed
-*.log
-*.dat
-*.out
-*.pid
-*.gz
-*.swp
-
-pids
-logs
-results
-tmp
-
-#Build
-public/css/main.css
-
-#user_uploads
-uploads/user_post
-
-# API keys and secrets
-.env
+# Never include live configuration file under version control!
+config.ini
 
 # Dependency directory
 node_modules
-bower_components
-
-# Editors
-.idea
-*.iml
-*.sublime-project
-*.sublime-workspace
 
 # OS metadata
 .DS_Store
 Thumbs.db
 
-config.ini
-
 # Node.JS
 yarn.lock
 package-lock.json
 
-# Python
+# Python setuptools/distutils
+build/
+dist/
 Pipfile
 Pipfile.lock
 *.egg-info/
+
+# Other Python
+*.pyc
 pyproject.toml
 __pycache__/
