@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import MainFeed from './components/MainFeed/MainFeed';
+import MainFeed from '../components/MainFeed/MainFeed';
 function Main(){
     return (
       <Switch>

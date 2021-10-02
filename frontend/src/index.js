@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
-import Main from './Main';
-import reportWebVitals from './reportWebVitals';
+import Main from './Router/Main';
+// import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <BrowserRouter>
@@ -11,5 +11,3 @@ ReactDOM.render(
   </BrowserRouter>,
   document.getElementById('root')
 );
-
-reportWebVitals();

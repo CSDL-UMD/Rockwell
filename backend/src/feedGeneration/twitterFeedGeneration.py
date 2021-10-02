@@ -4,7 +4,7 @@ import re
 import numpy as np
 import datetime
 import json
-import CardInfo
+import src.feedGeneration.CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
@@ -46,7 +46,7 @@ def get_feed_prereg():
 	print("page : "+str(page))
 	print("attn : "+str(attn))
 	print("cookie : "+str(cookiee))
-	cred = config('../../config.ini','twitterapp')
+	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
 	oauth = OAuth1Session(cred['key'],
@@ -422,7 +422,7 @@ def get_feed():
 	print("page : "+str(page))
 	print("attn : "+str(attn))
 	print("cookie : "+str(cookiee))
-	cred = config('../../config.ini','twitterapp')
+	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
 	oauth = OAuth1Session(cred['key'],
