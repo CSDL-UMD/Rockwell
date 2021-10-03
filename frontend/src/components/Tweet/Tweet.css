@@ -8,8 +8,38 @@
 }
 
 .TweetTitle {
+    padding: 1%;
     border-bottom: 1%;
-    border-style: solid;
-    border-color: grey;
+    border-bottom-style: solid;
+    border-color: black;
+    display: flex;
+}
+.TweetContent {
+    padding: 1%;
+}
 
+.TweetFooter {
+    padding: 1%;
+    display: flex;
+    border-top: 1%;
+    border-color: black;
+    border-top-style: solid;
+}
+
+.TweetStateBanner {
+    padding: 1%;
+    border-bottom-style: solid;
+    border-bottom: 1%;
+    border-color: grey;
+}
+
+.TweetArticleContainer {
+    border-top-style: solid;
+    border-top: 1%;
+    border-color: grey;
+}
+
+.TweetImage {
+    max-width: 100%;
+    max-height: 100%;
 }

@@ -1,23 +1,48 @@
 import React from 'react';
 import './Tweet.css';
 function Tweet(props) {
-    return (
-        <div class="completeTweet">
-            <div style={{ display: 'flex', flex: '100%' }} className="TweetTitle">
-                <img style={{alignItems: 'flex-start'}} src={props.tweet.actor_picture} />
-                <div style={{flex:'flex-end'}}>{props.tweet.actor_name + '@' + props.tweet.actor_username}</div>
-            </div>
-            <div className="TweetContent">
-                {props.tweet.body}
-            </div>
-            <div className="footer">
-                <div style={{display: 'inline-block', float:'left', marginLeft: '2%'}}>{'Retweets: ' + props.tweet.retweet_count}</div>
-                <div style={{display: 'inline-block'}}></div>
-                <div style={{display: 'inline-block', float: 'right', marginRight: '2%'}}>{'Likes: ' + props.tweet.likes}</div>
-
-            </div>
+  return (
+    <div class="completeTweet">
+      {
+        props.tweet.user_retweeted
+          ? <div className="TweetStateBanner"> Retweeted by: {props.tweet.retweeted_by} </div>
+          : null
+      }
+      {
+        props.tweet.quoted_by !== ''
+          ? <div className="TweetStateBanner"> Quoted by: {props.tweet.quoted_by} </div>
+          : null
+      }
+      <div className="TweetTitle">
+        <img style={{ justifySelf: 'flex-start' }} src={props.tweet.actor_picture} alt={"User " + props.tweet.actor_name + '\'s profile picture.'} />
+        <div style={{ marginLeft: 'auto' }}>
+          {props.tweet.actor_name}
+          {' @' + props.tweet.actor_username}
         </div>
-    )
+      </div>
+      <div className="TweetContent">
+        <div style={{ marginBottom: '1%' }}>{props.tweet.body + ' ' + props.tweet.expanded_urls}</div>
+        {props.tweet.picture !== ''
+          ? <div className="TweetArticleContainer">
+            <div style={{ marginTop: '1%', marginBottom: '1%' }}>{props.tweet.picture_heading}</div>
+            <img className="TweetImage" src={props.tweet.picture} alt='Article' />
+            <div>{props.tweet.picture_description}</div>
+          </div>
+          :
+          props.tweet.embeded_image
+            ?
+            <div>
+              <img className="TweetImage" src={props.tweet.embeded_image} alt='User posted' />
+            </div>
+            : null}
+      </div>
+      <div className="TweetFooter">
+        <div style={{ float: 'left', marginLeft: '2%' }}>{'Retweets: ' + props.tweet.retweet_count}</div>
+        <div style={{ marginLeft: 'auto', marginRight: '2%' }}>{'Likes: ' + props.tweet.likes}</div>
+
+      </div>
+    </div>
+  )
 }
 
 export default Tweet;
