@@ -29,10 +29,10 @@ function Tweet(props) {
             <div>{props.tweet.picture_description}</div>
           </div>
           :
-          props.tweet.embeded_image
+          props.tweet.embeded_image !== ''
             ?
             <div>
-              <img className="TweetImage" src={props.tweet.embeded_image} alt='User posted' />
+              <img className="TweetImage" src={props.tweet.embedded_image} alt='User posted' />
             </div>
             : null}
       </div>
