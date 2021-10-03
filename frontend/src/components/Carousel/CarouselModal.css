@@ -2,10 +2,14 @@
     position: fixed;
     top: 50%;
     left: 50%;
+    width: 50%;
+    min-width: 50%;
+    height: 60%;
+    min-height: 65%;
     transform: translate(-50%, -50%);
     background-color: grey;
-    border-radius: 2%;
-    padding: 2%;
+    /*border-radius: 2%;*/
+    /*padding: 2%;*/
     border-style: solid;
     border-color: black;
   }
