@@ -4,13 +4,17 @@ function Tweet(props) {
   return (
     <div class="completeTweet">
       {
-        props.tweet.user_retweeted
-          ? <div className="TweetStateBanner"> Retweeted by: {props.tweet.retweeted_by} </div>
+        props.tweet.user_retweet !== 'False'
+          ? <div className="TweetStateBanner"> Retweeted by: {props.tweet.retweet_by} </div>
           : null
       }
       {
         props.tweet.quoted_by !== ''
-          ? <div className="TweetStateBanner"> Quoted by: {props.tweet.quoted_by} </div>
+          ? 
+          <div>
+          <div className="TweetStateBanner"> Quoted by: {props.tweet.quoted_by} </div>
+          <div className="QuoteBody">{props.tweet.quoted_by_text}</div>
+          </div>
           : null
       }
       <div className="TweetTitle">

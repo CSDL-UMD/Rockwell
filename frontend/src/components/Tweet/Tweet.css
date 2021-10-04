@@ -33,6 +33,13 @@
     border-color: grey;
 }
 
+.QuoteBody {
+    padding: 1%;
+    border-bottom-style: solid;
+    border-bottom: 1%;
+    border-color: grey;
+}
+
 .TweetArticleContainer {
     border-top-style: solid;
     border-top: 1%;

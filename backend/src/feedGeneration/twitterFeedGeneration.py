@@ -657,6 +657,9 @@ def get_feed():
 			flag_image = False   
 			if len(mediaArr) > 0:    
 				for x in range(len(mediaArr)):
+					eimage.append(mediaArr[x]['media_url'])
+					flag_image = True
+					'''
 					if mediaArr[x]['type'] == 'photo':
 						hasEmbed = True
 						if "sizes" in mediaArr[x].keys():
@@ -675,7 +678,8 @@ def get_feed():
 								eimage.append(mediaArr[x]['media_url'])
 						else:
 							eimage.append(mediaArr[x]['media_url'])
-						flag_image = True   
+						flag_image = True  
+					''' 
 			if not flag_image:
 				eimage.append("") 
 		except Exception as error:
