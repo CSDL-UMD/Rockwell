@@ -141,9 +141,9 @@ def get_feed_prereg():
 		requests.post('http://127.0.0.1:5052/insert_prereg',json=finalJson)
 		public_tweets = public_tweets[0:5]
 	else:
+		print("page : "+str(page))
 		db_response = requests.get('http://127.0.0.1:5052/get_prereg_tweets?worker_id='+str(worker_id)+'&attnlevel='+str(page+1))
 		db_response = db_response.json()['data']
-		print(db_response)
 		public_tweets = [d[2] for d in db_response]
 	feed_json = []
 	rankk = 1
@@ -431,7 +431,7 @@ def get_feed_prereg():
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
-
+	print("IN GET FEED!!!")
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))

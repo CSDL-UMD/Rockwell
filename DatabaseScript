@@ -49,3 +49,13 @@ CREATE TABLE user_tweet_attn (
    FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
    PRIMARY KEY (worker_id,tweet_id)
 );
+
+CREATE TABLE prereg_attn (
+   tweet_id bigint,
+   worker_id bigint NOT NULL,
+   rank smallint NOT NULL,
+   attnlevel smallint NOT NULL,
+   present boolean,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id)
+);
