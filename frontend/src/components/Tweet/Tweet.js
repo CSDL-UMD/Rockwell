@@ -1,6 +1,27 @@
 import React from 'react';
 import './Tweet.css';
+import configuration from '../../Configuration/config';
 function Tweet(props) {
+  const handleRetweet = (tweet) => {
+    fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, {method: 'POST'});
+    try {
+      let amount = parseInt(tweet.retweet_count) + 1;
+      tweet.retweet_count = String(amount);
+    } catch {
+      console.log("Not an integer.");
+    }
+  };
+
+  const handleLike = (tweet) => {
+    fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, {method: 'POST'});
+    try { // Wont work as we need to update main object and update state to get the rerender of numbers.g
+      let amount = parseInt(tweet.likes) + 1;
+      tweet.likes = String(amount);
+    } catch {
+      console.log("Not an integer.");
+    }
+  };
+
   return (
     <div class="completeTweet">
       {
@@ -41,8 +62,8 @@ function Tweet(props) {
             : null}
       </div>
       <div className="TweetFooter">
-        <div style={{ float: 'left', marginLeft: '2%' }}>{'Retweets: ' + props.tweet.retweet_count}</div>
-        <div style={{ marginLeft: 'auto', marginRight: '2%' }}>{'Likes: ' + props.tweet.likes}</div>
+        <div style={{ float: 'left', marginLeft: '2%' }}>{<button onClick={() => handleRetweet(props.tweet)}>{'Retweets: ' + props.tweet.retweet_count}</button>}</div>
+        <div style={{ marginLeft: 'auto', marginRight: '2%' }}><button onClick={() => handleLike(props.tweet)}>{'Likes: ' + props.tweet.likes}</button></div>
 
       </div>
     </div>

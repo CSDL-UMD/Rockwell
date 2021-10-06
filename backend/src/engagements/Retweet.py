@@ -13,17 +13,13 @@ app.debug = False
 
 @app.route('/retweet', methods=['POST'])
 def retweet():
-    data = request.get_json()
-    data_arg = data['arguments']
-    tweet_id = data_arg.split(',')[0].strip()
-    session_id = data_arg.split(',')[1].strip()
-    access_token = data_arg.split(',')[2].strip()
-    access_token_secret = data_arg.split(',')[3].strip()
+    tweet_id = request.args.get('tweet_id')
+    session_id = request.args.get('session_id')
+    access_token = request.args.get('access_token')
+    access_token_secret = request.args.get('access_token_secret')
+
     cred = config('../configuration/config.ini','twitterapp')
 
-    #auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
-    #auth.set_access_token(cred["token"], cred["token_secret"])
-    #api = tweepy.API(auth)
     oauth = OAuth1Session(cred['key'],
                        client_secret=cred['key_secret'],
                        resource_owner_key=access_token,
@@ -41,13 +37,11 @@ def retweet():
 
 @app.route('/like', methods=['POST'])
 def like():
-    data = request.get_json()
-    data_arg = data['arguments']
-    tweet_id = data_arg.split(',')[0].strip()
-    session_id = data_arg.split(',')[1].strip()
-    access_token = data_arg.split(',')[2].strip()
-    access_token_secret = data_arg.split(',')[3].strip()
-    cred = config('../../config.ini','twitterapp')
+    tweet_id = request.args.get('tweet_id')
+    session_id = request.args.get('session_id')
+    access_token = request.args.get('access_token')
+    access_token_secret = request.args.get('access_token_secret')
+    cred = config('../configuration/config.ini','twitterapp')
 
     #auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
     #auth.set_access_token(cred["token"], cred["token_secret"])
@@ -127,5 +121,5 @@ def add_headers(response):
     return response
 
 if __name__ == "__main__":
-    app.run(host = "127.0.0.1", port = 5050)
+    app.run(host = "0.0.0.0", port = 5050)
     # app.run(ssl_context='adhoc', host = "0.0.0.0", port = 5050) To add SSL

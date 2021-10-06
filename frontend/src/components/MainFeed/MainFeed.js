@@ -58,7 +58,7 @@ const fetchTweets = (argumentObject) => {
         </div>
         {
           feedInformation.map(tweet => (
-            <Tweet key={JSON.stringify(tweet)} tweet={tweet} />
+            <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
           ))
         }
         <button onClick={handleShowInstructionCarousel}>Show Carousel</button>
