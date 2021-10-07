@@ -54,7 +54,7 @@ const fetchTweets = (argumentObject) => {
       :
       <div className="Feed">
         <div className="TopInstructions">
-          <h3 style={{ margin: '0' }}>Feed {givenArguments.page} out of 5, please read it like your regular feed.</h3>
+          <h3 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read it like your regular feed.</h3>
         </div>
         {
           feedInformation.map(tweet => (

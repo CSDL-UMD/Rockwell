@@ -22,6 +22,11 @@ function Tweet(props) {
     }
   };
 
+  const imageResizer = (image) => { // Bin these based on width, dynamic aspect ratio.
+    console.log(image.target.width);
+    image.target.height = image.target.width * 0.60;
+  };
+
   return (
     <div class="completeTweet">
       {
@@ -50,14 +55,14 @@ function Tweet(props) {
         {props.tweet.picture !== ''
           ? <div className="TweetArticleContainer">
             <div style={{ marginTop: '1%', marginBottom: '1%' }}>{props.tweet.picture_heading}</div>
-            <img className="TweetImage" src={props.tweet.picture} alt='Article' />
+            <img className = "TweetImage" onLoad={imageResizer} src={props.tweet.picture} alt='Article' />
             <div>{props.tweet.picture_description}</div>
           </div>
           :
           props.tweet.embeded_image !== ''
             ?
             <div>
-              <img className="TweetImage" src={props.tweet.embedded_image} alt='User posted' />
+              <img className = "TweetImage" onLoad={imageResizer} src={props.tweet.embedded_image} alt='User posted' />
             </div>
             : null}
       </div>
