@@ -38,7 +38,6 @@ const fetchTweets = (argumentObject) => {
   fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
     return resp.json();
   }).then(value => {
-    console.log(value);
     setFeedInformation(value);
   })
 }

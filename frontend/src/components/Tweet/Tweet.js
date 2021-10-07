@@ -26,7 +26,6 @@ function Tweet(props) {
   const handleTotalResize = () => {
     let res = document.getElementsByClassName('TweetImage'); 
     Object.keys(res).forEach(image => {
-      console.log(getImageHeightRatio(res[image].width));
       res[image].height = res[image].width * getImageHeightRatio(res[image].width);
     });
   };
@@ -81,7 +80,7 @@ function Tweet(props) {
           props.tweet.embeded_image !== ''
             ?
             <div>
-              <img className = "TweetImage" onLoad={imageResizerOnLoadd} src={props.tweet.embedded_image} alt='User posted' />
+              <img className = "TweetImage" onLoad={imageResizerOnLoad} src={props.tweet.embedded_image} alt='User posted' />
             </div>
             : null}
       </div>
