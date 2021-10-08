@@ -21,7 +21,7 @@ request_token_url = str(webInformation['request_token_url'])
 access_token_url = str(webInformation['access_token_url'])
 authorize_url = str(webInformation['authorize_url'])
 show_user_url = str(webInformation['show_user_url'])
-truman_url = str(webInformation['app_route'])
+rockwell_url = str(webInformation['app_route'])
 account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
@@ -50,7 +50,7 @@ def start():
     oauth_store[oauth_token] = oauth_token_secret
     start_url = authorize_url+"?oauth_token="+oauth_token
     #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
-    res = make_response(render_template('YouGov.html', start_url=start_url, screenname="###", truman_url="###"))
+    res = make_response(render_template('YouGov.html', start_url=start_url, screenname="###", rockwell_url="###"))
     # Trying to add a browser cookie
     res.set_cookie('exp','infodiversity',max_age=1800)
     return res
@@ -132,15 +132,15 @@ def callback():
     page = 0
     pre_attn_check = 1
 
-    truman_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) 
-    #truman_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
+    rockwell_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) 
+    #rockwell_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
 
     del oauth_store[oauth_token]
 
-    redirect(truman_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+    redirect(rockwell_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
 
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
-    return render_template('YouGov.html', start_url="###", screenname=screen_name, truman_url=truman_url_agg)
+    return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
 
 @app.errorhandler(500)
 def internal_server_error(e):
