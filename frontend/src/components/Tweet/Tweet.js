@@ -42,6 +42,10 @@ function Tweet(props) {
     }
   };
 
+  const handleLinkClicked = () => {
+    console.log('Link was clicked.');
+  };
+  
   const handleTotalResize = () => {
     let res = document.getElementsByClassName('TweetImage');
     Object.keys(res).forEach(image => {
@@ -92,7 +96,9 @@ function Tweet(props) {
         {localTweet.picture !== ''
           ? <div className="TweetArticleContainer">
             <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
+            <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={handleLinkClicked}>
             <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.picture} alt='Article' />
+            </a>
             <div>{localTweet.picture_description}</div>
           </div>
           :
