@@ -45,7 +45,7 @@ function Tweet(props) {
   const handleLinkClicked = () => {
     console.log('Link was clicked.');
   };
-  
+
   const handleTotalResize = () => {
     let res = document.getElementsByClassName('TweetImage');
     Object.keys(res).forEach(image => {
@@ -71,7 +71,7 @@ function Tweet(props) {
   return (
     <div class="completeTweet">
       {
-        localTweet.user_retweet !== 'False'
+        localTweet.retweet_by !== ''
           ? <div className="TweetStateBanner"> Retweeted by: {localTweet.retweet_by} </div>
           : null
       }
@@ -84,7 +84,7 @@ function Tweet(props) {
           </div>
           : null
       }
-      <div className="TweetTitle">
+      <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
         <img style={{ justifySelf: 'flex-start' }} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
         <div style={{ marginLeft: 'auto' }}>
           {localTweet.actor_name}
@@ -97,7 +97,7 @@ function Tweet(props) {
           ? <div className="TweetArticleContainer">
             <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
             <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={handleLinkClicked}>
-            <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.picture} alt='Article' />
+              <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.picture} alt='Article' />
             </a>
             <div>{localTweet.picture_description}</div>
           </div>

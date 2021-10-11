@@ -14,7 +14,14 @@
     border-color: black;
     display: flex;
 }
+
 .TweetContent {
+    padding: 1%;
+}
+
+.QuotedTweetContent {
+    margin-left: 5%;
+    width: 93%;
     padding: 1%;
 }
 
