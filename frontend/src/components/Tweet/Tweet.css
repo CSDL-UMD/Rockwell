@@ -17,12 +17,14 @@
 
 .TweetContent {
     padding: 1%;
+    text-align: left;
 }
 
 .QuotedTweetContent {
     margin-left: 5%;
     width: 93%;
     padding: 1%;
+    text-align: left;
 }
 
 .TweetFooter {

@@ -91,7 +91,7 @@ function Tweet(props) {
           {' @' + localTweet.actor_username}
         </div>
       </div>
-      <div className="TweetContent">
+      <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
         <div style={{ marginBottom: '1%' }}>{localTweet.body + ' ' + localTweet.expanded_urls}</div>
         {localTweet.picture !== ''
           ? <div className="TweetArticleContainer">
@@ -102,7 +102,7 @@ function Tweet(props) {
             <div>{localTweet.picture_description}</div>
           </div>
           :
-          localTweet.embeded_image !== ''
+          localTweet.embedded_image !== ''
             ?
             <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.embedded_image} alt='User posted' />
             : null}
