@@ -5,10 +5,7 @@ import './CarouselModal.css';
 
 function CarouselModal(props) {
     return (
-        <Modal show={props.showCarousel} size='lg'>
-            <Modal.Header>
-                App Instructions
-            </Modal.Header>
+        <Modal show={props.showCarousel} size='xl'>
             <Modal.Body>
             <CarouselComponent />
             </Modal.Body>
