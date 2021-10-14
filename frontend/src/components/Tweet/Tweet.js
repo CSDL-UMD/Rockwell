@@ -79,13 +79,15 @@ function Tweet(props) {
         localTweet.quoted_by !== ''
           ?
           <div>
-            <div className="TweetStateBanner"> Quoted by: {localTweet.quoted_by} </div>
+            <div style={{ display: 'flex' }} className="TweetStateBanner">
+              <img style={{paddingRight: '2%', paddingLeft: '1%'}} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
+              {localTweet.quoted_by + ' @' + localTweet.quoted_by_actor_username + ' Quoted:'} </div>
             <div className="QuoteBody">{localTweet.quoted_by_text}</div>
           </div>
           : null
       }
       <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
-        <img style={{ justifySelf: 'flex-start' }} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
+        <img src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
         <div style={{ marginLeft: 'auto' }}>
           {localTweet.actor_name}
           {' @' + localTweet.actor_username}

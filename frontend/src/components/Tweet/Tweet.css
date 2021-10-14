@@ -21,10 +21,12 @@
 }
 
 .QuotedTweetContent {
-    margin-left: 5%;
-    width: 93%;
+    margin-left: 10%;
+    width: 88%;
     padding: 1%;
     text-align: left;
+    font-size: 90%;
+    margin-top: '5%'
 }
 
 .TweetFooter {
@@ -44,9 +46,7 @@
 
 .QuoteBody {
     padding: 1%;
-    border-bottom-style: solid;
-    border-bottom: 1%;
-    border-color: grey;
+    margin-bottom: 5%;
 }
 
 .TweetArticleContainer {

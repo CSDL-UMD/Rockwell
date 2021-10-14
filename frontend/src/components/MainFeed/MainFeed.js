@@ -38,6 +38,7 @@ const fetchTweets = (argumentObject) => {
   fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
     return resp.json();
   }).then(value => {
+    console.log(value);
     setFeedInformation(value);
   })
 }
@@ -53,7 +54,7 @@ const fetchTweets = (argumentObject) => {
       :
       <div className="Feed">
         <div className="TopInstructions">
-          <h3 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read it like your regular feed.</h3>
+          <h4 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read it like your regular feed.</h4>
         </div>
         {
           feedInformation.map(tweet => (
