@@ -127,11 +127,13 @@ def check_attn():
         actual_ans = [d[1] for d in db_response]
         print(actual_ans)
         check = "Correct"
+        result_map = [1,1,1,1]
         for i in range(4):
             if bool(attn_map[i]) != actual_ans[i]:
-                check = "Incorrect"
-                break
-        return jsonify({"check":check})
+                result_map[i] = 0
+        if sum(result_map) < 3:
+            check = "Incorrect"
+        return jsonify({"check":check,"result_map":result_map})
     except Exception as e:
         print(e)
         return jsonify({"success":0}) # Retweet failed

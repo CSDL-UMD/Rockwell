@@ -307,7 +307,10 @@ function next_arrow() {
                 "attn_map": answers_map})        
       }).done(function(data) {
         console.log(data.check);
+        console.log(data.result_map);
         result = data.check;
+        result_map = data.result_map;
+        tot_correct = result_map.reduce((a, b) => a + b, 0);
         if(result == "Correct"){
           console.log("CORRECT!!!");
           document.getElementById('myModal1').style.display = "block";
@@ -320,7 +323,9 @@ function next_arrow() {
           else{
             page = parseInt(page) + 1;
             urll = 'http://127.0.0.1:3000?access_token=' + String(access_token) + '&access_token_secret=' + String(access_token_secret) + '&worker_id=' + String(worker_id) + '&attn=' + String(attn) + '&page=' + String(page) + '&pre_attn_check=' + String(pre_attn);
-            location.replace(urll);
+            document.getElementById('pincorrect').innerHTML = "That was incorrect! You got " + String(tot_correct) + " answers wrong. You need at least 3 answers right out of 4.";
+            document.getElementById('tryagainbtn').onclick = function() { location.replace(urll); };
+            document.getElementById('myModal3').style.display = "block";
           }
         }
       });
