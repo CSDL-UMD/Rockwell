@@ -7,9 +7,8 @@ function CarouselModal(props) {
     return (
         <Modal show={props.showCarousel} size='xl'>
             <Modal.Body>
-            <CarouselComponent />
+            <CarouselComponent hideCarousel={props.hideCarousel} />
             </Modal.Body>
-            <button onClick={props.hideCarousel}>Close</button>
         </Modal>
     )
 }
