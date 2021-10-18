@@ -28,7 +28,7 @@ function CarouselComponent() {
   }
 
   const moveDot = index => {
-    setSlideIndex(index)
+    //setSlideIndex(index)
   }
 
   return (
