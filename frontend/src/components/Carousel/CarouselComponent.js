@@ -46,9 +46,9 @@ function CarouselComponent(props) {
           ))}
         </div>
       </div>
-      <div className="CloseButton">
-      {SliderData.length === slideIndex ? <button style={{width: '100%'}}onClick={props.hideCarousel}>Close</button> : null}
-      </div>
+        <div className="CloseButton">
+          {SliderData.length === slideIndex ? <button style={{width: '100%'}}onClick={props.hideCarousel}>Close</button> : null}
+        </div>
     </div>
   )
 }
