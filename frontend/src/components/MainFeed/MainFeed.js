@@ -38,10 +38,27 @@ const fetchTweets = (argumentObject) => {
   fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
     return resp.json();
   }).then(value => {
-    console.log(value);
     setFeedInformation(value);
   })
 }
+
+const handleTotalResize = (arg) => {
+  let res = document.getElementsByClassName('TweetImage');
+  Object.keys(res).forEach(image => {
+    res[image].height = res[image].width * getImageHeightRatio(res[image].width);
+  });
+};
+
+const getImageHeightRatio = (width) => {
+  if (width > 800)
+    return 0.65;
+  if (width > 500)
+    return 0.60;
+  else
+    return 0.60;
+}
+
+window.addEventListener('resize', handleTotalResize);
 
   return (
     <div>
@@ -58,9 +75,10 @@ const fetchTweets = (argumentObject) => {
         </div>
         {
           feedInformation.map(tweet => (
-            <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
+            <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} getImageHeightRatio={getImageHeightRatio} />
           ))
         }
+        {window.scrollTo(0, 0) /* Fix user starting somewhere random in feed due to resize */}
         <button onClick={handleShowInstructionCarousel}>Show Carousel</button>
       </div>
       }

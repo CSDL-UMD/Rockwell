@@ -42,11 +42,20 @@
     border-bottom-style: solid;
     border-bottom: 1%;
     border-color: grey;
+    text-align: left;
+}
+
+.TweetStateBannerQuote {
+    padding: 1%;
+    text-align: left;
 }
 
 .QuoteBody {
     padding: 1%;
     margin-bottom: 5%;
+    border-bottom-style: solid;
+    border-bottom: 1%;
+    border-color: grey;
 }
 
 .TweetArticleContainer {

@@ -13,6 +13,8 @@ RUN apk add --no-cache --update alpine-sdk \
                      py-pip \
                      nano bash jq musl-dev
 
+# Install conda2
+# Install conda
 RUN CONDA_VERSION="4.5.12" && \
     CONDA_MD5_CHECKSUM="866ae9dff53ad0874e1d1a60b1ad1ef8" && \
     \
@@ -60,7 +62,8 @@ RUN conda install -y python=3.7.5\
         sqlparse \
         tabulate \
         gxx_linux-64 \
-        make
+        cryptography \
+	make
 
 RUN conda install -c conda-forge demjson
 
@@ -78,6 +81,23 @@ RUN apk add --no-cache python && \
     pip install --upgrade pip setuptools && \
     rm -r /root/.cache
 
+# Install Gosu to /usr/local/bin/gosu
+# ADD https://github.com/tianon/gosu/releases/download/1.10/gosu-amd64 /usr/local/sbin/gosu
+# RUN chmod +x /usr/local/sbin/gosu
+# RUN adduser -D hoaxy -h /hoaxy -s /bin/sh
+# USER hoaxy
+
+# Install tini to /usr/local/sbin
+# ADD https://github.com/krallin/tini/releases/download/v0.18.0/tini-muslc-amd64 /usr/local/sbin/tini
+# RUN apk --no-cache --no-progress add ca-certificates git libssh2 openssl \
+# && chmod +x /usr/local/sbin/tini && mkdir -p /opt \
+# && adduser -D hoaxy -h /opt/hoaxy -s /bin/sh \
+# && su hoaxy -c 'cd /opt/hoaxy; mkdir -p bin config data'
+
+# Switch to user context
+# USER hoaxy
+# WORKDIR /opt/hoaxy
+
 RUN curl https://downloads.apache.org/lucene/pylucene/pylucene-7.7.1-src.tar.gz | tar -xz --strip-components=1 \
     && cd jcc \
     && export JCC_ARGSEP=";" \
@@ -92,15 +112,28 @@ ENV HOAXY_VCS_BRANCH=${HOAXY_VCS_BRANCH:-"master"} \
     #HOAXY_VCS_REMOTE=${HOAXY_VCS_REMOTE:-"https://github.com/IUNetSci/hoaxy-backend.git"}
     HOAXY_VCS_REMOTE=${HOAXY_VCS_REMOTE:-"https://github.com/saumyabhadani95/hoaxy-backend.git"}
 
+
 RUN apk add --no-cache --no-progress yaml-dev postgresql-dev \
     && git clone --recursive --depth=${HOAXY_VCS_DEPTH} --branch ${HOAXY_VCS_BRANCH} ${HOAXY_VCS_REMOTE} \
     && cd hoaxy-backend 
+#    && conda install -y psycopg2
 
 RUN cd hoaxy-backend \
     && pip install --upgrade --force-reinstall jieba3k==0.35.1 \
     && pip install requests --upgrade \
     && python setup.py install
 
+#    && pip install --upgrade --force-reinstall setuptools \
+#    && find . -name '*.pyc' -delete \
+
+## Use entrypoint script to switch case and pass custom/default params to hoaxy
+#WORKDIR /opt
+#COPY entrypoint.sh .
+#RUN chmod +x /opt/entrypoint.sh
+
+## If Dockerfile at root dir of vcs repo
+# COPY . . 
+# RUN python setup.py install
 RUN mkdir /home/hoaxy
 WORKDIR /home/hoaxy
 
@@ -108,4 +141,12 @@ ENV HOAXY_HOME=/home/hoaxy
 
 EXPOSE 5432
 
+## If entrypoint.sh switch case
+#ENTRYPOINT ["/opt/entrypoint.sh"]
 CMD ["bash"]
+## Dev mode
+# CMD ["/bin/bash"]
+
+## With tini example
+# ENTRYPOINT ["tini", "-g", "--"]
+# CMD ["hoaxy", "-conf_dir=/opt/hoaxy/config"]

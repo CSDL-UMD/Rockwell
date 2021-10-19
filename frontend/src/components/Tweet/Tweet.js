@@ -46,27 +46,9 @@ function Tweet(props) {
     console.log('Link was clicked.');
   };
 
-  const handleTotalResize = () => {
-    let res = document.getElementsByClassName('TweetImage');
-    Object.keys(res).forEach(image => {
-      res[image].height = res[image].width * getImageHeightRatio(res[image].width);
-    });
-  };
-
   const imageResizerOnLoad = (image) => {
-    image.target.height = image.target.width * getImageHeightRatio(image.target.width);
+    image.target.height = image.target.width * props.getImageHeightRatio(image.target.width);
   };
-
-  const getImageHeightRatio = (width) => {
-    if (width > 800)
-      return 0.65;
-    if (width > 500)
-      return 0.60;
-    else
-      return 0.60;
-  }
-
-  window.addEventListener('resize', handleTotalResize);
 
   return (
     <div class="completeTweet">
@@ -79,7 +61,7 @@ function Tweet(props) {
         localTweet.quoted_by !== ''
           ?
           <div>
-            <div style={{ display: 'flex' }} className="TweetStateBanner">
+            <div style={{ display: 'flex' }} className="TweetStateBannerQuote">
               <img style={{paddingRight: '2%', paddingLeft: '1%'}} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
               {localTweet.quoted_by + ' @' + localTweet.quoted_by_actor_username + ' Quoted:'} </div>
             <div className="QuoteBody">{localTweet.quoted_by_text}</div>
@@ -94,7 +76,7 @@ function Tweet(props) {
         </div>
       </div>
       <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
-        <div style={{ marginBottom: '1%' }}>{localTweet.body + ' ' + localTweet.expanded_urls}</div>
+        <div style={{ marginBottom: '1%' }}>{localTweet.body}</div>
         {localTweet.picture !== ''
           ? <div className="TweetArticleContainer">
             <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
