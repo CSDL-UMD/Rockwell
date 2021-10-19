@@ -56,6 +56,7 @@
     border-bottom-style: solid;
     border-bottom: 1%;
     border-color: grey;
+    text-align: left;
 }
 
 .TweetArticleContainer {
