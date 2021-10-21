@@ -46,10 +46,6 @@ function Tweet(props) {
     console.log('Link was clicked.');
   };
 
-  const imageResizerOnLoad = (image) => {
-    image.target.height = image.target.width * props.getImageHeightRatio(image.target.width);
-  };
-
   return (
     <div class="completeTweet">
       {
@@ -81,14 +77,14 @@ function Tweet(props) {
           ? <div className="TweetArticleContainer">
             <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
             <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={handleLinkClicked}>
-              <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.picture} alt='Article' />
+              <img className="TweetImage" src={localTweet.picture} alt='Article' />
             </a>
             <div>{localTweet.picture_description}</div>
           </div>
           :
           localTweet.embedded_image !== ''
             ?
-            <img className="TweetImage" onLoad={imageResizerOnLoad} src={localTweet.embedded_image} alt='User posted' />
+            <img className="TweetImage" src={localTweet.embedded_image} alt='User posted' />
             : null}
       </div>
       <div className="TweetFooter">
