@@ -1,27 +1,19 @@
-
 .slider-container {
     display: block;
-    min-width: 70vw;
-    width: 70vw;
-    max-width: 90vw;
-    height: 70vh;
-    max-height: 90vh;
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
     margin: 0px auto 0;
-    overflow: auto;
-    /*box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);*/
+    overflow: none;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
-/*@media screen and (max-width: 500px){
-  .slider-container {
-    margin: 100px 10px 0;
-  }
-}*/
+
 .slide {
   margin-right: auto;
-  margin-left: auto;
+  margin-left: 6%;
   justify-content: center;
-  width: 84%;
+  width: 88%;
   height: 84%;
-  position: absolute;
   opacity: 0;
   transition: opacity ease-in-out 0.4s;
 }
@@ -35,6 +27,7 @@
   max-height: 100%;
   object-fit: cover;
 }
+
 .active-anim {
   opacity: 1;
 }
@@ -57,16 +50,19 @@
   height: 25px;
   pointer-events: none;
 }
+
 .prev {
   top: 50%;
-  left: 20px;
+  left: 1.5%;
   transform: translateY(-60%);
 }
+
 .next {
   top: 50%;
-  right: 20px;
+  right: 1.5%;
   transform: translateY(-60%);
 }
+
 .container-dots {
   position: absolute;
   bottom: 10px;
@@ -74,6 +70,7 @@
   transform: translateX(-50%);
   display: flex;
 }
+
 .dot {
   width: 20px;
   height: 20px;
@@ -82,6 +79,7 @@
   margin: 0 5px;
   background: #f1f1f1;
 }
+
 .dot.active {
   background: #9b9797;
 }
@@ -89,7 +87,8 @@
 .CloseButton {
   margin-top: auto;
   padding: 2%;
-  display: flex;
-  justify-content: right;
+  display: block;
+  justify-content: left;
+  width: 10%;
+  margin-left: 45%;
 }
-

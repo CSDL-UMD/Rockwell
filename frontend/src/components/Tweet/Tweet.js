@@ -20,10 +20,10 @@ function Tweet(props) {
         let amount = parseInt(newTweetLocal.retweet_count) + 1;
         newTweetLocal.retweet_count = String(amount);
         setLocalTweet(newTweetLocal);
+        setRetweetEnabled(false);
       } catch {
-        console.log("Not an integer.");
+        setRetweetEnabled(false);
       }
-      setRetweetEnabled(false);
     }
   };
 
@@ -35,10 +35,10 @@ function Tweet(props) {
         let amount = parseInt(newTweetLocal.likes) + 1;
         newTweetLocal.likes = String(amount);
         setLocalTweet(newTweetLocal);
+        setLikeEnabled(false);
       } catch {
-        console.log("Not an integer.");
+        setLikeEnabled(false);
       }
-      setLikeEnabled(false);
     }
   };
 
@@ -58,7 +58,7 @@ function Tweet(props) {
           ?
           <div>
             <div style={{ display: 'flex' }} className="TweetStateBannerQuote">
-              <img style={{paddingRight: '2%', paddingLeft: '1%'}} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
+              <img style={{ paddingRight: '2%', paddingLeft: '1%' }} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
               {localTweet.quoted_by + ' @' + localTweet.quoted_by_actor_username + ' Quoted:'} </div>
             <div className="QuoteBody">{localTweet.quoted_by_text}</div>
           </div>

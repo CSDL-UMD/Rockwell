@@ -28,15 +28,12 @@ function CarouselComponent(props) {
   return (
     <div>
       <div className="slider-container">
-        {SliderData.map((slide, i) => {
-          return (
-            <div className={slideIndex === i + 1 ? "slide active-anim" : "slide"}>
+            <div className="slide active-anim">
               <img
-                src={`/Instruction_Images/Screenshot${i + 1}.png`}
+                src={`/Instruction_Images/Screenshot${slideIndex}.png`}
                 alt="" />
             </div>
-          )
-        })}
+
         {SliderData.length !== slideIndex ? <BtnSlider moveSlide={nextSlide} direction={"next"} /> : null}
         {slideIndex !== 1 ? <BtnSlider moveSlide={prevSlide} direction={"prev"} /> : null}
 
@@ -47,14 +44,10 @@ function CarouselComponent(props) {
         </div>
       </div>
         <div className="CloseButton">
-          {SliderData.length === slideIndex ? <button style={{width: '100%'}}onClick={props.hideCarousel}>Close</button> : null}
+          {SliderData.length === slideIndex ? <button onClick={props.hideCarousel}>Close</button> : null}
         </div>
     </div>
   )
 }
 
 export default CarouselComponent;
-/*SliderData[index + 1].image*/
-
-/* src={slide.image} key={i}
-alt="" /> */

@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 import Tweet from '../Tweet/Tweet';
 import CarouselModal from '../Carousel/CarouselModal';
-import { useEffect, useState } from 'react';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import './MainFeed.css';
@@ -47,7 +47,7 @@ function MainFeed(props) {
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
-    
+
     const debounce = (fn, ms) => {
       let timer
       return _ => {
@@ -63,11 +63,11 @@ function MainFeed(props) {
       console.log(res);
       setTweetSizes(res);
     }, 500);
-    
+
     window.addEventListener('resize', debouncedHandleResize);
     return _ => {
       window.removeEventListener('resize', debouncedHandleResize)
-  }
+    }
   }, [props.location.search]);
 
   const handleCloseInstructionCarousel = () => {
@@ -97,7 +97,9 @@ function MainFeed(props) {
               <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
             ))
           }
-          {/*<button onClick={handleShowInstructionCarousel}>Show Carousel</button>*/}
+          <div className="TopInstructions">
+            <h4 style={{ margin: '0' }}>You have reached the end of your feed.</h4>
+          </div>
         </div>
       }
       <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />
