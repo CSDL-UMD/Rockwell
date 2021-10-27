@@ -1,8 +1,8 @@
 .slider-container {
     display: block;
-    min-width: 100%;
-    width: 100%;
-    max-width: 100%;
+    min-width: 85%;
+    width: 85%;
+    max-width: 85%;
     margin: 0px auto 0;
     overflow: none;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
