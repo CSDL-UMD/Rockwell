@@ -9,13 +9,13 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
-  const [tweetSizes, setTweetSizes] = useState([]);
 
   useEffect(() => {
+    let feedSize = [];
+    let furthestSeen = 0;
     const handleFirstRender = () => {
       let result = handleTotalResize();
-      console.log(result);
-      setTweetSizes(result);
+      feedSize = (calculateFeedSize(result, window.innerHeight));
       window.scrollTo(0, 0);
     };
 
@@ -43,10 +43,41 @@ function MainFeed(props) {
       return returnObject;
     }
 
-    const urlArgs = getUrlArgs();
-    setGivenArguments(urlArgs);
-    fetchTweets(urlArgs);
-    urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
+    const handleTweetViewTracking = () => {
+      if (!feedSize.length) {
+        return 0;
+      }
+  
+      const position = window.pageYOffset;
+  
+      if (position < feedSize[0]) {
+        return 0;
+      }
+  
+      let currentThreshold = 0;
+      let i = 0;
+      for (; i < furthestSeen; ++i) {
+        currentThreshold += feedSize[i];
+      }
+  
+      if (position < currentThreshold) {
+        return furthestSeen;
+      }
+      let didBreak = false;
+      for (; i < feedSize.length; ++i) {
+        currentThreshold += feedSize[i];
+        if (currentThreshold > position) {
+          didBreak = true;
+          break;
+        }
+      }
+  
+      if (didBreak) {
+        return i;
+      } else {
+        return i - 1;
+      }
+    };
 
     const debounce = (fn, ms) => {
       let timer
@@ -54,26 +85,49 @@ function MainFeed(props) {
         clearTimeout(timer)
         timer = setTimeout(_ => {
           timer = null
-          fn.apply(this, arguments)
+          fn.apply(this, arguments);
         }, ms)
       };
-    }
+    };
+
     const debouncedHandleResize = debounce(function handleResize() {
       let res = handleTotalResize();
-      console.log(res);
-      setTweetSizes(res);
+      feedSize = (calculateFeedSize(res, window.innerHeight));
     }, 500);
 
+    const debouncedHandleScroll = debounce(function handleScroll() {
+      const res = handleTweetViewTracking();
+      furthestSeen = res;
+      console.log('Furthest Tweet Seen: ' + res);
+    }, 500);
+    
+    const urlArgs = getUrlArgs();
+    setGivenArguments(urlArgs);
+    fetchTweets(urlArgs);
+    urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);
+    window.addEventListener('scroll', debouncedHandleScroll);
     return _ => {
-      window.removeEventListener('resize', debouncedHandleResize)
+      window.removeEventListener('resize', debouncedHandleResize);
+      window.removeEventListener('scroll', debouncedHandleScroll);
     }
   }, [props.location.search]);
+
+  const calculateFeedSize = (tweetSizeArray, clientHeight) => {
+    let feedSizeArray = Object.assign([], tweetSizeArray);
+    let res = document.getElementsByClassName('TopInstructions');
+    feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07)); // Might need to be between 7-9% here, 1% more than what is listed here because of next loop
+    for (let i = 0; i < feedSizeArray.length; i++) {
+      feedSizeArray[i] += (clientHeight * 0.01);
+    }
+    return feedSizeArray;
+  };
 
   const handleCloseInstructionCarousel = () => {
     setShowInstructionCarousel(false);
     document.getElementById('root').style.filter = 'blur(0px)'
   };
+
   const handleShowInstructionCarousel = () => {
     setShowInstructionCarousel(true);
     document.getElementById('root').style.filter = 'blur(5px)'

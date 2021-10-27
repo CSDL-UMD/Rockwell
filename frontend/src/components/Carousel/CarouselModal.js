@@ -4,13 +4,13 @@ import CarouselComponent from './CarouselComponent';
 import './CarouselModal.css';
 
 function CarouselModal(props) {
-    return (
-        <Modal show={props.showCarousel} size='xl'>
-            <Modal.Body>
-            <CarouselComponent hideCarousel={props.hideCarousel} />
-            </Modal.Body>
-        </Modal>
-    )
+  return (
+    <Modal show={props.showCarousel} size='xl'>
+      <Modal.Body>
+        <CarouselComponent hideCarousel={props.hideCarousel} />
+      </Modal.Body>
+    </Modal>
+  )
 }
 
 export default CarouselModal;
