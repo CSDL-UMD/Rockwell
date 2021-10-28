@@ -13,6 +13,7 @@ function MainFeed(props) {
   useEffect(() => {
     let feedSize = [];
     let furthestSeen = 0;
+
     const handleFirstRender = () => {
       let result = handleTotalResize();
       feedSize = (calculateFeedSize(result, window.innerHeight));
@@ -148,7 +149,7 @@ function MainFeed(props) {
         :
         <div className="Feed">
           <div className="TopInstructions">
-            <h4 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read it like your regular feed.</h4>
+            <h4 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h4>
           </div>
           {
             feedInformation.map(tweet => (
@@ -156,7 +157,7 @@ function MainFeed(props) {
             ))
           }
           <div className="TopInstructions">
-            <h4 style={{ margin: '0' }}>You have reached the end of your feed.</h4>
+            <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
         </div>
       }
