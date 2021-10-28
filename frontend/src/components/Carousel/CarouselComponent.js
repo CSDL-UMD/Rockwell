@@ -28,24 +28,24 @@ function CarouselComponent(props) {
   return (
     <div>
       <div className="slider-container">
-            <div className="slide active-anim">
-              <img
-                src={`/Instruction_Images/Screenshot${slideIndex}.png`}
-                alt="" />
-            </div>
+        <div className="slide active-anim">
+          <img
+            src={`/Instruction_Images/Screenshot${slideIndex}.png`}
+            alt="" />
+        </div>
 
         {SliderData.length !== slideIndex ? <BtnSlider moveSlide={nextSlide} direction={"next"} /> : null}
         {slideIndex !== 1 ? <BtnSlider moveSlide={prevSlide} direction={"prev"} /> : null}
 
         <div className="container-dots">
           {Array.from({ length: SliderData.length }).map((item, index) => (
-            <div className={slideIndex === index + 1 ? "dot active" : "dot"}></div>
+            <div key={'dot' + index + 1} className={slideIndex === index + 1 ? "dot active" : "dot"}></div>
           ))}
         </div>
       </div>
-        <div className="CloseButton">
-          {SliderData.length === slideIndex ? <button onClick={props.hideCarousel}>Close</button> : null}
-        </div>
+      <div className="CloseButton">
+        {SliderData.length === slideIndex ? <button onClick={props.hideCarousel}>Close</button> : null}
+      </div>
     </div>
   )
 }

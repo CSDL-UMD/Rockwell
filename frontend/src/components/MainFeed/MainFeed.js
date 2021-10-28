@@ -47,19 +47,21 @@ function MainFeed(props) {
       if (!feedSize.length) {
         return 0;
       }
-  
+
       const position = window.pageYOffset;
-  
-      if (position < feedSize[0]) {
+
+      if (position < feedSize[0] && furthestSeen === 0) {
         return 0;
+      } else if (position < feedSize[0]) {
+        return furthestSeen;
       }
-  
+
       let currentThreshold = 0;
       let i = 0;
       for (; i < furthestSeen; ++i) {
         currentThreshold += feedSize[i];
       }
-  
+
       if (position < currentThreshold) {
         return furthestSeen;
       }
@@ -71,7 +73,7 @@ function MainFeed(props) {
           break;
         }
       }
-  
+
       if (didBreak) {
         return i;
       } else {
@@ -100,7 +102,7 @@ function MainFeed(props) {
       furthestSeen = res;
       console.log('Furthest Tweet Seen: ' + res);
     }, 500);
-    
+
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
@@ -116,9 +118,11 @@ function MainFeed(props) {
   const calculateFeedSize = (tweetSizeArray, clientHeight) => {
     let feedSizeArray = Object.assign([], tweetSizeArray);
     let res = document.getElementsByClassName('TopInstructions');
-    feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07)); // Might need to be between 7-9% here, 1% more than what is listed here because of next loop
-    for (let i = 0; i < feedSizeArray.length; i++) {
-      feedSizeArray[i] += (clientHeight * 0.01);
+    if (res.length) {
+      feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07)); // Might need to be between 7-9% here, 1% more than what is listed here because of next loop
+      for (let i = 0; i < feedSizeArray.length; i++) {
+        feedSizeArray[i] += (clientHeight * 0.01);
+      }
     }
     return feedSizeArray;
   };
