@@ -24,12 +24,13 @@ function MainFeed(props) {
       fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
         return resp.json();
       }).then(value => {
+        console.log(value);
         setFeedInformation(value);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
         }
         sleep(500).then(() => {
-          handleFirstRender();
+          handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       })
     }
@@ -44,12 +45,12 @@ function MainFeed(props) {
       return returnObject;
     }
 
-    const handleTweetViewTracking = () => {
+    const handleTweetViewTracking = (clientHeight) => {
       if (!feedSize.length) {
         return 0;
       }
 
-      const position = window.pageYOffset;
+      const position = window.pageYOffset + clientHeight * 0.5;
 
       if (position < feedSize[0] && furthestSeen === 0) {
         return 0;
@@ -99,7 +100,7 @@ function MainFeed(props) {
     }, 500);
 
     const debouncedHandleScroll = debounce(function handleScroll() {
-      const res = handleTweetViewTracking();
+      const res = handleTweetViewTracking(window.innerHeight);
       furthestSeen = res;
       console.log('Furthest Tweet Seen: ' + res);
     }, 500);
@@ -149,7 +150,7 @@ function MainFeed(props) {
         :
         <div className="Feed">
           <div className="TopInstructions">
-            <h4 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h4>
+            <h5 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h5>
           </div>
           {
             feedInformation.map(tweet => (

@@ -2,6 +2,7 @@ import React from 'react';
 import './Tweet.css';
 import { useEffect, useState } from 'react';
 import configuration from '../../Configuration/config';
+
 function Tweet(props) {
   const [localTweet, setLocalTweet] = useState({});
   const [likeEnabled, setLikeEnabled] = useState(true);
@@ -47,7 +48,7 @@ function Tweet(props) {
   };
 
   return (
-    <div class="completeTweet">
+    <div className="completeTweet">
       {
         localTweet.retweet_by !== ''
           ? <div className="TweetStateBanner"> Retweeted by: {localTweet.retweet_by} </div>
