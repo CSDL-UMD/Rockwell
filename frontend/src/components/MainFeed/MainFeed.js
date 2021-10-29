@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import CarouselModal from '../Carousel/CarouselModal';
 import configuration from '../../Configuration/config';
@@ -160,6 +161,7 @@ function MainFeed(props) {
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
+          <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&attn=1&page=' + givenArguments.page}>Next</Link>
         </div>
       }
       <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />
