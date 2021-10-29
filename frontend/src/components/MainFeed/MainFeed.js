@@ -22,7 +22,7 @@ function MainFeed(props) {
     };
 
     const fetchTweets = (argumentObject) => {
-      fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
+      fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
         return resp.json();
       }).then(value => {
         console.log(value);
@@ -43,6 +43,7 @@ function MainFeed(props) {
         let temp = pair.split('=');
         returnObject[temp[0]] = temp[1];
       })
+      console.log(JSON.stringify(returnObject))
       return returnObject;
     }
 
@@ -161,7 +162,7 @@ function MainFeed(props) {
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
-          <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&attn=1&page=' + givenArguments.page}>Next</Link>
+          <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
         </div>
       }
       <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />

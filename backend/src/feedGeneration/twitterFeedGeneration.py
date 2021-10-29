@@ -431,6 +431,7 @@ def get_feed():
 						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
+	print(worker_id)
 	refresh = 0
 	#check cookie here and set attn and page to 0 and increment refresh
 	if cookiee == "NO":

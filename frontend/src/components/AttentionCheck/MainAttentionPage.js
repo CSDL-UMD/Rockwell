@@ -22,7 +22,7 @@ function MainAttentionPage(props) {
 
   return (
     <div>{JSON.stringify(givenArguments)}
-      <Link to={'/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>Next</Link>
+      <Link to={'/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>Next</Link>
     </div>
   )
 }
