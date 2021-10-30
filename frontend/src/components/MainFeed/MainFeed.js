@@ -10,6 +10,12 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
+  const [nextCond, setNextCond] = useState(1);
+  
+  async function beginTimer() {
+    await new Promise(r => setTimeout(r, 30000));
+    setNextCond(0)
+  }
 
   useEffect(() => {
     let feedSize = [];
@@ -133,6 +139,7 @@ function MainFeed(props) {
 
   const handleCloseInstructionCarousel = () => {
     setShowInstructionCarousel(false);
+    beginTimer();
     document.getElementById('root').style.filter = 'blur(0px)'
   };
 
@@ -162,10 +169,17 @@ function MainFeed(props) {
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
-          <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
+          {nextCond === 0
+          ?
+            <div>
+                <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
+            </div>
+          :
+            null
+          }
         </div>
       }
-      <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />
+      <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel}/>
     </div>
   );
 }
