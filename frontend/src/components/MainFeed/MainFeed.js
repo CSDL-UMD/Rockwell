@@ -10,11 +10,11 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
-  const [nextCond, setNextCond] = useState(1);
+  const [nextCond, setNextCond] = useState(false);
   
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
-    setNextCond(0)
+    setNextCond(true)
   }
 
   useEffect(() => {
@@ -169,13 +169,15 @@ function MainFeed(props) {
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
-          {nextCond === 0
+          {nextCond === true
           ?
             <div>
-                <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
+              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
             </div>
           :
-            null
+            <div>
+              Next
+            </div>
           }
         </div>
       }
