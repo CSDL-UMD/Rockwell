@@ -24,3 +24,5 @@ Pipfile.lock
 pyproject.toml
 __pycache__/
 .ipynb_checkpoints/
+
+*.log
