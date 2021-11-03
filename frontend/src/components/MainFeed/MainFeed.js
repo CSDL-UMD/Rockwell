@@ -169,24 +169,15 @@ function MainFeed(props) {
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
-          {nextCond === true
-          ?
-            <div>
-              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-                <button disabled={false}>
-                  Next
-                </button>
-              </Link>
-            </div>
-          :
-            <div>
-              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-                <button disabled={true}>
-                  Next
-                </button>
-              </Link>
-            </div>
-          }
+            
+          <div>
+            <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
+              <button disabled={!nextCond}>
+                Next
+              </button>
+            </Link>
+          </div>
+          
         </div>
       }
       <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel}/>
