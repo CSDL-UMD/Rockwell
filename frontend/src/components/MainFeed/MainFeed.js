@@ -172,11 +172,19 @@ function MainFeed(props) {
           {nextCond === true
           ?
             <div>
-              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>Next</Link>
+              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
+                <button disabled={false}>
+                  Next
+                </button>
+              </Link>
             </div>
           :
             <div>
-              Next
+              <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
+                <button disabled={true}>
+                  Next
+                </button>
+              </Link>
             </div>
           }
         </div>
