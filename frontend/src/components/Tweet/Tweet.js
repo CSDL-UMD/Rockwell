@@ -2,6 +2,10 @@ import React from 'react';
 import './Tweet.css';
 import { useEffect, useState } from 'react';
 import configuration from '../../Configuration/config';
+import retUnclicked from '../MainFeed/Icons/retweet-unclicked.png';
+import retClicked from '../MainFeed/Icons/retweet-clicked.png';
+import likeUnclicked from '../MainFeed/Icons/like-unclicked.png';
+import likeClicked from '../MainFeed/Icons/like-clicked.png';
 
 function Tweet(props) {
   const [localTweet, setLocalTweet] = useState({});
@@ -89,9 +93,8 @@ function Tweet(props) {
             : null}
       </div>
       <div className="TweetFooter">
-        <div style={{ float: 'left', marginLeft: '2%' }}>{<button onClick={() => handleRetweet(localTweet)}>{'Retweets: ' + localTweet.retweet_count}</button>}</div>
-        <div style={{ marginLeft: 'auto', marginRight: '2%' }}><button onClick={() => handleLike(localTweet)}>{'Likes: ' + localTweet.likes}</button></div>
-
+        <div className = 'retBtn' onClick={() => handleRetweet(localTweet)}><img className = 'retImg' src= {retweetEnabled ? retUnclicked : retClicked} alt = ''/>{localTweet.retweet_count}</div>
+        <div className = 'likeBtn' onClick={() => handleLike(localTweet)}><img className = 'likeImg' src= {likeEnabled ? likeUnclicked : likeClicked} alt = ''/>{localTweet.likes}</div>
       </div>
     </div>
   )

@@ -70,3 +70,29 @@
     min-width: 100%;
     /* object-fit: contain; */
 }
+
+.retBtn {
+    max-width: 7%;
+    min-width: 7%;
+    margin-left: 28.6%;
+    margin-right: 28.6%;
+    cursor: pointer;
+}
+
+.retImg {
+    object-fit: cover;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.likeBtn {
+    max-width: 7%;
+    min-width: 7%;
+    cursor: pointer;
+}
+
+.likeImg {
+    object-fit: cover;
+    max-height: 100%;
+    max-width: 100%;
+}
