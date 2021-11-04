@@ -40,3 +40,14 @@
   text-align: center;
   margin-bottom: 1%;
 }
+
+.BottomNavBar {
+  min-height: 5vh;
+  max-height: 5vh;
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0px;
+  z-index: 2;
+  justify-items: center;
+  background-color: lightgray;
+}

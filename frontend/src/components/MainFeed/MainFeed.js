@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import CarouselModal from '../Carousel/CarouselModal';
@@ -10,11 +10,12 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
-  const [nextCond, setNextCond] = useState(false);
-  
-  async function beginTimer() {
-    await new Promise(r => setTimeout(r, 30000));
-    setNextCond(true)
+  const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
+  const [hasReachedEndOfFeed, setHasReachedEndOfFeed] = useState(true);
+
+  async function beginTimer() { // This must be called in my handleFirstRender function, change to promise syntax
+    await new Promise(r => setTimeout(r, 30000)); // Also need to consider time that the modal is shown
+    setMinimumFeedTimeCondition(true)
   }
 
   useEffect(() => {
@@ -54,8 +55,13 @@ function MainFeed(props) {
     }
 
     const handleTweetViewTracking = (clientHeight) => {
+      const time = new Date();
+      console.log("HOURS:" + String(time.getHours()) + ' MINUTES: ' + String(time.getMinutes()) + ' SECONDS: ' + + String(time.getSeconds()) + ' DATE: ' + String(time.getFullYear()) + String(time.getMonth()) + String(time.getDate()));
       if (!feedSize.length) {
         return 0;
+      }
+      if (furthestSeen === 10) {
+        return furthestSeen;
       }
 
       const position = window.pageYOffset + clientHeight * 0.5;
@@ -85,6 +91,7 @@ function MainFeed(props) {
       }
 
       if (didBreak) {
+        setHasReachedEndOfFeed(true);
         return i;
       } else {
         return i - 1;
@@ -111,7 +118,7 @@ function MainFeed(props) {
       const res = handleTweetViewTracking(window.innerHeight);
       furthestSeen = res;
       console.log('Furthest Tweet Seen: ' + res);
-    }, 500);
+    }, 1);
 
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
@@ -157,30 +164,30 @@ function MainFeed(props) {
         ?
         <div style={{ alignContent: 'center', textAlign: 'center' }}> Please wait while your feed is loading.</div>
         :
-        <div className="Feed">
-          <div className="TopInstructions">
-            <h5 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h5>
+        <React.Fragment>
+          <div className="Feed">
+            <div className="TopInstructions">
+              <h5 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h5>
+            </div>
+            {
+              feedInformation.map(tweet => (
+                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
+              ))
+            }
+            <div className="TopInstructions">
+              <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
+            </div>
           </div>
-          {
-            feedInformation.map(tweet => (
-              <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
-            ))
-          }
-          <div className="TopInstructions">
-            <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
-          </div>
-            
-          <div>
+          <div className="BottomNavBar">
             <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <button disabled={!nextCond}>
+              <button style={{marginLeft: '46%', width: '8%'}} disabled={!minimumFeedTimeCondition || !hasReachedEndOfFeed}>
                 Next
               </button>
             </Link>
           </div>
-          
-        </div>
+        </React.Fragment>
       }
-      <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel}/>
+      <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />
     </div>
   );
 }
