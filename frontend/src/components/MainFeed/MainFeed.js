@@ -4,6 +4,7 @@ import Tweet from '../Tweet/Tweet';
 import CarouselModal from '../Carousel/CarouselModal';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
+import rightArrow from './Icons/arrow-right.png';
 import './MainFeed.css';
 
 function MainFeed(props) {
@@ -178,13 +179,13 @@ function MainFeed(props) {
               <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
             </div>
           </div>
+
           <div className="BottomNavBar">
             <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <button style={{marginLeft: '46%', width: '8%'}} disabled={!minimumFeedTimeCondition || !hasReachedEndOfFeed}>
-                Next
-              </button>
+              <button className='nextBtn' disabled={!minimumFeedTimeCondition || !hasReachedEndOfFeed}><img className='rightImg' src = {rightArrow} alt=''/></button>
             </Link>
           </div>
+
         </React.Fragment>
       }
       <CarouselModal showCarousel={showInstructionCarousel} hideCarousel={handleCloseInstructionCarousel} />

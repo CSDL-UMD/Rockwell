@@ -51,3 +51,37 @@
   justify-items: center;
   background-color: lightgray;
 }
+
+.nextBtn {
+  max-width: 10%;
+  height: 5vh;
+  margin-left: 45%;
+}
+
+@media only screen and (min-width: 1500px) {
+  .rightImg {
+    justify-content: center;
+    width: 25%;
+  }
+}
+
+@media only screen and (min-width: 500px) and (max-width: 1500px) {
+  .rightImg {
+    justify-content: center;
+    width: 20%;
+  }
+}
+
+@media only screen and (max-width: 825px){
+  .rightImg {
+    justify-content: center;
+    width: 40%;
+  }
+}
+
+@media only screen and (max-width: 500px){
+  .rightImg {
+    justify-content: center;
+    width: 60%;
+  }
+}
