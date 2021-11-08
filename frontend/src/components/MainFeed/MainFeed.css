@@ -58,30 +58,34 @@
   margin-left: 45%;
 }
 
+.rightImg {
+  max-height: 5vh;
+}
+
 @media only screen and (min-width: 1500px) {
   .rightImg {
-    justify-content: center;
-    width: 25%;
+    margin-left: 46%;
+    width: 3%;
   }
 }
 
 @media only screen and (min-width: 500px) and (max-width: 1500px) {
   .rightImg {
-    justify-content: center;
-    width: 20%;
+    margin-left: 45%;
+    width: 4%;
   }
 }
 
 @media only screen and (max-width: 825px){
   .rightImg {
-    justify-content: center;
-    width: 40%;
+    margin-left: 46%;
+    width: 7%;
   }
 }
 
 @media only screen and (max-width: 500px){
   .rightImg {
-    justify-content: center;
-    width: 60%;
+    margin-left: 46%;
+    width: 7%;
   }
 }

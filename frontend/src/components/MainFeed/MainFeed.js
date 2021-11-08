@@ -20,26 +20,32 @@ function MainFeed(props) {
   }
 
   useEffect(() => {
+    let startTime = Date.now();
     let feedSize = [];
-    let furthestSeen = 0;
+    let furthestSeen = [1, 0];
+    const tweetViewTimeStamps = [];
 
-    const handleFirstRender = () => {
+    const handleFirstRender = (argumentObject) => {
       let result = handleTotalResize();
       feedSize = (calculateFeedSize(result, window.innerHeight));
       window.scrollTo(0, 0);
+      startTime = Date.now();
+      if (argumentObject.page !== 0) {
+        beginTimer();
+      }
+      tweetViewTimeStamps.push([0,0]);
     };
 
     const fetchTweets = (argumentObject) => {
       fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
         return resp.json();
       }).then(value => {
-        console.log(value);
         setFeedInformation(value);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
         }
         sleep(500).then(() => {
-          handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
+          handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       })
     }
@@ -51,37 +57,37 @@ function MainFeed(props) {
         let temp = pair.split('=');
         returnObject[temp[0]] = temp[1];
       })
-      console.log(JSON.stringify(returnObject))
       return returnObject;
     }
 
-    const handleTweetViewTracking = (clientHeight) => {
-      const time = new Date();
-      console.log("HOURS:" + String(time.getHours()) + ' MINUTES: ' + String(time.getMinutes()) + ' SECONDS: ' + + String(time.getSeconds()) + ' DATE: ' + String(time.getFullYear()) + String(time.getMonth()) + String(time.getDate()));
+    const handleTweetViewTracking = (clientHeight) => { // Return None when its the same and then handle not none outside with a timestamp and tracking state change.
+      const time = Date.now();
+      // Need to account for first tweet being on the screen at the start (set in array manually perhaps and set this to only report > 1)
       if (!feedSize.length) {
-        return 0;
+        return null;
       }
-      if (furthestSeen === 10) {
-        return furthestSeen;
+      if (furthestSeen[0] === 10) {
+        return null;
       }
 
       const position = window.pageYOffset + clientHeight * 0.5;
 
-      if (position < feedSize[0] && furthestSeen === 0) {
-        return 0;
+      if (position < feedSize[0] && furthestSeen[0] === 0) {
+        return null;
       } else if (position < feedSize[0]) {
-        return furthestSeen;
+        return null;
       }
 
       let currentThreshold = 0;
       let i = 0;
-      for (; i < furthestSeen; ++i) {
+      for (; i <= furthestSeen[0]; ++i) {
         currentThreshold += feedSize[i];
       }
 
       if (position < currentThreshold) {
-        return furthestSeen;
+        return null;
       }
+
       let didBreak = false;
       for (; i < feedSize.length; ++i) {
         currentThreshold += feedSize[i];
@@ -90,12 +96,13 @@ function MainFeed(props) {
           break;
         }
       }
-
       if (didBreak) {
         setHasReachedEndOfFeed(true);
-        return i;
+        tweetViewTimeStamps.push([i,time-startTime]);
+        return [i, time - startTime];
       } else {
-        return i - 1;
+        tweetViewTimeStamps.push([i - 1,time-startTime]);
+        return [i - 1, time - startTime];
       }
     };
 
@@ -117,8 +124,11 @@ function MainFeed(props) {
 
     const debouncedHandleScroll = debounce(function handleScroll() {
       const res = handleTweetViewTracking(window.innerHeight);
-      furthestSeen = res;
-      console.log('Furthest Tweet Seen: ' + res);
+      if (res !== null) {
+        // Make a copy of view array and reset state with the new one here.
+        furthestSeen = res;
+        console.log('Furthest Tweet Seen: ' + res[0], ' Time: ' + res[1]);
+      }
     }, 1);
 
     const urlArgs = getUrlArgs();
@@ -182,7 +192,7 @@ function MainFeed(props) {
 
           <div className="BottomNavBar">
             <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <button className='nextBtn' disabled={!minimumFeedTimeCondition || !hasReachedEndOfFeed}><img className='rightImg' src = {rightArrow} alt=''/></button>
+              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !hasReachedEndOfFeed) ? 'disabled' : ''} src={rightArrow} className="rightImg" />
             </Link>
           </div>
 
