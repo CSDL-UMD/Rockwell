@@ -56,8 +56,7 @@ function MainFeed(props) {
     }
 
     const handleTweetViewTracking = (clientHeight) => {
-      const time = new Date();
-      console.log("HOURS:" + String(time.getHours()) + ' MINUTES: ' + String(time.getMinutes()) + ' SECONDS: ' + + String(time.getSeconds()) + ' DATE: ' + String(time.getFullYear()) + String(time.getMonth()) + String(time.getDate()));
+      const time = Date.now();
       if (!feedSize.length) {
         return 0;
       }
@@ -117,8 +116,10 @@ function MainFeed(props) {
 
     const debouncedHandleScroll = debounce(function handleScroll() {
       const res = handleTweetViewTracking(window.innerHeight);
-      furthestSeen = res;
-      console.log('Furthest Tweet Seen: ' + res);
+      if (res !== null) {
+        furthestSeen = res;
+        console.log('Furthest Tweet Seen: ' + res[0], ' Time: ' + res[1]);
+      }
     }, 1);
 
     const urlArgs = getUrlArgs();
@@ -137,7 +138,7 @@ function MainFeed(props) {
     let feedSizeArray = Object.assign([], tweetSizeArray);
     let res = document.getElementsByClassName('TopInstructions');
     if (res.length) {
-      feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07)); // Might need to be between 7-9% here, 1% more than what is listed here because of next loop
+      feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07));
       for (let i = 0; i < feedSizeArray.length; i++) {
         feedSizeArray[i] += (clientHeight * 0.01);
       }
