@@ -12,10 +12,10 @@ function MainFeed(props) {
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
-  const [hasReachedEndOfFeed, setHasReachedEndOfFeed] = useState(true);
+  const [hasReachedEndOfFeed, setHasReachedEndOfFeed] = useState(false);
 
-  async function beginTimer() { // This must be called in my handleFirstRender function, change to promise syntax
-    await new Promise(r => setTimeout(r, 30000)); // Also need to consider time that the modal is shown
+  async function beginTimer() {
+    await new Promise(r => setTimeout(r, 30000));
     setMinimumFeedTimeCondition(true)
   }
 
@@ -33,7 +33,7 @@ function MainFeed(props) {
       if (argumentObject.page !== 0) {
         beginTimer();
       }
-      tweetViewTimeStamps.push([0,0]);
+      tweetViewTimeStamps.push([1,0]);
     };
 
     const fetchTweets = (argumentObject) => {
@@ -60,9 +60,8 @@ function MainFeed(props) {
       return returnObject;
     }
 
-    const handleTweetViewTracking = (clientHeight) => { // Return None when its the same and then handle not none outside with a timestamp and tracking state change.
+    const handleTweetViewTracking = (clientHeight) => {
       const time = Date.now();
-      // Need to account for first tweet being on the screen at the start (set in array manually perhaps and set this to only report > 1)
       if (!feedSize.length) {
         return null;
       }
@@ -88,22 +87,18 @@ function MainFeed(props) {
         return null;
       }
 
-      let didBreak = false;
       for (; i < feedSize.length; ++i) {
         currentThreshold += feedSize[i];
         if (currentThreshold > position) {
-          didBreak = true;
           break;
         }
       }
-      if (didBreak) {
-        setHasReachedEndOfFeed(true);
+        if (i === 10 && !hasReachedEndOfFeed) {
+          setHasReachedEndOfFeed(true);
+          console.log(tweetViewTimeStamps);
+        }
         tweetViewTimeStamps.push([i,time-startTime]);
         return [i, time - startTime];
-      } else {
-        tweetViewTimeStamps.push([i - 1,time-startTime]);
-        return [i - 1, time - startTime];
-      }
     };
 
     const debounce = (fn, ms) => {
@@ -125,7 +120,6 @@ function MainFeed(props) {
     const debouncedHandleScroll = debounce(function handleScroll() {
       const res = handleTweetViewTracking(window.innerHeight);
       if (res !== null) {
-        // Make a copy of view array and reset state with the new one here.
         furthestSeen = res;
         console.log('Furthest Tweet Seen: ' + res[0], ' Time: ' + res[1]);
       }
