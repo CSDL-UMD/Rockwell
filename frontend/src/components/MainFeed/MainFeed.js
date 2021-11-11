@@ -5,6 +5,7 @@ import CarouselModal from '../Carousel/CarouselModal';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
+import rightArrowEnabled from './Icons/Enabled_arrow.png';
 import './MainFeed.css';
 
 function MainFeed(props) {
@@ -12,7 +13,7 @@ function MainFeed(props) {
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
-  const [hasReachedEndOfFeed, setHasReachedEndOfFeed] = useState(false);
+  const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
 
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
@@ -22,7 +23,8 @@ function MainFeed(props) {
   useEffect(() => {
     let startTime = Date.now();
     let feedSize = [];
-    let furthestSeen = [1, 0];
+    let currentTweet = [1, 0];
+    let hasReachedEndOfFeed = false;
     const tweetViewTimeStamps = [];
 
     const handleFirstRender = (argumentObject) => {
@@ -33,7 +35,7 @@ function MainFeed(props) {
       if (argumentObject.page !== 0) {
         beginTimer();
       }
-      tweetViewTimeStamps.push([1,0]);
+      tweetViewTimeStamps.push([1, 0]);
     };
 
     const fetchTweets = (argumentObject) => {
@@ -62,43 +64,32 @@ function MainFeed(props) {
 
     const handleTweetViewTracking = (clientHeight) => {
       const time = Date.now();
+
       if (!feedSize.length) {
-        return null;
-      }
-      if (furthestSeen[0] === 10) {
         return null;
       }
 
       const position = window.pageYOffset + clientHeight * 0.5;
+      let feedPosition = feedSize[0];
+      let feedIndex = 1;
 
-      if (position < feedSize[0] && furthestSeen[0] === 0) {
-        return null;
-      } else if (position < feedSize[0]) {
-        return null;
+      while (position > feedPosition && feedIndex < 11) {
+        feedPosition += feedSize[feedIndex];
+        feedIndex++;
       }
-
-      let currentThreshold = 0;
-      let i = 0;
-      for (; i <= furthestSeen[0]; ++i) {
-        currentThreshold += feedSize[i];
-      }
-
-      if (position < currentThreshold) {
+      feedIndex--;
+      if (feedIndex === currentTweet[0]) {
         return null;
       }
 
-      for (; i < feedSize.length; ++i) {
-        currentThreshold += feedSize[i];
-        if (currentThreshold > position) {
-          break;
-        }
+      if (feedIndex === 10 && !hasReachedEndOfFeed) {
+        hasReachedEndOfFeed = true;
+        setEndOfFeedCondition(true);
+        console.log(tweetViewTimeStamps);
       }
-        if (i === 10 && !hasReachedEndOfFeed) {
-          setHasReachedEndOfFeed(true);
-          console.log(tweetViewTimeStamps);
-        }
-        tweetViewTimeStamps.push([i,time-startTime]);
-        return [i, time - startTime];
+
+      tweetViewTimeStamps.push([feedIndex, time - startTime]);
+      return [feedIndex, time - startTime];
     };
 
     const debounce = (fn, ms) => {
@@ -120,8 +111,8 @@ function MainFeed(props) {
     const debouncedHandleScroll = debounce(function handleScroll() {
       const res = handleTweetViewTracking(window.innerHeight);
       if (res !== null) {
-        furthestSeen = res;
-        console.log('Furthest Tweet Seen: ' + res[0], ' Time: ' + res[1]);
+        currentTweet = res;
+        console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
       }
     }, 1);
 
@@ -186,7 +177,7 @@ function MainFeed(props) {
 
           <div className="BottomNavBar">
             <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !hasReachedEndOfFeed) ? 'disabled' : ''} src={rightArrow} className="rightImg" />
+              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" />
             </Link>
           </div>
 

@@ -64,28 +64,28 @@
 
 @media only screen and (min-width: 1500px) {
   .rightImg {
-    margin-left: 46%;
-    width: 3%;
+    margin-left: 47.9%;
+    width: 2.5%;
   }
 }
 
 @media only screen and (min-width: 500px) and (max-width: 1500px) {
   .rightImg {
-    margin-left: 45%;
-    width: 4%;
+    margin-left: 47.5%;
+    width: 5%;
   }
 }
 
 @media only screen and (max-width: 825px){
   .rightImg {
-    margin-left: 46%;
+    margin-left: 46.5%;
     width: 7%;
   }
 }
 
 @media only screen and (max-width: 500px){
   .rightImg {
-    margin-left: 46%;
-    width: 7%;
+    margin-left: 45.5%;
+    width: 9%;
   }
 }

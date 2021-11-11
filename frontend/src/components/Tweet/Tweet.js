@@ -78,11 +78,15 @@ function Tweet(props) {
       </div>
       <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
         <div style={{ marginBottom: '1%' }}>{localTweet.body}</div>
-        {localTweet.picture !== ''
+        {localTweet.urls !== ''
           ? <div className="TweetArticleContainer">
-            <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
+            {localTweet.picture_heading !== '' ?
+              <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
+              : null}
             <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={handleLinkClicked}>
-              <img className="TweetImage" src={localTweet.picture} alt='Article' />
+              {localTweet.picture !== '' ?
+                <img className="TweetImage" src={localTweet.picture} alt='Article' />
+                : localTweet.urls}
             </a>
             <div>{localTweet.picture_description}</div>
           </div>
@@ -93,8 +97,8 @@ function Tweet(props) {
             : null}
       </div>
       <div className="TweetFooter">
-        <div className = 'retBtn' onClick={() => handleRetweet(localTweet)}><img className = 'retImg' src= {retweetEnabled ? retUnclicked : retClicked} alt = ''/>{localTweet.retweet_count}</div>
-        <div className = 'likeBtn' onClick={() => handleLike(localTweet)}><img className = 'likeImg' src= {likeEnabled ? likeUnclicked : likeClicked} alt = ''/>{localTweet.likes}</div>
+        <div className='retBtn' onClick={() => handleRetweet(localTweet)}><img className='retImg' src={retweetEnabled ? retUnclicked : retClicked} alt='' />{localTweet.retweet_count}</div>
+        <div className='likeBtn' onClick={() => handleLike(localTweet)}><img className='likeImg' src={likeEnabled ? likeUnclicked : likeClicked} alt='' />{localTweet.likes}</div>
       </div>
     </div>
   )
