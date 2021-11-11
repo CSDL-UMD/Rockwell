@@ -15,3 +15,6 @@ Like button (clicked):
 Next button:
 <div>Icons made by <a href="https://www.flaticon.com/authors/deemakdaksina" title="deemakdaksina">deemakdaksina</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
 
+Next button (active):
+<div>Icons made by <a href="https://www.flaticon.com/authors/deemakdaksina" title="deemakdaksina">deemakdaksina</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+
