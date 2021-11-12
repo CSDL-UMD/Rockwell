@@ -20,14 +20,18 @@ function Tweet(props) {
   const handleRetweet = (tweet) => {
     if (retweetEnabled) {
       fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
-      try {
-        const newTweetLocal = Object.assign({}, localTweet);
-        let amount = parseInt(newTweetLocal.retweet_count) + 1;
-        newTweetLocal.retweet_count = String(amount);
-        setLocalTweet(newTweetLocal);
+      if (localTweet.retweet_count.includes('k')) {
         setRetweetEnabled(false);
-      } catch {
-        setRetweetEnabled(false);
+      } else {
+        try {
+          const newTweetLocal = Object.assign({}, localTweet);
+          let amount = parseInt(newTweetLocal.retweet_count) + 1;
+          newTweetLocal.retweet_count = String(amount);
+          setLocalTweet(newTweetLocal);
+          setRetweetEnabled(false);
+        } catch {
+          setRetweetEnabled(false);
+        }
       }
     }
   };
@@ -35,14 +39,18 @@ function Tweet(props) {
   const handleLike = (tweet) => {
     if (likeEnabled) {
       fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
-      try {
-        const newTweetLocal = Object.assign({}, localTweet);
-        let amount = parseInt(newTweetLocal.likes) + 1;
-        newTweetLocal.likes = String(amount);
-        setLocalTweet(newTweetLocal);
+      if (localTweet.likes.includes('k')) {
         setLikeEnabled(false);
-      } catch {
-        setLikeEnabled(false);
+      } else {
+        try {
+          const newTweetLocal = Object.assign({}, localTweet);
+          let amount = parseInt(newTweetLocal.likes) + 1;
+          newTweetLocal.likes = String(amount);
+          setLocalTweet(newTweetLocal);
+          setLikeEnabled(false);
+        } catch {
+          setLikeEnabled(false);
+        }
       }
     }
   };
