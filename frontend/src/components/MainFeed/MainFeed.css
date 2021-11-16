@@ -42,14 +42,16 @@
 }
 
 .BottomNavBar {
-  min-height: 5vh;
-  max-height: 5vh;
+  min-height: 7.5vh;
+  max-height: 7.5vh;
   position: -webkit-sticky;
   position: sticky;
   bottom: 0px;
   z-index: 2;
   justify-items: center;
   background-color: lightgray;
+  padding-top: 0.75%;
+  padding-bottom: 2%;
 }
 
 .nextBtn {
@@ -65,7 +67,7 @@
 @media only screen and (min-width: 1500px) {
   .rightImg {
     margin-left: 47.5%;
-    width: 5%;
+    width: 50px;
   }
 }
 
@@ -89,3 +91,4 @@
     width: 9%;
   }
 }
+
