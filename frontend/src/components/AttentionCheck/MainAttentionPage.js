@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Form, Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import configuration from '../../Configuration/config';
 
 function MainAttentionPage(props) {
+  let tweet_pos = 1;
+  let attn_marked = [0,0,0,0,0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
 
@@ -48,6 +51,14 @@ function MainAttentionPage(props) {
     return feedSizeArray;
   };
 
+  const onValueChange = (event) => {
+    alert("Radio button clicked : "+event.target.name);
+  };
+
+  const incrementcount = () => {
+    tweet_pos = tweet_pos + 1;
+  };  
+
   return (
     <div>
       <div className="Title">
@@ -63,29 +74,32 @@ function MainAttentionPage(props) {
           </div>
           {
             feedInformation.map(tweet => (
-              <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
+              <div key={JSON.stringify(tweet)}>
+                <Tweet tweet={tweet} givenArguments={givenArguments} />
+                {['radio'].map((type) => (
+                    <div key={`inline-${type}`} className="mb-3">
+                      <Form.Check
+                        inline
+                        label="Yes"
+                        name={"Y_" + tweet_pos}
+                        type={type}
+                        id={`inline-${type}-1`}
+                        onChange={onValueChange}
+                      />
+                      <Form.Check
+                        inline
+                        label="No"
+                        name={ "N_" + tweet_pos}
+                        type={type}
+                        id={`inline-${type}-2`}
+                        onChange={onValueChange}
+                      />
+                    </div>
+                ))}
+                {incrementcount()}
+              </div>
             ))
           }
-          <form>
-            <div className="radio">
-              <label>
-                <input
-                  type="radio"
-                  name="isPublished"
-                  value="true"/>
-                Yes
-              </label>
-            </div>
-            <div className="radio">
-              <label>
-                <input
-                  type="radio"
-                  name="isPublished"
-                  value="false"/>
-                No
-              </label>
-            </div>
-          </form>
           <div className="TopInstructions">
             <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
           </div>
