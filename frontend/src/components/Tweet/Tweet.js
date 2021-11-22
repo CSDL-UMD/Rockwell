@@ -63,7 +63,7 @@ function Tweet(props) {
     <div className="completeTweet">
       {
         localTweet.retweet_by !== ''
-          ? <div className="TweetStateBanner"> Retweeted by: {localTweet.retweet_by} </div>
+          ? <div className="TweetStateBanner"> Retweeted by: <b>{localTweet.retweet_by}</b> </div>
           : null
       }
       {
@@ -80,7 +80,7 @@ function Tweet(props) {
       <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
         <img src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
         <div style={{ marginLeft: 'auto' }}>
-          {localTweet.actor_name}
+          <b>{localTweet.actor_name /* Line this up with actor photo */}</b>
           {' @' + localTweet.actor_username}
         </div>
       </div>

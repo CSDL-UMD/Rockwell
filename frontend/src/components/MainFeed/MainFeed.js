@@ -69,7 +69,7 @@ function MainFeed(props) {
         return null;
       }
 
-      const position = window.pageYOffset + clientHeight * 0.5;
+      const position = window.pageYOffset + clientHeight * 0.75; // Need to account for the bottom bar height
       let feedPosition = feedSize[0];
       let feedIndex = 1;
 
