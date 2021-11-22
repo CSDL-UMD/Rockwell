@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import configuration from '../../Configuration/config';
+import rightArrow from './Icons/arrow-right.png';
+import rightArrowEnabled from './Icons/Enabled_arrow.png';
 
 function MainAttentionPage(props) {
   let tweet_pos = 1;
   let attn_marked = [0,0,0,0,0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
+  const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
 
   useEffect(() => {
 
@@ -52,7 +55,21 @@ function MainAttentionPage(props) {
   };
 
   const onValueChange = (event) => {
-    alert("Radio button clicked : "+event.target.name);
+    let answer = event.target.name.split('_')[0];
+    let idx = event.target.name.split('_')[1];
+    if(answer == 'Y')
+      attn_marked[idx-1] = 1;
+    else
+      attn_marked[idx-1] = 2;
+    let all_marked = 1;
+    for (let i = 0; i < attn_marked.length; i++){
+      if (attn_marked[i] == 0){
+        all_marked = 0;
+        break;
+      }
+    }
+    if (all_marked == 1)
+      setEndOfFeedCondition(true);
   };
 
   const incrementcount = () => {
@@ -68,45 +85,50 @@ function MainAttentionPage(props) {
         ?
         <div style={{ alignContent: 'center', textAlign: 'center' }}> Please wait while your attention check is loading.</div>
         :
-        <div className="Feed">
-          <div className="TopInstructions">
-            <h5 style={{ margin: '0' }}>Please indicate whether the tweets below appeared on the previous screen of the survey:</h5>
+        <React.Fragment>
+          <div className="Feed">
+            <div className="TopInstructions">
+              <h5 style={{ margin: '0' }}>Please indicate whether the tweets below appeared on the previous screen of the survey:</h5>
+            </div>
+            {
+              feedInformation.map(tweet => (
+                <div key={JSON.stringify(tweet)}>
+                  <Tweet tweet={tweet} givenArguments={givenArguments} />
+                  {['radio'].map((type) => (
+                      <div key={`inline-${type}`} className="mb-3">
+                        <Form.Check
+                          inline
+                          label="Yes"
+                          name={"Y_" + tweet_pos}
+                          type={type}
+                          id={`inline-${type}-1`}
+                          onChange={onValueChange}
+                        />
+                        <Form.Check
+                          inline
+                          label="No"
+                          name={ "N_" + tweet_pos}
+                          type={type}
+                          id={`inline-${type}-2`}
+                          onChange={onValueChange}
+                        />
+                      </div>
+                  ))}
+                  {incrementcount()}
+                </div>
+              ))
+            }
+            <div className="TopInstructions">
+              <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
+            </div>
           </div>
-          {
-            feedInformation.map(tweet => (
-              <div key={JSON.stringify(tweet)}>
-                <Tweet tweet={tweet} givenArguments={givenArguments} />
-                {['radio'].map((type) => (
-                    <div key={`inline-${type}`} className="mb-3">
-                      <Form.Check
-                        inline
-                        label="Yes"
-                        name={"Y_" + tweet_pos}
-                        type={type}
-                        id={`inline-${type}-1`}
-                        onChange={onValueChange}
-                      />
-                      <Form.Check
-                        inline
-                        label="No"
-                        name={ "N_" + tweet_pos}
-                        type={type}
-                        id={`inline-${type}-2`}
-                        onChange={onValueChange}
-                      />
-                    </div>
-                ))}
-                {incrementcount()}
-              </div>
-            ))
-          }
-          <div className="TopInstructions">
-            <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
+
+          <div className="BottomNavBar">
+            <Link to={'/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
+              <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
+            </Link>
           </div>
-          <div>
-            <Link to={'/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>Next</Link>
-          </div>
-        </div>
+        </React.Fragment>
       }
     </div>
   )

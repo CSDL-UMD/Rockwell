@@ -1,9 +1,14 @@
-CREATE TABLE truman_user (
-   worker_id BIGSERIAL PRIMARY KEY,
-   assignment_id VARCHAR(80) NOT NULL,
+CREATE TABLE mturk_user (
+   worker_id bigint NOT NULL,
+   assignment_id bigint NOT NULL,
+   user_id bigint NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES user (user_id),
+);
+
+CREATE TABLE user (
+   user_id BIGSERIAL PRIMARY KEY,
    twitter_id bigint NOT NULL,
    session_start TIME NOT NULL,
-   session_end TIME NOT NULL,
    account_settings JSON
 );
 
@@ -19,33 +24,33 @@ CREATE TABLE click (
    url VARCHAR(1000) NOT NULL,
    is_card boolean NOT NULL,
    click_timestamp TIME NOT NULL,
-   worker_id bigint NOT NULL,
-   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
+   user_id bigint NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES user (user_id),
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id)
 );
 
 CREATE TABLE user_tweet_ass (
    tweet_id bigint,
-   worker_id bigint NOT NULL,
+   user_id bigint NOT NULL,
    is_favorited_before boolean NOT NULL,
    has_retweet_before boolean NOT NULL,
-   tweet_seen boolean NULL,
-   tweet_retweeted boolean NOT NULL,
-   tweet_favorited boolean NULL,
+   tweet_seen TIME,
+   tweet_retweeted boolean,
+   tweet_favorited boolean,
    tweet_min boolean,
    tweet_max boolean,
    refreshh smallint NOT NULL,
    rank smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
-   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
-   PRIMARY KEY (worker_id,tweet_id,refreshh)
+   FOREIGN KEY (user_id) REFERENCES user (user_id),
+   PRIMARY KEY (user_id,tweet_id,refreshh)
 );
 
 CREATE TABLE user_tweet_attn (
    tweet_id bigint,
-   worker_id bigint NOT NULL,
+   user_id bigint NOT NULL,
    rank smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
-   FOREIGN KEY (worker_id) REFERENCES truman_user (worker_id),
-   PRIMARY KEY (worker_id,tweet_id)
+   FOREIGN KEY (user_id) REFERENCES user (user_id),
+   PRIMARY KEY (user_id,tweet_id)
 );

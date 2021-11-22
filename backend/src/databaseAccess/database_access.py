@@ -50,7 +50,7 @@ def insert_tweet():
     connection = None
     favorite_now = False
     retweet_now = False
-    tweet_seen = False
+    tweet_seen = None
     try:
         #Getting connection from pool
         payload = request.json
@@ -84,7 +84,7 @@ def insert_tweet():
                 tweet_min = obj['tweet_min']
                 tweet_max = obj['tweet_max']
                 refreshh = obj['refresh']
-                sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id,is_favorited_before,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,tweet_min,tweet_max,refreshh,rank)
+                sql = """INSERT INTO user_tweet_ass(tweet_id,user_id,is_favorited_before,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,tweet_min,tweet_max,refreshh,rank)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
                 conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,tweet_seen,retweet_now,favorite_now,tweet_min,tweet_max,refreshh,rank,))
             connection.commit()
@@ -92,7 +92,7 @@ def insert_tweet():
             for obj in payload[2]: # Take care of tweet in attention here.
                 tweet_id = obj['tweet_id']
                 rank = obj['rank']
-                sql = """INSERT INTO user_tweet_attn(tweet_id,worker_id,rank) VALUES(%s,%s,%s);"""
+                sql = """INSERT INTO user_tweet_attn(tweet_id,user_id,rank) VALUES(%s,%s,%s);"""
                 conn_cur.execute(sql,(tweet_id,worker_id,rank,))
             connection.commit()
 
@@ -253,7 +253,7 @@ def get_worker_tweet():
     try:
         conn_cur = connection.cursor()
         sql = """SELECT UA.tweet_id,UA.tweet_min,UA.tweet_max,UA.refreshh,T.tweet_json FROM user_tweet_ass UA,tweet T 
-        WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where worker_id = %s)"""
+        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where worker_id = %s)"""
         conn_cur.execute(sql, (worker_id,worker_id))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
@@ -290,7 +290,7 @@ def get_worker_attention_tweet():
     #try:
     conn_cur = connection.cursor()
     sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_attn UA,tweet T 
-    WHERE T.tweet_id = UA.tweet_id AND UA.worker_id = %s"""
+    WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
     conn_cur.execute(sql, (worker_id,))     
     if conn_cur.rowcount > 0:
         ret = conn_cur.fetchall()
@@ -403,6 +403,14 @@ def set_deleted_tweets():
 #        print(error)
 #    return "Done!"
 
+@app.route('/tracking_save', methods=['POST'])
+def save_tracking():
+    tries = 5
+    connection = None
+    worker_id = ''
+    
+
+
 @app.route('/engagements_save', methods=['POST']) # Should the method be GET?
 def save_all_engagements():
     tries = 5
@@ -500,8 +508,8 @@ def update_tweet_like():
 def insert_user():
     """ insert a new vendor into the vendors table """
     retVal123 = -1
-    sql = """INSERT INTO truman_user(assignment_id,twitter_id,session_start,session_end)
-         VALUES(%s,%s,%s,%s) RETURNING worker_id;"""
+    sql = """INSERT INTO rockwell_user(twitter_id,session_start,account_settings)
+         VALUES(%s,%s,%s) RETURNING user_id;"""
     try:
         connection = accessPool.getconn()
         if connection is not False: 
@@ -510,7 +518,7 @@ def insert_user():
             now_session_start = datetime.datetime.now()
             session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             cursor = connection.cursor()
-            cursor.execute(sql, ("BETA",twitter_id,session_start,session_start,))
+            cursor.execute(sql, (twitter_id,session_start,account_settings_json,))
             retVal123 = cursor.fetchall()[0][0]
             cursor.close()
             connection.commit()
