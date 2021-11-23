@@ -72,7 +72,7 @@ function Tweet(props) {
           <div>
             <div style={{ display: 'flex' }} className="TweetStateBannerQuote">
               <img style={{ paddingRight: '2%', paddingLeft: '1%' }} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
-              {localTweet.quoted_by + ' @' + localTweet.quoted_by_actor_username + ' Quoted:'} </div>
+              <b>{localTweet.quoted_by}</b>&nbsp;{"@" + localTweet.quoted_by_actor_username + ' Quoted:'}</div>
             <div className="QuoteBody">{localTweet.quoted_by_text}</div>
           </div>
           : null
