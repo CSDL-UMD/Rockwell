@@ -72,14 +72,14 @@ function Tweet(props) {
           <div>
             <div style={{ display: 'flex' }} className="TweetStateBannerQuote">
               <img style={{ paddingRight: '2%', paddingLeft: '1%' }} src={localTweet.quoted_by_actor_picture} alt={"User " + localTweet.quoted_by_actor_picture + '\'s profile picture.'} />
-              <b>{localTweet.quoted_by}</b>&nbsp;{"@" + localTweet.quoted_by_actor_username + ' Quoted:'}</div>
+              <b style={{alignItems: 'right'}}>{localTweet.quoted_by}</b>&nbsp;{"@" + localTweet.quoted_by_actor_username + ' Quoted:'}</div>
             <div className="QuoteBody">{localTweet.quoted_by_text}</div>
           </div>
           : null
       }
-      <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
-        <img src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
-        <div style={{ marginLeft: 'auto' }}>
+      <div style={{display: 'flex'}} className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
+        <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
+        <div style={{ marginLeft: '5%'}}>
           <b>{localTweet.actor_name /* Line this up with actor photo */}</b>
           {' @' + localTweet.actor_username}
         </div>

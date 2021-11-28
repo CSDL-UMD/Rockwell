@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import configuration from '../../Configuration/config';
@@ -21,9 +21,6 @@ function MainAttentionPage(props) {
       }).then(value => {
         console.log(value);
         setFeedInformation(value);
-        const sleep = (time) => {
-          return new Promise((resolve) => setTimeout(resolve, time));
-        }
       })
     }
 
@@ -42,33 +39,21 @@ function MainAttentionPage(props) {
     fetchTweets(urlArgs);
   }, [props]);
 
-  const calculateFeedSize = (tweetSizeArray, clientHeight) => {
-    let feedSizeArray = Object.assign([], tweetSizeArray);
-    let res = document.getElementsByClassName('TopInstructions');
-    if (res.length) {
-      feedSizeArray.unshift(res[0].clientHeight + (clientHeight * 0.07)); // Might need to be between 7-9% here, 1% more than what is listed here because of next loop
-      for (let i = 0; i < feedSizeArray.length; i++) {
-        feedSizeArray[i] += (clientHeight * 0.01);
-      }
-    }
-    return feedSizeArray;
-  };
-
   const onValueChange = (event) => {
     let answer = event.target.name.split('_')[0];
     let idx = event.target.name.split('_')[1];
-    if(answer == 'Y')
+    if(answer === 'Y')
       attn_marked[idx-1] = 1;
     else
       attn_marked[idx-1] = 2;
     let all_marked = 1;
     for (let i = 0; i < attn_marked.length; i++){
-      if (attn_marked[i] == 0){
+      if (attn_marked[i] === 0){
         all_marked = 0;
         break;
       }
     }
-    if (all_marked == 1)
+    if (all_marked === 1)
       setEndOfFeedCondition(true);
   };
 
