@@ -1,7 +1,6 @@
 const Script = require('../models/Script.js');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
-const python_json = require('../public/js/retweet.js');
 const _ = require('lodash');
 const axx = require('axios');
 const fs = require('fs');
@@ -149,7 +148,10 @@ exports.getScript = (req, res, next) => {
           }
           //console.log("COOKIES");
           //console.log(req.cookies);
-          makeGetRequest('http://127.0.0.1:5051/getfeedprereg?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
+          if(pre_attn_check == 1)
+            makeGetRequest('http://127.0.0.1:5051/getfeedprereg?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
+          else
+            makeGetRequest('http://127.0.0.1:5051/getfeed?access_token='+oauthAccessToken+"&access_token_secret="+oauthAccessTokenSecret+"&worker_id="+workerid+"&attn="+attn+"&page="+page+"&cookiee="+cookiee,oauthAccessToken,oauthAccessTokenSecret);
         } catch (err) {
           log_error(err, ["accesstoken: ",oauthAccessToken, " tokensecret: ",oauthAccessTokenSecret, " workerid: ",workerid]);
         }
