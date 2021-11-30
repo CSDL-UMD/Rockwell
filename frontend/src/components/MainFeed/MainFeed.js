@@ -49,6 +49,8 @@ function MainFeed(props) {
         sleep(500).then(() => {
           handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
+      }).catch(err => {
+        alert("We were unable to find tweets for you, sorry.");
       })
     }
 
