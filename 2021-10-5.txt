@@ -1,3 +1,0 @@
-
-2021-10-5 0:9:42 Relevant information: 
-Error: Request failed with status code 500
