@@ -514,7 +514,7 @@ def insert_user():
         connection = accessPool.getconn()
         if connection is not False: 
             twitter_id = request.args.get('twitter_id')
-            account_settings_json = request.args.get('account_settings')
+            account_settings_json = json.dumps(request.args.get('account_settings'))
             now_session_start = datetime.datetime.now()
             session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             cursor = connection.cursor()

@@ -125,7 +125,7 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
     
-    resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
+    resp_worker_id = requests.get('http://' + webInformation['url'] + ':5052/insert_user?twitter_id='+str(user_id)+'&account_settings='+account_settings_user)
     worker_id = resp_worker_id.json()["data"]
 
     attn = 0
