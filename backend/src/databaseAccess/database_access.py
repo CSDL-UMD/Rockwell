@@ -253,7 +253,7 @@ def get_worker_tweet():
     try:
         conn_cur = connection.cursor()
         sql = """SELECT UA.tweet_id,UA.tweet_min,UA.tweet_max,UA.refreshh,T.tweet_json FROM user_tweet_ass UA,tweet T 
-        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where worker_id = %s)"""
+        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where user_id = %s)"""
         conn_cur.execute(sql, (worker_id,worker_id))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
@@ -514,7 +514,7 @@ def insert_user():
         connection = accessPool.getconn()
         if connection is not False: 
             twitter_id = request.args.get('twitter_id')
-            account_settings_json = request.args.get('account_settings')
+            account_settings_json = json.dumps(request.args.get('account_settings'))
             now_session_start = datetime.datetime.now()
             session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             cursor = connection.cursor()
