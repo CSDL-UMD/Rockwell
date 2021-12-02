@@ -253,7 +253,7 @@ def get_worker_tweet():
     try:
         conn_cur = connection.cursor()
         sql = """SELECT UA.tweet_id,UA.tweet_min,UA.tweet_max,UA.refreshh,T.tweet_json FROM user_tweet_ass UA,tweet T 
-        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where worker_id = %s)"""
+        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where user_id = %s)"""
         conn_cur.execute(sql, (worker_id,worker_id))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
