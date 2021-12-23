@@ -165,8 +165,8 @@ function MainFeed(props) {
         <React.Fragment>
           <div className="Feed">
             <div className="TopInstructions">
-              <h5 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h5>
-              <h5 style={{ margin: '0' }}><b>Make sure to scroll through the entire feed.</b></h5>
+              <h5 style={{ margin: '0.3em' }}>Feed {parseInt(givenArguments.page) + 1} of 5</h5> 
+              <p style={{ margin: '0.1em' }}><i>Please interact with the content below as if you were on Twitter. To complete this page, make sure to scroll through the entire feed.</i></p>
             </div>
             {
               feedInformation.map(tweet => (
