@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import Tweet from '../Tweet/Tweet';
+import Tweet from '../Tweet/Tweet_attn.js';
 import configuration from '../../Configuration/config';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
@@ -78,28 +78,7 @@ function MainAttentionPage(props) {
             {
               feedInformation.map(tweet => (
                 <div key={JSON.stringify(tweet)}>
-                  <Tweet tweet={tweet} givenArguments={givenArguments} />
-                  {['radio'].map((type) => (
-                      <div key={`inline-${type}`} className="mb-3">
-                        <Form.Check
-                          inline
-                          label="Yes"
-                          name={"Y_" + tweet_pos}
-                          type={type}
-                          id={`inline-${type}-1`}
-                          onChange={onValueChange}
-                        />
-                        <Form.Check
-                          inline
-                          label="No"
-                          name={ "N_" + tweet_pos}
-                          type={type}
-                          id={`inline-${type}-2`}
-                          onChange={onValueChange}
-                        />
-                      </div>
-                  ))}
-                  {incrementcount()}
+                <Tweet tweet={tweet} givenArguments={givenArguments} />
                 </div>
               ))
             }
