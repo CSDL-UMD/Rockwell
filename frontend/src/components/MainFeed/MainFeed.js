@@ -14,7 +14,7 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
-
+  
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
     setMinimumFeedTimeCondition(true)
@@ -94,6 +94,17 @@ function MainFeed(props) {
       return [feedIndex, time - startTime];
     };
 
+    document.addEventListener("visibilitychange", event => {
+      const time = Date.now()
+      if (document.visibilityState == "visible") {
+        tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
+        console.log('Tab Activity Logged. Time: ' + (time - startTime))
+      } else {
+        tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
+        console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
+      }
+    })
+
     const debounce = (fn, ms) => {
       let timer
       return _ => {
@@ -152,7 +163,7 @@ function MainFeed(props) {
     setShowInstructionCarousel(true);
     document.getElementById('root').style.filter = 'blur(5px)'
   };
-
+  
   return (
     <div>
       <div className="Title">
