@@ -419,9 +419,6 @@ def get_feed():
 	attn = int(request.args.get('attn'))
 	page = int(request.args.get('page'))
 	cookiee = request.args.get('cookiee')
-	print("page : "+str(page))
-	print("attn : "+str(attn))
-	print("cookie : "+str(cookiee))
 	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
@@ -431,7 +428,6 @@ def get_feed():
 						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
-	print(worker_id)
 	refresh = 0
 	#check cookie here and set attn and page to 0 and increment refresh
 	if cookiee == "NO":
@@ -441,9 +437,10 @@ def get_feed():
 	new_session = False
 	if attn == 0 and page == 0:
 		new_session = True
-		params = {"count": "50","tweet_mode": "extended"}
+		params = {"count": "80","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
 		public_tweets = json.loads(response.text)
+		tot_tweets = len(public_tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
 		db_tweet_payload = []
@@ -469,19 +466,36 @@ def get_feed():
 				'fav_before':str(tweet['favorited']),
 				'tid':str(tweet["id"]),
 				'rtbefore':str(tweet['retweeted']),
-				'rank':str(rankk),
+				'rank':rankk,
 				'tweet_min':str(if_min_tweet_id),
 				'tweet_max':str(if_max_tweet_id),
 				'refresh':str(refresh)
 			}
 			db_tweet_session_payload.append(db_tweet_session)
-			if rankk < 20:
+			#if (rankk - 1) in attn_idx:
+			#	db_tweet_attn = {
+			#		'tweet_id':str(tweet["id"]),
+			#		'rankk':str(rankk),
+			#		'rank':attn_idx.index(rankk - 1)+1
+			#	}
+			#	db_tweet_attn_payload.append(db_tweet_attn)
+			rankk = rankk + 1
+		attn_rankk = 1
+		for page_attn in range(5):
+			present_tweets = range(page_attn*10,(page_attn+1)*10)
+			absent_tweets = range((page_attn+1)*10+1,tot_tweets)
+			present_idx = np.random.choice(present_tweets,size=3,replace=False)
+			absent_idx = np.random.choice(absent_tweets,size=2,replace=False)
+			each_attn_idx = np.concatenate((present_idx,absent_idx),axis=0)
+			np.random.shuffle(each_attn_idx)
+			for ee in each_attn_idx:
+				tweet = public_tweets[ee]
 				db_tweet_attn = {
 					'tweet_id':str(tweet["id"]),
-					'rank':str(rankk)
+					'rank':str(attn_rankk)
 				}
 				db_tweet_attn_payload.append(db_tweet_attn)
-			rankk = rankk + 1
+				attn_rankk = attn_rankk + 1
 		finalJson = []
 		finalJson.append(db_tweet_payload)
 		finalJson.append(db_tweet_session_payload)
@@ -499,6 +513,7 @@ def get_feed():
 			db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)) # This definetely doesnt work right now.
 			db_response = db_response.json()['data']
 			public_tweets = [d[4] for d in db_response]
+			public_tweets.reverse()
 			public_tweets = public_tweets[page*10:(page+1)*10]
 	"""
 	This is for refresh
