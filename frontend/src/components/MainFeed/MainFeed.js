@@ -96,7 +96,7 @@ function MainFeed(props) {
 
     document.addEventListener("visibilitychange", event => {
       const time = Date.now()
-      if (document.visibilityState == "visible") {
+      if (document.visibilityState === "visible") {
         tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
         console.log('Tab Activity Logged. Time: ' + (time - startTime))
       } else {

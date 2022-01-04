@@ -1,36 +1,14 @@
 import React from 'react';
 import './Tweet.css';
-import { Form } from "react-bootstrap";
 import { useEffect, useState } from 'react';
-import configuration from '../../Configuration/config';
-import retUnclicked from '../MainFeed/Icons/retweet-unclicked.png';
-import retClicked from '../MainFeed/Icons/retweet-clicked.png';
-import likeUnclicked from '../MainFeed/Icons/like-unclicked.png';
-import likeClicked from '../MainFeed/Icons/like-clicked.png';
 
 function Tweet(props) {
-  let tweet_pos = 1;
   const [localTweet, setLocalTweet] = useState({});
-  const [likeEnabled, setLikeEnabled] = useState(true);
-  const [retweetEnabled, setRetweetEnabled] = useState(true);
 
   useEffect(() => {
     if (props.tweet)
       setLocalTweet(props.tweet)
   }, [props.tweet]);
-
-  const yesbtnclicked = (event) => {
-    event.target.style.backgroundColor = "red";
-    //event.target.style.background-color = "yellow";
-    //document.getElementById("no_button").style.background-color = "white"
-    //document.getElementById("yes_button").style.background-color = "yellow"
-  };
-
-  const nobtnclicked = (event) => {
-    //event.target.style.background-color = "yellow";
-    //document.getElementById("yes_button").style.background-color = "white"
-    //document.getElementById("no_button").style.background-color = "yellow"
-  };
 
   return (
     <div className="completeTweet">
