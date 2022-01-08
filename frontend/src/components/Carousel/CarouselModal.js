@@ -5,7 +5,7 @@ import './CarouselModal.css';
 
 function CarouselModal(props) {
   return (
-    <Modal show={props.showCarousel} size='xl'>
+    <Modal show={props.showCarousel} size='m'>
       <Modal.Body>
         <CarouselComponent hideCarousel={props.hideCarousel} />
       </Modal.Body>
