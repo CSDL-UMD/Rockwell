@@ -10,6 +10,18 @@ function Tweet(props) {
       setLocalTweet(props.tweet)
   }, [props.tweet]);
 
+  const yesbtnclicked = (event) => {
+    document.getElementById("yes_button_"+localTweet.rank).style.backgroundColor = "yellow"
+    document.getElementById("no_button_"+localTweet.rank).style.backgroundColor = "white"
+    props.handleUserSelection(localTweet.rank,'Y');
+  };
+
+  const nobtnclicked = (event) => {
+    document.getElementById("no_button_"+localTweet.rank).style.backgroundColor = "yellow"
+    document.getElementById("yes_button_"+localTweet.rank).style.backgroundColor = "white"
+    props.handleUserSelection(localTweet.rank,'N');
+  };
+  
   return (
     <div className="completeTweet">
       {
@@ -56,8 +68,8 @@ function Tweet(props) {
       <div className="TweetFooterAttn">
         <p className="attnpara"><strong>Did this tweet appear on the previous screen?</strong></p>
         <div className="attnbuttondiv">
-        <button className="attnbutton" id="yes_button" onClick="yesbtnclicked()">Yes</button>
-        <button className="attnbutton" id="no_button" onClick="nobtnclicked()">No</button>
+        <button className="attnbutton" id={"yes_button_"+localTweet.rank} onClick={() => yesbtnclicked()}>Yes</button>
+        <button className="attnbutton" id={"no_button_"+localTweet.rank} onClick={() => nobtnclicked()}>No</button>
         </div>
       </div>
     </div>

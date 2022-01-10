@@ -80,7 +80,7 @@ def insert_tweet():
                 fav_before = obj['fav_before']
                 tid = obj['tid']
                 rtbefore = obj['rtbefore']
-                rank = obj['rank']
+                rank = str(obj['rank'])
                 tweet_min = obj['tweet_min']
                 tweet_max = obj['tweet_max']
                 refreshh = obj['refresh']
@@ -91,7 +91,7 @@ def insert_tweet():
 
             for obj in payload[2]: # Take care of tweet in attention here.
                 tweet_id = obj['tweet_id']
-                rank = obj['rank']
+                rank = str(obj['rank'])
                 sql = """INSERT INTO user_tweet_attn(tweet_id,user_id,rank) VALUES(%s,%s,%s);"""
                 conn_cur.execute(sql,(tweet_id,worker_id,rank,))
             connection.commit()
