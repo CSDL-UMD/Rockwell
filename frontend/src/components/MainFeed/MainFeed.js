@@ -14,7 +14,7 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
-
+  
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
     setMinimumFeedTimeCondition(true)
@@ -94,6 +94,17 @@ function MainFeed(props) {
       return [feedIndex, time - startTime];
     };
 
+    document.addEventListener("visibilitychange", event => {
+      const time = Date.now()
+      if (document.visibilityState === "visible") {
+        tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
+        console.log('Tab Activity Logged. Time: ' + (time - startTime))
+      } else {
+        tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
+        console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
+      }
+    })
+
     const debounce = (fn, ms) => {
       let timer
       return _ => {
@@ -152,7 +163,7 @@ function MainFeed(props) {
     setShowInstructionCarousel(true);
     document.getElementById('root').style.filter = 'blur(5px)'
   };
-
+  
   return (
     <div>
       <div className="Title">
@@ -165,7 +176,8 @@ function MainFeed(props) {
         <React.Fragment>
           <div className="Feed">
             <div className="TopInstructions">
-              <h5 style={{ margin: '0' }}>Feed {parseInt(givenArguments.page) + 1} out of 5, please read and interact with it like your regular feed.</h5>
+              <h5 style={{ margin: '0.3em' }}>Feed {parseInt(givenArguments.page) + 1} of 5</h5> 
+              <p style={{ margin: '0.1em' }}><i>Please interact with the content below as if you were on Twitter. To complete this page, make sure to scroll through the entire feed.</i></p>
             </div>
             {
               feedInformation.map(tweet => (

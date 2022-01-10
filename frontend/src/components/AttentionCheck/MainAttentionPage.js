@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet_attn.js';
 import configuration from '../../Configuration/config';
@@ -7,11 +6,9 @@ import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
 
 function MainAttentionPage(props) {
-  let tweet_pos = 1;
-  let attn_marked = [0,0,0,0,0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
-  const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
+  const endOfFeedCondition = false;
 
   useEffect(() => {
 
@@ -38,7 +35,7 @@ function MainAttentionPage(props) {
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
   }, [props]);
-
+  
   const onValueChange = (event) => {
     let answer = event.target.name.split('_')[0];
     let idx = event.target.name.split('_')[1];
@@ -77,7 +74,7 @@ function MainAttentionPage(props) {
     if (all_marked == 1)
       setEndOfFeedCondition(true);
   };  
-
+  
   return (
     <div>
       <div className="Title">

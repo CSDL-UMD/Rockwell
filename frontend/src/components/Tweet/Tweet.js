@@ -15,6 +15,8 @@ function Tweet(props) {
   useEffect(() => {
     if (props.tweet)
       setLocalTweet(props.tweet)
+    props.tweet.user_fav === 'True' ? setLikeEnabled(false) : setLikeEnabled(true);
+    props.tweet.user_retweet === 'True' ? setRetweetEnabled(false) : setRetweetEnabled(true); 
   }, [props.tweet]);
 
   const handleRetweet = (tweet) => {
