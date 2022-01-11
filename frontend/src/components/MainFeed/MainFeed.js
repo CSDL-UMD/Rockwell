@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
-import CarouselModal from '../Carousel/CarouselModal';
+import CarouselModal from '../Carousel/CarouselModal/CarouselModal';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
