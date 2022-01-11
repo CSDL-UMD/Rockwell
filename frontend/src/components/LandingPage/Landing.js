@@ -7,7 +7,7 @@ function Landing(props) {
         window.location.href = config.authorizer;
     }, [])
     return (
-        <div>Welcome to my landing page.</div>
+        <div></div>
     )
 
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
-import CarouselComponent from './CarouselComponent';
-import './CarouselModal.css';
+import CarouselComponent from '../CarouselComponent/CarouselComponent';
 
 function CarouselModal(props) {
   return (

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
-import CarouselModal from '../Carousel/CarouselModal';
+import CarouselModal from '../Carousel/CarouselModal/CarouselModal';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
+import config from '../../Configuration/config';
 import './MainFeed.css';
 
 function MainFeed(props) {
@@ -50,7 +51,8 @@ function MainFeed(props) {
           handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       }).catch(err => {
-        alert("We were unable to find tweets for you, sorry.");
+        // alert("We were unable to find tweets for you, sorry.");
+        window.location.href = config.error;
       })
     }
 
