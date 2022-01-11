@@ -35,6 +35,12 @@ export const SliderData = [
   {
       image: './Instruction_Images/Screenshot12.png'
   },
+  {
+      image: './Instruction_Images/Screenshot13.png'
+  },
+  {
+      image: './Instruction_Images/Screenshot14.png'
+  },
 ]
 
 //export default SliderData
