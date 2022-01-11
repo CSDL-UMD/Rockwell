@@ -6,6 +6,7 @@ import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
+import config from '../../Configuration/config';
 import './MainFeed.css';
 
 function MainFeed(props) {
@@ -51,6 +52,7 @@ function MainFeed(props) {
         });
       }).catch(err => {
         alert("We were unable to find tweets for you, sorry.");
+        window.location.href = config.error;
       })
     }
 

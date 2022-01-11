@@ -6,7 +6,6 @@ import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
 
 function MainAttentionPage(props) {
-  let tweet_pos = 1;
   let attn_marked = [0,0,0,0,0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
@@ -38,29 +37,6 @@ function MainAttentionPage(props) {
     fetchTweets(urlArgs);
   }, [props]);
   
-  const onValueChange = (event) => {
-    let answer = event.target.name.split('_')[0];
-    let idx = event.target.name.split('_')[1];
-    if(answer === 'Y')
-      attn_marked[idx-1] = 1;
-    else
-      attn_marked[idx-1] = 2;
-    let all_marked = 1;
-    for (let i = 0; i < attn_marked.length; i++){
-      if (attn_marked[i] === 0){
-        all_marked = 0;
-        break;
-      }
-    }
-    if (all_marked == 1)
-      setEndOfFeedCondition(true);
-  };
-
-  const incrementcount = () => {
-    tweet_pos = tweet_pos + 1;
-  };  
-
-  //
   const handleattncheck = (rank,answer) => {
     if(answer === 'Y')
       attn_marked[rank-1] = 1;
@@ -73,7 +49,7 @@ function MainAttentionPage(props) {
         break;
       }
     }
-    if (all_marked == 1)
+    if (all_marked === 1)
       setEndOfFeedCondition(true);
   };  
   
