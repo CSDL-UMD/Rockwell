@@ -77,7 +77,6 @@ def get_cookie():
 
 @app.route('/callback')
 def callback():
-    print("IN CALLBACK")
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
@@ -85,7 +84,8 @@ def callback():
     if oauth_denied:
         if oauth_denied in oauth_store:
             del oauth_store[oauth_denied]
-        return render_template('error.html', error_message="the OAuth request was denied by this user")
+        #return render_template('error.html', error_message="the OAuth request was denied by this user")
+        return redirect('http://' + str(webInformation['url']) + ':5000')
 
     if not oauth_token or not oauth_verifier:
         return render_template('error.html', error_message="callback param(s) missing")
