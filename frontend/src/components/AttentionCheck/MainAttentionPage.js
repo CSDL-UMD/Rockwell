@@ -6,9 +6,11 @@ import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
 
 function MainAttentionPage(props) {
+  let tweet_pos = 1;
+  let attn_marked = [0,0,0,0,0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
-  const endOfFeedCondition = false;
+  const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
 
   useEffect(() => {
 
