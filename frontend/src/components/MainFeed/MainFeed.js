@@ -134,6 +134,7 @@ function MainFeed(props) {
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
+    checkActionValidity();
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);
     window.addEventListener('scroll', debouncedHandleScroll);
@@ -142,6 +143,14 @@ function MainFeed(props) {
       window.removeEventListener('scroll', debouncedHandleScroll);
     }
   }, [props.location.search]);
+
+  const checkActionValidity = () => { // Function to check on cookie before any action is done, to be passed as a prop to any component needed cookie verification.
+    if (document.cookie !== 'exp=infodiversity') {
+      alert("Cookie has expired, a refresh would happen.");
+    } else {
+      console.log("Cookie is valid.");
+    }
+  };
 
   const calculateFeedSize = (tweetSizeArray, clientHeight) => {
     let feedSizeArray = Object.assign([], tweetSizeArray);
