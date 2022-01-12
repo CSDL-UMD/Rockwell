@@ -65,7 +65,7 @@
 
 .container-dots {
   position: absolute;
-  bottom: 10px;
+  bottom: 0px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -90,5 +90,14 @@
   display: block;
   justify-content: left;
   width: 10%;
-  margin-left: 45%;
+  margin-left: 42%;
+}
+
+.SpaceHolder {
+  margin-top: auto;
+  padding-bottom: 20%;
+  display: block;
+  justify-content: left;
+  width: 10%;
+  margin-left: 42%;
 }
