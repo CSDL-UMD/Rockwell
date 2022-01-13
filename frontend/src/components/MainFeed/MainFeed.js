@@ -96,16 +96,16 @@ function MainFeed(props) {
       return [feedIndex, time - startTime];
     };
 
-    document.addEventListener("visibilitychange", event => {
+    const tabTracking = () => {
       const time = Date.now()
       if (document.visibilityState === "visible") {
         tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
-        console.log('Tab Activity Logged. Time: ' + (time - startTime))
+        console.log('Tab Activity Logged. Time: ' + (time - startTime));
       } else {
         tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
-        console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
+        console.log('Tab Inactivity Logged. Time: ' + (time - startTime));
       }
-    })
+    }
 
     const debounce = (fn, ms) => {
       let timer
@@ -137,9 +137,11 @@ function MainFeed(props) {
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);
     window.addEventListener('scroll', debouncedHandleScroll);
+    window.addEventListener("visibilitychange", tabTracking);
     return _ => {
       window.removeEventListener('resize', debouncedHandleResize);
       window.removeEventListener('scroll', debouncedHandleScroll);
+      window.removeEventListener("visibilitychange", tabTracking);
     }
   }, [props.location.search]);
 
