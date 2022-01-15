@@ -44,6 +44,7 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
             if imageLink is None:
                 meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
+                imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
 
