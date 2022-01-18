@@ -4,6 +4,7 @@ import MainAttentionPage from '../components/AttentionCheck/MainAttentionPage';
 import MainFeed from '../components/MainFeed/MainFeed';
 import Landing from '../components/LandingPage/Landing';
 import ErrorLanding from '../components/FeedError/ErrorLanding';
+import FinalPage from '../components/EndLandingPage/FinalPage';
 
 function Main(){
     return (
@@ -13,6 +14,7 @@ function Main(){
         <Route exact path='/feed' render={(props) => <MainFeed {...props} />}></Route>
         <Route exact path='/attention' render={(props) => <MainAttentionPage {...props} />}></Route>
         <Route exact path='/error' render={(props) => <ErrorLanding {...props} />}></Route>
+        <Route exact path='/complete' render={(props) => <FinalPage {...props} />}></Route>
       </Switch>
     );
   }

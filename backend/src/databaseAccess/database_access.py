@@ -21,28 +21,6 @@ app = Flask(__name__)
 
 app.debug = False
 
-# Is full Universal to check when function calls, if is full is true our buffer is being used (push package immediately), if not continue as normal
-# WINNER:::I should make it normal where we can call them all but on overflow it is pushed to queue here and then the loop function is called, now on empty terminate. (if it keeps being added to it keeps going)
-#def queueLoop() -> None: # async so it doesnt interfere with the rest of the execution.
-#            """ Hold a queue of overflow and squeeze them in as the program runs """
-#            # Main loop of the dequeue function
-#            while True: # Runs throughout program to flush queue.
-#                while len(universal_buffer) > 0:
-#                    try:
-#                        info = universal_buffer.pop(0) # Get the first in line (put in function call) Deleteing with pop, if write fails it will be added here again through the function itself.
-#                        if info.at(0) == "insert_tweet":
-#                            status = insert_tweet(info.at(1))
-#                        elif info.at(0) == "insert_tweet_session":
-#                            status = insert_tweet_session(info.at(1),info.at(2),info.at(3),info.at(4),info.at(5))
-#                        # elif ....
-#                        if status == "Full":
-#                            time.sleep(1)
-#                    except FullQueue:
-#                        time.sleep(1) # wait one second when the queue has data but connections are full.
-#            time.sleep(5)
-
-# Send me JSON with 2 arrays of arrays/objects. 0: tweets, 1: tweet_session. (I will get ID's for the other relation from 0) AND append the worker id as the 3rd "array/object"
-# Essentially I want an array of "arrays" where the outer array has 3 elements and inside they have arrays of objects etc.
 @app.route('/insert_tweet', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
 def insert_tweet():
     start_time = time.time()
@@ -148,91 +126,11 @@ def insert_prereg():
             accessPool.putconn(connection) #closing the connection
         except Exception as error:
             print(str(error) + " Something inside of the insertion failed.") # Log this.
-    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
-    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
-
-@app.route('/insert_tweet_async', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
-def insert_tweet_async():
-    start_time = time.time()
-    tries = 5
-    try:
-        #Getting connection from pool
-        payload = request.json
-    except:
-        print("Failed to recieve the JSON package.") # Log this
-        return "Failed"
-    while(tries > 0):
-        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
-        if connection is None:
-            time.sleep(0.2)
-            tries = tries - 1
-            continue
-        tries = -1
-        try:
-            #cur1 = connection.cursor()
-            #cur2 = connection.cursor()
-            #cur3 = connection.cursor()
-            #tasks = []
-            #loop = asyncio.get_event_loop()
-            #tasks.append(loop.create_task(insert_async_tweet(payload[0],cur1)))
-            #tasks.append(loop.create_task(user_tweet_ass(payload[0],payload[2]["worker_id"], cur2)))            
-            #tasks.append(loop.create_task(tweet_session(payload[1],cur3)))
-            #loop.run_until_complete(main())
-            #loop.run_until_complete(asyncio.wait(tasks))
-            asyncio.run(run_tasks(payload,connection))
-
-        
-        except Exception as error:
-            print("Big issue: " + str(error))
-
-    print("TOTAL RUN TIME: ASYNCRONUS: " +str(time.time() - start_time) )
     return "Done"
-
-async def run_tasks(payload,connection):
-    cur1 = connection.cursor()
-    cur2 = connection.cursor()
-    cur3 = connection.cursor()
-    await asyncio.gather (
-        insert_async_tweet(payload[0],cur1),
-        user_tweet_ass(payload[0],payload[2], cur2),
-        tweet_session(payload[1],cur3)
-    )
-    connection.commit()
-    cur1.close()
-    cur2.close()
-    cur3.close()
-    accessPool.putconn(connection)
-
-async def insert_async_tweet(tweets, conn_cur) -> None:
-    for obj in tweets:
-        tweet_id = obj['tweet_id']
-        sql = """INSERT INTO tweet(tweet_id) VALUES(%s) ON CONFLICT DO NOTHING;"""
-        conn_cur.execute(sql, (tweet_id,))
-
-async def user_tweet_ass(tweets, worker_id, conn_cur) -> None:
-    for obj in tweets: # User_tweet_ass
-        tweet_id = obj['tweet_id']
-        sql = """INSERT INTO user_tweet_ass(tweet_id,worker_id) VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
-        conn_cur.execute(sql, (tweet_id,worker_id))     
-
-async def tweet_session(tweets, conn_cur) -> None:
-    favorite_now = False
-    retweet_now = False
-    tweet_seen = False
-    for obj in tweets: # Take care of tweet in session here.
-        fav_before = obj['fav_before']
-        sid = obj['sid']
-        tid = obj['tid']
-        rtbefore = obj['rtbefore']
-        rank = obj['rank']
-        sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
-        VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
-        conn_cur.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
-
 
 # New functions for the checking of existing tweets for a worker_id tweet_id relationship.
 
-@app.route('/get_existing_tweets', methods=['GET','POST']) # Should the method be GET?
+@app.route('/get_existing_tweets', methods=['GET','POST'])
 def get_worker_tweet():
     tries = 5
     connection = None
@@ -242,10 +140,10 @@ def get_worker_tweet():
         worker_id = request.args.get('worker_id').strip()
         print("Worker ID : "+worker_id)
     except:
-        print("Failed to recieve the worker id.") # Log this
+        print("Failed to recieve the worker id.")
         return "Failed"
     while(tries > 0):
-        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        connection = accessPool.getconn()
         if connection is None:
             time.sleep(0.2)
             tries = tries - 1
@@ -269,7 +167,7 @@ def get_worker_tweet():
         print(error)
     return "Done!"
 
-@app.route('/get_existing_attn_tweets', methods=['GET','POST']) # Should the method be GET?
+@app.route('/get_existing_attn_tweets', methods=['GET','POST'])
 def get_worker_attention_tweet():
     tries = 5
     connection = None
@@ -279,10 +177,10 @@ def get_worker_attention_tweet():
         worker_id = request.args.get('worker_id').strip()
         print("Worker ID : "+worker_id)
     except:
-        print("Failed to recieve the worker id.") # Log this
+        print("Failed to recieve the worker id.")
         return "Failed"
     while(tries > 0):
-        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        connection = accessPool.getconn()
         if connection is None:
             time.sleep(0.2)
             tries = tries - 1
@@ -307,7 +205,7 @@ def get_worker_attention_tweet():
     #    print(error)
     return "Done!"
 
-@app.route('/get_prereg_tweets', methods=['GET','POST']) # Should the method be GET?
+@app.route('/get_prereg_tweets', methods=['GET','POST'])
 def get_prereg_tweets():
     tries = 5
     connection = None
@@ -322,7 +220,7 @@ def get_prereg_tweets():
         print("Failed to recieve the worker id.") # Log this
         return "Failed"
     while(tries > 0):
-        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        connection = accessPool.getconn()
         if connection is None:
             time.sleep(0.2)
             tries = tries - 1
@@ -347,7 +245,7 @@ def get_prereg_tweets():
     #    print(error)
     return "Done!"
 
-@app.route('/set_deleted_tweets', methods=['POST']) # Should the method be GET?
+@app.route('/set_deleted_tweets', methods=['POST']) 
 def set_deleted_tweets():
     connection = None
     try:
@@ -412,7 +310,7 @@ def save_tracking():
     
 
 
-@app.route('/engagements_save', methods=['POST']) # Should the method be GET?
+@app.route('/engagements_save', methods=['POST'])
 def save_all_engagements():
     tries = 5
     connection = None
@@ -434,10 +332,10 @@ def save_all_engagements():
         print(seen_map)
         print(click_map_url)
     except:
-        print("Failed to recieve the worker id.") # Log this
+        print("Failed to recieve the worker id.")
         return "Failed"
     while(tries > 0):
-        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        connection = accessPool.getconn()
         if connection is None:
             time.sleep(0.2)
             tries = tries - 1
@@ -556,5 +454,4 @@ def add_headers(response):
     return response
 
 if __name__ == "__main__":
-    #await queueLoop()
     app.run(host = "0.0.0.0", port = 5052)
