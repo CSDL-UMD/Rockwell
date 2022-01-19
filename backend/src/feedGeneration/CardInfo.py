@@ -49,6 +49,7 @@ def getCardData(link) -> dict:
             articleTitleFiltered = meta_tag_title.get('content')
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+
             #Creating the return dictonary if all actions worked.
             out = {
                 "image": imageLink,
@@ -60,7 +61,33 @@ def getCardData(link) -> dict:
             
         except:
             pass # Did not discover, not an error just no twitter tag.
+            
+        try: #try twitter tag under <meta name> if <meta property> didn't work
+            meta_tag_image = soup.find("meta", {"name": "twitter:image"}) # Could be None even in this tag scope, if below.
+            meta_tag_title = soup.find("meta", {"name": "twitter:title"})
+            meta_tag_description = soup.find("meta", {"name": "twitter:description"})
 
+            imageLink = meta_tag_image.get('content')
+            if imageLink is None:
+                meta_tag_image = soup.find("meta", {"name": "twitter:image:src"})
+                imageLink = meta_tag_image.get('content')
+
+            articleTitleFiltered = meta_tag_title.get('content')
+
+            articleDescriptionFiltered = meta_tag_description.get('content')
+
+            #Creating the return dictonary if all actions worked.
+            out = {
+                "image": imageLink,
+                "title": articleTitleFiltered,
+                "description": articleDescriptionFiltered
+            }
+
+            return out # Returning a dictonary with all neccessary information
+            
+        except:
+            pass # Did not discover, not an error just no twitter tag under meta name.
+        
         try: # Try the default og: tags if twitter: does not work.
             meta_tag_image = soup.find("meta", {"property": "og:image"})
             meta_tag_title = soup.find("meta", {"property": "og:title"})
@@ -79,6 +106,7 @@ def getCardData(link) -> dict:
             return out
         except:
             pass
+        
 
     else: # REQUEST FAILED.
         return out
