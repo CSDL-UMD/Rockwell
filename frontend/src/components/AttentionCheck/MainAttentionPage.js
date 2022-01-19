@@ -4,6 +4,7 @@ import Tweet from '../Tweet/Tweet_attn.js';
 import configuration from '../../Configuration/config';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
+import handleTotalResize from '../MainFeed/handleTotalResize';
 
 function MainAttentionPage(props) {
   let attn_marked = [0,0,0,0,0];
@@ -19,6 +20,13 @@ function MainAttentionPage(props) {
       }).then(value => {
         console.log(value);
         setFeedInformation(value);
+        const sleep = (time) => {
+          return new Promise((resolve) => setTimeout(resolve, time));
+        }
+        sleep(500).then(() => {
+          //handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
+          handleTotalResize();
+        });
       })
     }
 
