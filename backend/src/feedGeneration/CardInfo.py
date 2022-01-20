@@ -47,8 +47,15 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered)
+            articleTitleFiltered = titleSoup.get_text()
+
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            
 
             #Creating the return dictonary if all actions worked.
             out = {
@@ -73,8 +80,14 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered)
+            articleTitleFiltered = titleSoup.get_text()
+
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
 
             #Creating the return dictonary if all actions worked.
             out = {
@@ -94,9 +107,16 @@ def getCardData(link) -> dict:
             meta_tag_description = soup.find("meta", {"property": "og:description"})
 
             imageLink = meta_tag_image.get('content')
+            
             articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered)
+            articleTitleFiltered = titleSoup.get_text()
+
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
             #Creating the return dictonary if all actions worked.
             out = {
                 "image": imageLink,
