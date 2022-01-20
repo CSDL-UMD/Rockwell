@@ -41,10 +41,10 @@ def getCardData(link) -> dict:
             meta_tag_title = soup.find("meta", {"property": "twitter:title"})
             meta_tag_description = soup.find("meta", {"property": "twitter:description"})
 
-            imageLink = meta_tag_image.get('content')
-            if imageLink is None:
+            if meta_tag_image is None:
                 meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
-                imageLink = meta_tag_image.get('content')
+            
+            imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
 
@@ -59,7 +59,7 @@ def getCardData(link) -> dict:
 
             return out # Returning a dictonary with all neccessary information
             
-        except:
+        except AttributeError:
             pass # Did not discover, not an error just no twitter tag.
             
         try: #try twitter tag under <meta name> if <meta property> didn't work
@@ -67,10 +67,10 @@ def getCardData(link) -> dict:
             meta_tag_title = soup.find("meta", {"name": "twitter:title"})
             meta_tag_description = soup.find("meta", {"name": "twitter:description"})
 
+            if meta_tag_image is None:
+                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
+            
             imageLink = meta_tag_image.get('content')
-            if imageLink is None:
-                meta_tag_image = soup.find("meta", {"name": "twitter:image:src"})
-                imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
 
@@ -85,7 +85,7 @@ def getCardData(link) -> dict:
 
             return out # Returning a dictonary with all neccessary information
             
-        except:
+        except AttributeError:
             pass # Did not discover, not an error just no twitter tag under meta name.
         
         try: # Try the default og: tags if twitter: does not work.
@@ -104,7 +104,7 @@ def getCardData(link) -> dict:
                 "description": articleDescriptionFiltered
             }
             return out
-        except:
+        except AttributeError:
             pass
         
 
