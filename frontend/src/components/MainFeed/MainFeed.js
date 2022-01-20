@@ -33,7 +33,7 @@ function MainFeed(props) {
       feedSize = (calculateFeedSize(result, window.innerHeight));
       window.scrollTo(0, 0);
       startTime = Date.now();
-      if (argumentObject.page !== 0) {
+      if (parseInt(argumentObject.page) !== 0) {
         beginTimer();
       }
       tweetViewTimeStamps.push([1, 0]);
