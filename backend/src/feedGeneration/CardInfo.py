@@ -80,7 +80,7 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered)
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
 
@@ -109,12 +109,12 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
             
             articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered)
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
 
             articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
             articleDescriptionFiltered = descriptionSoup.get_text()
 
             #Creating the return dictonary if all actions worked.
