@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import config from '../../Configuration/config';
 
 function ErrorLanding(props) {
   const [errorMessage, setErrorMessage] = useState(null);
@@ -15,10 +16,11 @@ function ErrorLanding(props) {
     }
     const errorMessageSelector = (errorCode) => {
       switch (errorCode) { // Error codes can be made into names using an error config for clarity (Translates back to a simple number)
-        case 0:
+        case config.error_codes.no_tweets_main_feed:
           setErrorMessage("Sorry we were unable to find tweets for this account."); // Likely need a zero tweet and an error case, this would be error in actuality
           break;
-        case 1:
+        case config.error_codes.tweet_fetch_error_main_feed:
+          setErrorMessage("Unfortunately there was an error trying to fetch tweets at this time.");
           break;
         case 2:
           setErrorMessage("Sorry no attention tweets existed for your account.");

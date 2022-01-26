@@ -22,14 +22,14 @@ function MainAttentionPage(props) {
         return resp.json();
       }).then(value => {
         if (JSON.stringify(value) === '{}') {
-          window.location.href = config.error + '?error=2';
+          window.location.href = config.error + '?error=' + config.error_codes.no_tweets_attn_check;
         }
         setFeedInformation(value);
         sleep(500).then(() => {
           handleTotalResize();
         });
       }).catch(err => {
-        window.location.href = config.error + '?error=3';
+        window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_attn_check;
       })
     }
 
