@@ -40,9 +40,28 @@ function MainAttentionPage(props) {
       return returnObject;
     }
 
+    const debounce = (fn, ms) => {
+      let timer
+      return _ => {
+        clearTimeout(timer)
+        timer = setTimeout(_ => {
+          timer = null
+          fn.apply(this, arguments);
+        }, ms)
+      };
+    };
+
+    const debouncedHandleResize = debounce(function handleResize() {
+      handleTotalResize();
+    }, 500);
+
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
+    window.addEventListener('resize', debouncedHandleResize);
+    return _ => {
+      window.removeEventListener('resize', debouncedHandleResize);
+    }
   }, [props]);
   
   const handleattncheck = (rank,answer) => {
