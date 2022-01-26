@@ -22,10 +22,10 @@ function ErrorLanding(props) {
         case config.error_codes.tweet_fetch_error_main_feed:
           setErrorMessage("Unfortunately there was an error trying to fetch tweets at this time.");
           break;
-        case 2:
+        case config.error_codes.no_tweets_attn_check:
           setErrorMessage("Sorry no attention tweets existed for your account.");
           break;
-        case 3:
+        case config.error_codes.tweet_fetch_error_attn_check:
           setErrorMessage("We were unable to retrieve your attention check at this time.");
           break
         default:
