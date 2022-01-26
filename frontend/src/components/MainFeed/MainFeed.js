@@ -52,7 +52,7 @@ function MainFeed(props) {
         });
       }).catch(err => {
         // alert("We were unable to find tweets for you, sorry.");
-        window.location.href = config.error;
+        window.location.href = config.error + '?error=0';
       })
     }
 
