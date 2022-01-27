@@ -6,6 +6,7 @@ import time
 #import asgiref # pip install asgiref
 from bs4 import BeautifulSoup
 import asyncio
+from src.databaseAccess.database_config import config
 
 # no longer fetches the actual image this should increase the speed of execution by alot. !!
 #@async_to_sync
@@ -29,6 +30,10 @@ def getCardData(link) -> dict:
             break
 
     out = {}
+    params = config('../configuration/config.ini','twitterapp')
+    titleMax = int(params['title_max'])
+    descriptionMax = int(params['description_max'])
+
     if(searchMe is not None): # Check if our request passed.
         soup = ""
         try: # Create our BeautifulSoup parser "soup"
@@ -50,16 +55,16 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered)
             articleTitleFiltered = titleSoup.get_text()
 
-            if (len(articleTitleFiltered) > 140):
-                articleTitleFiltered = articleTitleFiltered[0:140]
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
                 articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
             articleDescriptionFiltered = descriptionSoup.get_text()
 
-            if (len(articleDescriptionFiltered) > 280):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
                 articleDescriptionFiltered = articleDescriptionFiltered + "..."
 
             #Creating the return dictonary if all actions worked.
@@ -88,16 +93,16 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
-            if (len(articleTitleFiltered) > 140):
-                articleTitleFiltered = articleTitleFiltered[0:140]
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
                 articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
             articleDescriptionFiltered = descriptionSoup.get_text()
 
-            if (len(articleDescriptionFiltered) > 280):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
                 articleDescriptionFiltered = articleDescriptionFiltered + "..."
 
 
@@ -125,16 +130,16 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
-            if (len(articleTitleFiltered) > 140):
-                articleTitleFiltered = articleTitleFiltered[0:140]
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
                 articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
             articleDescriptionFiltered = descriptionSoup.get_text()
 
-            if (len(articleDescriptionFiltered) > 280):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
                 articleDescriptionFiltered = articleDescriptionFiltered + "..."
 
 
