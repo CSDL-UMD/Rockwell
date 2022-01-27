@@ -8,7 +8,7 @@ import src.feedGeneration.CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from requests_oauthlib import OAuth1Session
-from configparser import ConfigParser
+from src.databaseAccess.database_config import config
 import xml
 import xml.sax.saxutils
 
@@ -17,24 +17,6 @@ import xml.sax.saxutils
 app = Flask(__name__)
 
 app.debug = False
-
-def config(filename,section):
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
-
-    # get section, default to postgresql
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
-
 
 @app.route('/getfeedprereg', methods=['GET'])
 def get_feed_prereg():
