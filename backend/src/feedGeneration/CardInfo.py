@@ -50,12 +50,17 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered)
             articleTitleFiltered = titleSoup.get_text()
 
+            if (len(articleTitleFiltered) > 140):
+                articleTitleFiltered = articleTitleFiltered[0:140]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
             articleDescriptionFiltered = descriptionSoup.get_text()
 
-            
+            if (len(articleDescriptionFiltered) > 280):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
 
             #Creating the return dictonary if all actions worked.
             out = {
@@ -83,10 +88,18 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
+            if (len(articleTitleFiltered) > 140):
+                articleTitleFiltered = articleTitleFiltered[0:140]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
             articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > 280):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
 
 
             #Creating the return dictonary if all actions worked.
@@ -112,10 +125,18 @@ def getCardData(link) -> dict:
             titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
+            if (len(articleTitleFiltered) > 140):
+                articleTitleFiltered = articleTitleFiltered[0:140]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
             descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
             articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > 280):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:280]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
 
             #Creating the return dictonary if all actions worked.
             out = {
