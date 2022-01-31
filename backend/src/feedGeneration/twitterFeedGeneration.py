@@ -1,4 +1,3 @@
-""" Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
 import re
 import numpy as np
@@ -48,7 +47,6 @@ def get_feed_prereg():
 		params = {"count": "30","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
 		public_tweets = json.loads(response.text)
-		#print(tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
 		db_tweet_payload = []

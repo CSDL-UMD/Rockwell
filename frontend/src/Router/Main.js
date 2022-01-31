@@ -1,10 +1,10 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import MainAttentionPage from '../components/AttentionCheck/MainAttentionPage';
-import MainFeed from '../components/MainFeed/MainFeed';
-import Landing from '../components/LandingPage/Landing';
-import ErrorLanding from '../components/FeedError/ErrorLanding';
-import FinalPage from '../components/EndLandingPage/FinalPage';
+import MainAttentionPage from '../Components/AttentionCheck/MainAttentionPage';
+import MainFeed from '../Components/MainFeed/MainFeed';
+import Landing from '../Components/FeedError/Landing';
+import ErrorLanding from '../Components/FeedError/ErrorLanding';
+import FinalPage from '../Components/EndLandingPage/FinalPage';
 
 function Main(){
     return (
