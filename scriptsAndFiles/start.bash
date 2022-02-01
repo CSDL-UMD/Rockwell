@@ -1,32 +1,53 @@
 #!/bin/bash
 
-if (($1 == 0))
-then
+# Bash "strict" mode, see http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+function usage () {
+    echo "Usage: $0 [start|stop|restart]"
+}
+
+function startbackend () {
+    echo -e "Starting backend..."
     #tmux new-session -s NodeApp -d 'node ./app.js'
-    tmux new-session -s Authorizer -d 'cd ./twitter_api/twauth-web-master/ && python3 ./twauth-web.py'
-    tmux new-session -s FeedRendering -d 'cd ./twitter_api/guest_access_tweepy/ && python3 ./guest_access_twitter_flask.py'
-    tmux new-session -s DatabaseAccess -d 'cd ./twitter_api/database_access/ && python3 ./database_access.py'
-    tmux new-session -s Engagement -d 'cd ./twitter_api/engagement_servers/ && python3 ./Retweet.py'
-elif (($1 == 1))
+    tmux new-session -s Authorizer -d 'cd ./src/authorizer/ && python3 ./twauth-web.py' || echo "Could not start Authorizer!"
+    tmux new-session -s FeedRendering -d 'cd ./src/feedGeneration/ && python3 ./twitterFeedGeneration.py' || echo "Could not start FeedRendering!"
+    tmux new-session -s DatabaseAccess -d 'cd ./src/databaseAccess/ && python3 ./database_access.py' || echo "Could not start DatabaseAccess!"
+    tmux new-session -s Engagement -d 'cd ./src/engagements/ && python3 ./Retweet.py' || echo "Could not start Engagement!"
+    echo "done."
+}
+
+function stopbackend () {
+    echo -e "Stopping backend..."
+    #tmux kill-session -t NodeApp || echo "Could not kill NodeApp; check it is running."
+    tmux kill-session -t Authorizer || echo "Could not kill Authorizer; check it is running."
+    tmux kill-session -t FeedRendering || echo "Could not kill Authorizer; check it is running."
+    tmux kill-session -t DatabaseAccess || echo "Could not kill DatabaseAccess; check it is running."
+    tmux kill-session -t Engagement || echo "Could not kill Engagement; check it is running."
+    echo "done."
+}
+
+if [[ $# -ne 1 ]] 
 then
-    #tmux kill-session -t NodeApp
-    tmux kill-session -t Authorizer
-    tmux kill-session -t FeedRendering
-    tmux kill-session -t DatabaseAccess
-    tmux kill-session -t Engagement
-elif (($1 == 2))
+    echo "Error: not enough arguments!"
+    usage
+    exit -1
+fi
+
+if [[ $1 = "start" ]]
 then
-    #tmux kill-session -t NodeApp
-    tmux kill-session -t Authorizer
-    tmux kill-session -t FeedRendering
-    tmux kill-session -t DatabaseAccess
-    tmux kill-session -t Engagement
+    startbackend
+elif [[ $1 = "stop" ]]
+then
+    stopbackend
+elif [[ $1 = "restart" ]]
+then
+    stopbackend
     sleep 5
-    #tmux new-session -s NodeApp -d 'node ./app.js'
-    tmux new-session -s Authorizer -d 'cd ./twitter_api/twauth-web-master/ && python3 ./twauth-web.py'
-    tmux new-session -s FeedRendering -d 'cd ./twitter_api/guest_access_tweepy/ && python3 ./guest_access_twitter_flask.py'
-    tmux new-session -s DatabaseAccess -d 'cd ./twitter_api/database_access/ && python3 ./database_access.py'
-    tmux new-session -s Engagement -d 'cd ./twitter_api/engagement_servers/ && python3 ./Retweet.py'
+    startbackend
 else
-    echo "Enter 0 for start, 1 for stop, and 2 for restart as a command line argument."
+    echo "Error: unknown command: $1" 
+    usage
+    exit -1
 fi

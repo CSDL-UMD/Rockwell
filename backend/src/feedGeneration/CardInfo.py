@@ -6,6 +6,7 @@ import time
 #import asgiref # pip install asgiref
 from bs4 import BeautifulSoup
 import asyncio
+from src.databaseAccess.database_config import config
 
 # no longer fetches the actual image this should increase the speed of execution by alot. !!
 #@async_to_sync
@@ -29,6 +30,10 @@ def getCardData(link) -> dict:
             break
 
     out = {}
+    params = config('../configuration/config.ini','twitterapp')
+    titleMax = int(params['title_max'])
+    descriptionMax = int(params['description_max'])
+
     if(searchMe is not None): # Check if our request passed.
         soup = ""
         try: # Create our BeautifulSoup parser "soup"
@@ -41,14 +46,27 @@ def getCardData(link) -> dict:
             meta_tag_title = soup.find("meta", {"property": "twitter:title"})
             meta_tag_description = soup.find("meta", {"property": "twitter:description"})
 
-            imageLink = meta_tag_image.get('content')
-            if imageLink is None:
+            if meta_tag_image is None:
                 meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
-                imageLink = meta_tag_image.get('content')
+            
+            imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered)
+            articleTitleFiltered = titleSoup.get_text()
+
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
             #Creating the return dictonary if all actions worked.
             out = {
                 "image": imageLink,
@@ -58,18 +76,73 @@ def getCardData(link) -> dict:
 
             return out # Returning a dictonary with all neccessary information
             
-        except:
+        except AttributeError:
             pass # Did not discover, not an error just no twitter tag.
+            
+        try: #try twitter tag under <meta name> if <meta property> didn't work
+            meta_tag_image = soup.find("meta", {"name": "twitter:image"}) # Could be None even in this tag scope, if below.
+            meta_tag_title = soup.find("meta", {"name": "twitter:title"})
+            meta_tag_description = soup.find("meta", {"name": "twitter:description"})
 
+            if meta_tag_image is None:
+                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
+            
+            imageLink = meta_tag_image.get('content')
+
+            articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
+            articleTitleFiltered = titleSoup.get_text()
+
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
+
+            articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
+
+
+            #Creating the return dictonary if all actions worked.
+            out = {
+                "image": imageLink,
+                "title": articleTitleFiltered,
+                "description": articleDescriptionFiltered
+            }
+
+            return out # Returning a dictonary with all neccessary information
+            
+        except AttributeError:
+            pass # Did not discover, not an error just no twitter tag under meta name.
+        
         try: # Try the default og: tags if twitter: does not work.
             meta_tag_image = soup.find("meta", {"property": "og:image"})
             meta_tag_title = soup.find("meta", {"property": "og:title"})
             meta_tag_description = soup.find("meta", {"property": "og:description"})
 
             imageLink = meta_tag_image.get('content')
+            
             articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
+            articleTitleFiltered = titleSoup.get_text()
+
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
+
             #Creating the return dictonary if all actions worked.
             out = {
                 "image": imageLink,
@@ -77,8 +150,9 @@ def getCardData(link) -> dict:
                 "description": articleDescriptionFiltered
             }
             return out
-        except:
+        except AttributeError:
             pass
+        
 
     else: # REQUEST FAILED.
         return out

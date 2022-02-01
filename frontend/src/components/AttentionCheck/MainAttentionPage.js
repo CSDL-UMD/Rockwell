@@ -4,21 +4,35 @@ import Tweet from '../Tweet/Tweet_attn.js';
 import configuration from '../../Configuration/config';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
+import handleTotalResize from '../MainFeed/handleTotalResize';
+import config from '../../Configuration/config';
+import 'bootstrap/dist/css/bootstrap.css';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover'
 
 function MainAttentionPage(props) {
-  let attn_marked = [0,0,0,0,0];
+  let attn_marked = [0, 0, 0, 0, 0];
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
 
   useEffect(() => {
-
+    const sleep = (time) => {
+      return new Promise((resolve) => setTimeout(resolve, time));
+    }
     const fetchTweets = (argumentObject) => {
       fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
         return resp.json();
       }).then(value => {
-        console.log(value);
+        if (JSON.stringify(value) === '{}') {
+          window.location.href = config.error + '?error=' + config.error_codes.no_tweets_attn_check;
+        }
         setFeedInformation(value);
+        sleep(500).then(() => {
+          handleTotalResize();
+        });
+      }).catch(err => {
+        window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_attn_check;
       })
     }
 
@@ -32,27 +46,46 @@ function MainAttentionPage(props) {
       return returnObject;
     }
 
+    const debounce = (fn, ms) => {
+      let timer
+      return _ => {
+        clearTimeout(timer)
+        timer = setTimeout(_ => {
+          timer = null
+          fn.apply(this, arguments);
+        }, ms)
+      };
+    };
+
+    const debouncedHandleResize = debounce(function handleResize() {
+      handleTotalResize();
+    }, 500);
+
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
+    window.addEventListener('resize', debouncedHandleResize);
+    return _ => {
+      window.removeEventListener('resize', debouncedHandleResize);
+    }
   }, [props]);
-  
-  const handleattncheck = (rank,answer) => {
-    if(answer === 'Y')
-      attn_marked[rank-1] = 1;
+
+  const handleattncheck = (rank, answer) => {
+    if (answer === 'Y')
+      attn_marked[rank - 1] = 1;
     else
-      attn_marked[rank-1] = 2;
+      attn_marked[rank - 1] = 2;
     let all_marked = 1;
-    for (let i = 0; i < attn_marked.length; i++){
-      if (attn_marked[i] === 0){
+    for (let i = 0; i < attn_marked.length; i++) {
+      if (attn_marked[i] === 0) {
         all_marked = 0;
         break;
       }
     }
     if (all_marked === 1)
       setEndOfFeedCondition(true);
-  };  
-  
+  };
+
   return (
     <div>
       <div className="Title">
@@ -70,7 +103,7 @@ function MainAttentionPage(props) {
             {
               feedInformation.map(tweet => (
                 <div key={JSON.stringify(tweet)}>
-                <Tweet tweet={tweet} givenArguments={givenArguments} handleUserSelection={handleattncheck}/>
+                  <Tweet tweet={tweet} givenArguments={givenArguments} handleUserSelection={handleattncheck} />
                 </div>
               ))
             }
@@ -80,8 +113,10 @@ function MainAttentionPage(props) {
           </div>
 
           <div className="BottomNavBar">
-            <Link to={givenArguments.page === '4' ? '/complete' :  '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
-              <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
+            <Link to={givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
+              <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger="hover" overlay={(<Popover style = {{color: 'red'}}><Popover.Title as='h5'>Mark either yes or no for all given tweets to proceed to the next page</Popover.Title></Popover>)}>
+                <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
+              </OverlayTrigger>
             </Link>
           </div>
         </React.Fragment>

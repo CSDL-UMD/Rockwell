@@ -37,7 +37,7 @@ function MainFeed(props) {
       feedSize = (calculateFeedSize(result, window.innerHeight));
       window.scrollTo(0, 0);
       startTime = Date.now();
-      if (argumentObject.page !== 0) {
+      if (parseInt(argumentObject.page) !== 0) {
         beginTimer();
       }
       page = argumentObject.page;
@@ -48,6 +48,9 @@ function MainFeed(props) {
       fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
         return resp.json();
       }).then(value => {
+        if (JSON.stringify(value) === '{}') {
+          window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
+        }
         setFeedInformation(value);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
@@ -57,7 +60,7 @@ function MainFeed(props) {
         });
       }).catch(err => {
         // alert("We were unable to find tweets for you, sorry.");
-        window.location.href = config.error;
+        window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
       })
     }
 
