@@ -15,11 +15,11 @@ function ErrorLanding(props) {
       return returnObject;
     }
     const errorMessageSelector = (errorCode) => {
-      switch (errorCode) { // Error codes can be made into names using an error config for clarity (Translates back to a simple number)
+      switch (Number(errorCode)) {
         case config.error_codes.no_tweets_main_feed:
-          setErrorMessage("Sorry we were unable to find tweets for this account."); // Likely need a zero tweet and an error case, this would be error in actuality
+          setErrorMessage("Sorry we were unable to find tweets for this account.");
           break;
-        case config.error_codes.tweet_fetch_error_main_feed:
+        case (config.error_codes.tweet_fetch_error_main_feed):
           setErrorMessage("Unfortunately there was an error trying to fetch tweets at this time.");
           break;
         case config.error_codes.no_tweets_attn_check:
@@ -31,16 +31,12 @@ function ErrorLanding(props) {
         default:
           setErrorMessage("Something went wrong...");
       }
-
     };
-
-    setErrorMessage(errorMessageSelector(getUrlArgs().error));
+    errorMessageSelector(getUrlArgs().error);
   }, [props.location.search])
   return (
     <div>
-      {errorMessage ? errorMessage : null
-
-      }
+      {errorMessage ? errorMessage : ''}
       <br />
       <Link to={'/'}><button>Login Again</button></Link>
     </div>
