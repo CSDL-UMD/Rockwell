@@ -213,8 +213,8 @@ function MainFeed(props) {
           </div>
 
           <div className="BottomNavBar">
-            <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
+            <Link style = {(!minimumFeedTimeCondition || !endOfFeedCondition) ? {pointerEvents: 'none'} : {}}to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
+              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" />
             </Link>
           </div>
 
