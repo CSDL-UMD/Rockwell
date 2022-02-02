@@ -35,6 +35,7 @@ function Tweet(props) {
           setRetweetEnabled(false);
         }
       }
+      props.handleRetweet(localTweet.rank);
     }
   };
 
@@ -54,6 +55,7 @@ function Tweet(props) {
           setLikeEnabled(false);
         }
       }
+      props.handleLike(localTweet.rank);
     }
   };
 

@@ -1,15 +1,15 @@
-CREATE TABLE mturk_user (
-   worker_id bigint NOT NULL,
-   assignment_id bigint NOT NULL,
-   user_id bigint NOT NULL,
-   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
-);
-
 CREATE TABLE rockwell_user (
    user_id BIGSERIAL PRIMARY KEY,
    twitter_id bigint NOT NULL,
    session_start TIME NOT NULL,
    account_settings JSON
+);
+
+CREATE TABLE mturk_user (
+   worker_id bigint NOT NULL,
+   assignment_id bigint NOT NULL,
+   user_id bigint NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
 );
 
 CREATE TABLE tweet (
@@ -41,6 +41,7 @@ CREATE TABLE user_tweet_ass (
    tweet_max boolean,
    refreshh smallint NOT NULL,
    rank smallint NOT NULL,
+   page smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
    PRIMARY KEY (user_id,tweet_id,refreshh)
@@ -49,7 +50,7 @@ CREATE TABLE user_tweet_ass (
 CREATE TABLE user_tweet_attn (
    tweet_id bigint,
    user_id bigint NOT NULL,
-   rank smallint NOT NULL,
+   page smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
 );

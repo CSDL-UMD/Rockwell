@@ -15,6 +15,9 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
+  let page = 0;
+  const tweetRetweets = [];
+  const tweetLikes = [];
   
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
@@ -25,8 +28,9 @@ function MainFeed(props) {
     let startTime = Date.now();
     let feedSize = [];
     let currentTweet = [1, 0];
-    let hasReachedEndOfFeed = false;
+    let hasReachedEndOfFeed = false; 
     const tweetViewTimeStamps = [];
+    const tweetClicks = [];
 
     const handleFirstRender = (argumentObject) => {
       let result = handleTotalResize();
@@ -36,6 +40,7 @@ function MainFeed(props) {
       if (parseInt(argumentObject.page) !== 0) {
         beginTimer();
       }
+      page = argumentObject.page;
       tweetViewTimeStamps.push([1, 0]);
     };
 
@@ -99,16 +104,16 @@ function MainFeed(props) {
       return [feedIndex, time - startTime];
     };
 
-    const tabTracking = () => {
+    document.addEventListener("visibilitychange", event => {
       const time = Date.now()
       if (document.visibilityState === "visible") {
         tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
-        console.log('Tab Activity Logged. Time: ' + (time - startTime));
+        console.log('Tab Activity Logged. Time: ' + (time - startTime))
       } else {
         tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
-        console.log('Tab Inactivity Logged. Time: ' + (time - startTime));
+        console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
       }
-    }
+    })
 
     const debounce = (fn, ms) => {
       let timer
@@ -137,25 +142,14 @@ function MainFeed(props) {
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
     fetchTweets(urlArgs);
-    checkActionValidity();
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);
     window.addEventListener('scroll', debouncedHandleScroll);
-    window.addEventListener("visibilitychange", tabTracking);
     return _ => {
       window.removeEventListener('resize', debouncedHandleResize);
       window.removeEventListener('scroll', debouncedHandleScroll);
-      window.removeEventListener("visibilitychange", tabTracking);
     }
   }, [props.location.search]);
-
-  const checkActionValidity = () => { // Function to check on cookie before any action is done, to be passed as a prop to any component needed cookie verification.
-    if (document.cookie !== 'exp=infodiversity') {
-      alert("Cookie has expired, a refresh would happen.");
-    } else {
-      console.log("Cookie is valid.");
-    }
-  };
 
   const calculateFeedSize = (tweetSizeArray, clientHeight) => {
     let feedSizeArray = Object.assign([], tweetSizeArray);
@@ -179,7 +173,20 @@ function MainFeed(props) {
     setShowInstructionCarousel(true);
     document.getElementById('root').style.filter = 'blur(5px)'
   };
-  
+
+  const handleRetweet = (feedIndex) => {
+    tweetRetweets.push(feedIndex);
+  };
+
+  const handleLike = (feedIndex) => {
+    tweetLikes.push(feedIndex);
+    console.log(tweetLikes);
+  };  
+
+  const nextButtonClicked = () => {
+    alert("Next Button Clicked");
+  };
+
   return (
     <div>
       <div className="Title">
@@ -197,7 +204,7 @@ function MainFeed(props) {
             </div>
             {
               feedInformation.map(tweet => (
-                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} />
+                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike}/>
               ))
             }
             <div className="TopInstructions">
@@ -207,7 +214,7 @@ function MainFeed(props) {
 
           <div className="BottomNavBar">
             <Link to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" />
+              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
             </Link>
           </div>
 
