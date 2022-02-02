@@ -6,9 +6,10 @@ import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
 import handleTotalResize from '../MainFeed/handleTotalResize';
 import config from '../../Configuration/config';
-import 'bootstrap/dist/css/bootstrap.css';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover'
+//import 'bootstrap/dist/css/bootstrap.css';
+//import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+//import Popover from 'react-bootstrap/Popover';
+
 
 function MainAttentionPage(props) {
   let attn_marked = [0, 0, 0, 0, 0];
@@ -113,10 +114,8 @@ function MainAttentionPage(props) {
           </div>
 
           <div className="BottomNavBar">
-            <Link to={givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
-              <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger="hover" overlay={(<Popover style = {{color: 'red'}}><Popover.Title as='h5'>Mark either yes or no for all given tweets to proceed to the next page</Popover.Title></Popover>)}>
-                <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
-              </OverlayTrigger>
+            <Link style = {!endOfFeedCondition ? {pointerEvents: 'none'} : {}} to={givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
+                  <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} style = {!endOfFeedCondition ? {pointerEvents: 'none'} : {}} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
             </Link>
           </div>
         </React.Fragment>
