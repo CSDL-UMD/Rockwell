@@ -116,6 +116,12 @@ function MainAttentionPage(props) {
             <Link style = {!endOfFeedCondition ? {pointerEvents: 'none'} : {}}to={givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
               <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
             </Link>
+
+            <div style = {endOfFeedCondition ? {pointerEvents: 'none'} : {}}>
+              <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger = 'click' rootClose overlay={(<Popover style = {{color: 'red'}}><Popover.Title as='h5'>Mark either yes or no for all given tweets to proceed to the next page</Popover.Title></Popover>)}>
+                <div style = {{width: '50px', height: '50px', position: 'absolute', left: '48%', top: '0%'}} className = "Trigger"/>
+              </OverlayTrigger>
+            </div>
           </div>
         </React.Fragment>
       }
