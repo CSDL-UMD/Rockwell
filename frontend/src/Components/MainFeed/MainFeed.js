@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
-import CarouselModal from '../Carousel/CarouselModal/CarouselModal';
+import CarouselModal from '../Carousel/Components/CarouselModal';
 import configuration from '../../Configuration/config';
 import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
@@ -15,7 +15,7 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
-  let page = 0;
+  // let page = 0;
   const tweetRetweets = [];
   const tweetLikes = [];
   
@@ -30,7 +30,7 @@ function MainFeed(props) {
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false; 
     const tweetViewTimeStamps = [];
-    const tweetClicks = [];
+    // const tweetClicks = [];
 
     const handleFirstRender = (argumentObject) => {
       let result = handleTotalResize();
@@ -40,7 +40,7 @@ function MainFeed(props) {
       if (parseInt(argumentObject.page) !== 0) {
         beginTimer();
       }
-      page = argumentObject.page;
+      // page = argumentObject.page;
       tweetViewTimeStamps.push([1, 0]);
     };
 

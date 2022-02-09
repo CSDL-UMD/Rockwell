@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { SliderData } from './SliderData';
-import BtnSlider from './BtnSlider';
-import './Carousel.css';
+import { SliderData } from './Components/SliderData';
+import BtnSlider from './Components/BtnSlider';
+import './Components/Carousel.css';
 
 function CarouselComponent(props) {
 
