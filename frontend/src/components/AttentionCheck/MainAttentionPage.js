@@ -86,6 +86,14 @@ function MainAttentionPage(props) {
       setEndOfFeedCondition(true);
   };
 
+  const popup = () =>(
+    <Popover id = 'popover-positioned-top' style = {{color: 'red'}}>
+      <Popover.Title as='h5'>
+        Mark either yes or no for all given tweets to proceed to the next page
+      </Popover.Title>
+    </Popover>
+  );
+
   return (
     <div>
       <div className="Title">
@@ -118,8 +126,8 @@ function MainAttentionPage(props) {
             </Link>
 
             <div style = {endOfFeedCondition ? {pointerEvents: 'none'} : {}}>
-              <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger = 'click' rootClose overlay={(<Popover style = {{color: 'red'}}><Popover.Title as='h5'>Mark either yes or no for all given tweets to proceed to the next page</Popover.Title></Popover>)}>
-                <div style = {{width: '50px', height: '50px', position: 'absolute', left: '48%', top: '0%'}} className = "Trigger"/>
+              <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger = 'click' rootClose = {true} overlay={popup()}>
+                <div className = "Trigger"/>
               </OverlayTrigger>
             </div>
           </div>
