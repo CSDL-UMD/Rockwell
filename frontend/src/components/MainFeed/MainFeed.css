@@ -64,6 +64,14 @@
   max-height: 5vh;
 }
 
+.Trigger{
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  left: 48%;
+  top: 0%;
+}
+
 @media only screen and (min-width: 1500px) {
   .rightImg {
     margin-left: 47.5%;
@@ -91,4 +99,3 @@
     width: 9%;
   }
 }
-
