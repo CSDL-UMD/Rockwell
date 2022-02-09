@@ -190,7 +190,7 @@ function MainFeed(props) {
   return (
     <div>
       <div className="Title">
-        <h1 style={{ margin: '0' }}>Infodiversity</h1>
+        <h1 style={{ margin: '0' }}>Rockwell</h1>
       </div>
       {JSON.stringify(feedInformation) === '{}'
         ?
