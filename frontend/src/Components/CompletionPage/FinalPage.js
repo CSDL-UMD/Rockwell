@@ -1,12 +1,18 @@
-import { Link } from 'react-router-dom';
+import config from '../../Configuration/config';
+import './FinalPage.css';
 
-function FinalPage(props) {
+function FinalPage() {
     return (
-        <div>
-            Thank you for participating in the ...
+        <div className="TextBody">
+            Thank you for answering these questions. This research is not intended to support or oppose any political candidate or
+            office. The research has no affiliation with any political candidate or campaign and has received no financial support from any political candidate or campaign. Should you have any questions about this study, please contact Brendan Nyhan at
+            nyhan@dartmouth.edu.
+
+            We will not access your Twitter account again in the future. You can revoke access to your profile at any time by following
+            the instructions <a rel="noopener noreferrer" target="_blank" href="https://help.twitter.com/en/managing-your-account/connect-or-revoke-access-to-third-party-apps">here.</a> Please click the next button below to finish the survey and receive credit for completion from YouGov.
+            Thank you again for participating!
             <br />
-            <Link to={'/'}><button>Return to Yougov</button></Link>
-            <div>Note: The button currently doesnt work until we have a link back to YouGov</div>
+            <button onClick={() => window.location.href = config.youGovCompleteRedirect}>Next</button>
         </div>
     )
 }
