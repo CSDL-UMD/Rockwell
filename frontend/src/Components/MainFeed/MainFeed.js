@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet';
 import CarouselModal from '../Carousel/Components/CarouselModal';
 import configuration from '../../Configuration/config';
@@ -184,7 +183,8 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
-    alert("Next Button Clicked");
+    //alert("Next Button Clicked");
+    window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
   };
 
   return (
@@ -213,9 +213,7 @@ function MainFeed(props) {
           </div>
 
           <div className="BottomNavBar">
-            <Link style = {(!minimumFeedTimeCondition || !endOfFeedCondition) ? {pointerEvents: 'none'} : {}} to={'/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page}>
-              <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
-            </Link>
+            <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
           </div>
 
         </React.Fragment>

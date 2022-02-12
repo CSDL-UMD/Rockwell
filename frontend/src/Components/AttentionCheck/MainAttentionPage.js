@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Tweet from '../Tweet/Tweet_attn.js';
 import configuration from '../../Configuration/config';
 import rightArrow from './Icons/arrow-right.png';
@@ -94,6 +93,11 @@ function MainAttentionPage(props) {
     </Popover>
   );
 
+  const nextButtonClickedAttn = () => {
+    //alert("Next Button Clicked");
+    window.location.href = givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)
+  };
+
   return (
     <div>
       <div className="Title">
@@ -122,9 +126,7 @@ function MainAttentionPage(props) {
 
           <div className="BottomNavBar">
             { /* <Link to={isActive ? '/link-to-route' : '#'} /> */}
-            <Link style={!endOfFeedCondition ? { pointerEvents: 'none' } : {}} to={givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)}>
-              <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" />
-            </Link>
+            <input type="image" alt="right arrow, next page button" disabled={!endOfFeedCondition ? 'disabled' : ''} src={!endOfFeedCondition ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClickedAttn}/>
 
             <div style = {endOfFeedCondition ? {pointerEvents: 'none'} : {}}>
               <OverlayTrigger placement={!endOfFeedCondition ? 'top' : ''} trigger = 'click' rootClose = {true} overlay={popup()}>
