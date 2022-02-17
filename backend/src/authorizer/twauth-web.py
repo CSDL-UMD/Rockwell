@@ -58,7 +58,7 @@ def start():
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
 @app.route('/qualtrics')
-def start():
+def startqualtrics():
     app_callback_url = url_for('qualtricscallback', _external=True)
     cred = config('../configuration/config.ini','twitterapp')
 
@@ -169,7 +169,7 @@ def callback():
     return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
 
 @app.route('/qualtricscallback')
-def callback():
+def callbackqualtrics():
     oauth_token = request.args.get('oauth_token')
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
