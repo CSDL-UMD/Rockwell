@@ -14,10 +14,10 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
-  // let page = 0;
-  const tweetRetweets = [];
-  const tweetLikes = [];
-  
+  const [tweetRetweets, setTweetRetweets] = useState([]);
+  const [tweetLikes, setTweetLikes] = useState([]);
+  // const [page, setPage] = useState(null);
+
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
     setMinimumFeedTimeCondition(true)
@@ -58,7 +58,6 @@ function MainFeed(props) {
           handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       }).catch(err => {
-        // alert("We were unable to find tweets for you, sorry.");
         window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
       })
     }
@@ -174,16 +173,18 @@ function MainFeed(props) {
   };
 
   const handleRetweet = (feedIndex) => {
-    tweetRetweets.push(feedIndex);
+    let tempObject = Object.assign([], tweetRetweets);
+    tempObject.push(feedIndex);
+    setTweetRetweets(tempObject);
   };
 
   const handleLike = (feedIndex) => {
-    tweetLikes.push(feedIndex);
-    console.log(tweetLikes);
+    let tempObject = Object.assign([], tweetLikes);
+    tempObject.push(feedIndex);
+    setTweetLikes(tempObject);
   };  
 
   const nextButtonClicked = () => {
-    //alert("Next Button Clicked");
     window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
   };
 

@@ -76,7 +76,7 @@ def getCardData(link) -> dict:
 
             return out # Returning a dictonary with all neccessary information
             
-        except AttributeError:
+        except:
             pass # Did not discover, not an error just no twitter tag.
             
         try: #try twitter tag under <meta name> if <meta property> didn't work
@@ -116,7 +116,7 @@ def getCardData(link) -> dict:
 
             return out # Returning a dictonary with all neccessary information
             
-        except AttributeError:
+        except:
             pass # Did not discover, not an error just no twitter tag under meta name.
         
         try: # Try the default og: tags if twitter: does not work.
@@ -150,7 +150,7 @@ def getCardData(link) -> dict:
                 "description": articleDescriptionFiltered
             }
             return out
-        except AttributeError:
+        except:
             pass
         
 
