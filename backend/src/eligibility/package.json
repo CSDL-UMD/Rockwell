@@ -11,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "twitter-api-v2": "^1.11.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
