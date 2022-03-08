@@ -30,3 +30,5 @@ __pycache__/
 frontend/src/Configuration/config.js
 
 backend/src/configuration/config.js
+
+backend/src/eligibility/Resources/domains.json
