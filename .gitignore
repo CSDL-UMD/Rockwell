@@ -32,3 +32,5 @@ frontend/src/Configuration/config.js
 backend/src/configuration/config.js
 
 backend/src/eligibility/Resources/domains.json
+
+backend/src/eligibility/User_Data/
