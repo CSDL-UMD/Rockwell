@@ -16,20 +16,19 @@ const writeOut = async (writeObject, twitterId) => {
     fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
       if (err)
         return console.log(err);
+        
+      // Close file streams
       fileContents.destroy();
       writeStream.destroy();
-      deleteFile(jsonPath);
+
+      // Attempt to delete file
+      fs.unlink(jsonPath, (err) => {
+        if (err) return console.log(err);
+      });
+
     });
 
   });
-
-  const deleteFile = (fileName) => {
-    // Try to delete unzipped file
-      fs.unlink(fileName, (err) => {
-        if (err) return console.log(err);
-      });
-  };
-
 };
 
 module.exports = writeOut;

@@ -34,3 +34,5 @@ backend/src/configuration/config.js
 backend/src/eligibility/Resources/domains.json
 
 backend/src/eligibility/User_Data/978813333301268480.json
+
+backend/src/eligibility/User_Data/978813333301268480.json.gz
