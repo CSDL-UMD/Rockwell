@@ -45,30 +45,30 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
       for (const url of tweet.entities.urls) {
         for (let i = 0; i < domainList.length; i++)
           try {
-            if (url.expanded_url.includes(domainList[i])) {
-              newsGuardLinkCount++;
-              break; // If it matches one stop looking, increase speed.
-            }
+          if (url.expanded_url.includes(domainList[i])) {
+            newsGuardLinkCount++;
+            break; // If it matches one stop looking, increase speed.
+          }
           } catch {
             console.log("String parsing error.");
           }
       }
-      if (tweetCount == 18) // For dev so limit isn't hit
-        break;
+      /*if (tweetCount == 18) // For dev so limit isn't hit
+        break;*/
     }
-  } catch (Error) {
+  } catch (Error){
     console.log(Error);
     error = true;
   }
   const writeObject = {
-    "userTweets": userTweets,
+    "userTweets" : userTweets,
     "MTurkId": mturk_id,
     "MTurkHitId": mturk_hit_id,
     "MTurkAssignmentId": mturk_assignment_id
   };
 
   if (!error)
-    writeOut(writeObject, userId); // Asynchronously call the function to avoid slowdown.
+    writeOut(writeObject,userId); // Asynchronously call the function to avoid slowdown.
 
   const json_response = {
     tweetCount: tweetCount,
