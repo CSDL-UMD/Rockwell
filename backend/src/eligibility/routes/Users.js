@@ -45,8 +45,10 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
       for (const url of tweet.entities.urls) {
         for (let i = 0; i < domainList.length; i++)
           try {
-          if (url.expanded_url.includes(domainList[i]))
+          if (url.expanded_url.includes(domainList[i])) {
             newsGuardLinkCount++;
+            break; // If it matches one stop looking, increase speed.
+          }
           } catch {
             console.log("String parsing error.");
           }
