@@ -33,6 +33,7 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   let retweetCount = 0;
   let likedTweetsListCount = 0;
   let homeTimelineNewsGuardLinkCount = 0;
+  let likedTweetsNewsGuardLinkCount = 0;
   let error = false;
 
   try {
@@ -56,17 +57,26 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
             console.log("String parsing error.");
           }
       }
-      /*if (tweetCount == 18) // For dev so limit isn't hit
-        break;*/
+      /* if (tweetCount == 18) // For dev so limit isn't hit
+        break; */
     }
     // Get users liked tweets and parse as well.
-    const userLikes = await client.v2.userLikedTweets(userId);
-    while (!userLikes.done) {
-      for (let i = 0; i < userLikes.tweets.length; ++i) {
-        likedTweetsListCount++;
-        userLikedTweets.push(userLikes.tweets[i]);
+    const userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
+    for (let i = 0; i < userLikes.length; ++i) {
+      likedTweetsListCount++;
+      userLikedTweets.push(userLikes[i]);
+      // Look for newsguard links in the liked tweets
+      for (const url of userLikes[i].entities.urls) {
+        for (let i = 0; i < domainList.length; i++)
+          try {
+            if (url.expanded_url.includes(domainList[i])) {
+              likedTweetsNewsGuardLinkCount++;
+              break; // If it matches one stop looking, increase speed.
+            }
+          } catch {
+            console.log("String parsing error.");
+          }
       }
-      await userLikes.fetchNext();
     }
 
   } catch (Error) {
@@ -90,7 +100,8 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
     homeTimelineFavoriteCount: favoriteCount,
     homeTimelineRetweetCount: retweetCount,
     homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
-    likedTweetsListCount: likedTweetsListCount
+    likedTweetsListCount: likedTweetsListCount,
+    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount
   }
 
   response.write(JSON.stringify(json_response));
