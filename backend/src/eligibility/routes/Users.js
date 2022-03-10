@@ -11,6 +11,7 @@ const domainList = JSON.parse(rawData).Domains;
 
 router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const userTweets = [];
+  const userLikedTweets = [];
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -30,8 +31,10 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   let tweetCount = 0;
   let favoriteCount = 0;
   let retweetCount = 0;
-  let newsGuardLinkCount = 0;
+  let likedTweetsListCount = 0;
+  let homeTimelineNewsGuardLinkCount = 0;
   let error = false;
+
   try {
     const homeTimeline = await client.v1.homeTimeline({ exclude_replies: true });
     for await (const tweet of homeTimeline) {
@@ -46,7 +49,7 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
         for (let i = 0; i < domainList.length; i++)
           try {
             if (url.expanded_url.includes(domainList[i])) {
-              newsGuardLinkCount++;
+              homeTimelineNewsGuardLinkCount++;
               break; // If it matches one stop looking, increase speed.
             }
           } catch {
@@ -56,12 +59,23 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
       /*if (tweetCount == 18) // For dev so limit isn't hit
         break;*/
     }
+    // Get users liked tweets and parse as well.
+    const userLikes = await client.v2.userLikedTweets(userId);
+    while (!userLikes.done) {
+      for (let i = 0; i < userLikes.tweets.length; ++i) {
+        likedTweetsListCount++;
+        userLikedTweets.push(userLikes.tweets[i]);
+      }
+      await userLikes.fetchNext();
+    }
+
   } catch (Error) {
     console.log(Error);
     error = true;
   }
   const writeObject = {
     "userTweets": userTweets,
+    "likedTweets": userLikedTweets,
     "MTurkId": mturk_id,
     "MTurkHitId": mturk_hit_id,
     "MTurkAssignmentId": mturk_assignment_id
@@ -73,9 +87,10 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   const json_response = {
     tweetCount: tweetCount,
     error: error,
-    favoriteCount: favoriteCount,
-    retweetCount: retweetCount,
-    newsGuardCount: newsGuardLinkCount
+    homeTimelineFavoriteCount: favoriteCount,
+    homeTimelineRetweetCount: retweetCount,
+    homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
+    likedTweetsListCount: likedTweetsListCount
   }
 
   response.write(JSON.stringify(json_response));

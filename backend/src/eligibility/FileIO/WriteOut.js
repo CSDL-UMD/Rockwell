@@ -22,11 +22,11 @@ const writeOut = async (writeObject, twitterId) => {
       writeStream.destroy();
 
       // Attempt to delete file
+    }).on('close', function (err) { // further test this
       fs.unlink(jsonPath, (err) => {
         if (err) return console.log(err);
       });
-
-    });
+  });;
 
   });
 };
