@@ -30,3 +30,11 @@ __pycache__/
 frontend/src/Configuration/config.js
 
 backend/src/configuration/config.js
+
+backend/src/eligibility/Resources/domains.json
+
+backend/src/eligibility/User_Data/978813333301268480.json
+
+backend/src/eligibility/User_Data/978813333301268480.json.gz
+
+backend/src/eligibility/api-driver-test.py
