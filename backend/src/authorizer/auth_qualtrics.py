@@ -1,9 +1,7 @@
 import os
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
-import requests
 import datetime
 from requests_oauthlib import OAuth1Session
-from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -14,6 +12,23 @@ app.debug = True
 
 #log_level = logging.DEBUG
 #logging.basicConfig(filename='authorizer.log', level=log_level)
+
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -30,6 +45,7 @@ screenname_store = {}
 @app.route('/')
 def start():
     app_callback_url = url_for('callback', _external=True)
+    print(app_callback_url)
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
@@ -45,6 +61,8 @@ def start():
     #oauth_token_secret = request_token[b'oauth_token_secret'].decode('utf-8')
 
     data_tokens = content.text.split("&")
+
+    print(data_tokens)
 
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
@@ -169,4 +187,4 @@ def add_headers(response):
 
   
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0",ssl_context='adhoc')

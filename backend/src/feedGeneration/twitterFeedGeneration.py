@@ -44,7 +44,6 @@ def get_feed():
 	access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))
 	page = int(request.args.get('page'))
-	cookiee = request.args.get('cookiee')
 	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
@@ -55,11 +54,6 @@ def get_feed():
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
 	refresh = 0
-	#check cookie here and set attn and page to 0 and increment refresh
-	if cookiee == "NO":
-		attn = 0
-		page = 0
-		refresh = refresh + 1
 	new_session = False
 	if attn == 0 and page == 0:
 		new_session = True
@@ -75,17 +69,9 @@ def get_feed():
 		rankk = 0
 		tweetids_by_page = defaultdict(list)
 		all_tweet_ids = [tweet['id'] for tweet in public_tweets]
-		min_tweet_id = min(all_tweet_ids)
-		max_tweet_id = max(all_tweet_ids)
 		for tweet in public_tweets:
 			page = int(rankk/10)
 			rank_in_page = (rankk%10) + 1
-			if_min_tweet_id = False
-			if tweet["id"] == min_tweet_id:
-				if_min_tweet_id = True
-			if_max_tweet_id = False
-			if tweet["id"] == max_tweet_id:
-				if_max_tweet_id = True
 			db_tweet = {
 				'tweet_id':tweet["id"],
 				'tweet_json':tweet
@@ -96,15 +82,11 @@ def get_feed():
 				'tid':str(tweet["id"]),
 				'rtbefore':str(tweet['retweeted']),
 				'page':page,
-				'rank':rank_in_page,
-				'tweet_min':str(if_min_tweet_id),
-				'tweet_max':str(if_max_tweet_id),
-				'refresh':str(refresh)
+				'rank':rank_in_page
 			}
 			db_tweet_session_payload.append(db_tweet_session)
 			tweetids_by_page[page].append(tweet["id"])
 			rankk = rankk + 1
-		print(tweetids_by_page)
 		for attn_page in range(5):
 			present_tweets = tweetids_by_page[attn_page]
 			absent_tweets = all_tweet_ids[(attn_page+1)*10+1:]

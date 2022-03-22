@@ -50,7 +50,6 @@ def insert_tweet():
     connection = None
     favorite_now = False
     retweet_now = False
-    tweet_seen = None
     try:
         #Getting connection from pool
         payload = request.json
@@ -70,8 +69,8 @@ def insert_tweet():
             for obj in payload[0]:
                 tweet_id = obj['tweet_id']
                 tweet_json = json.dumps(obj['tweet_json'])
-                sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
-                conn_cur.execute(sql, (tweet_id,tweet_json,False))
+                sql = """INSERT INTO tweet VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json))
             connection.commit()
 
             worker_id = payload[3]
@@ -82,12 +81,9 @@ def insert_tweet():
                 rtbefore = obj['rtbefore']
                 page = obj['page']
                 rank = str(obj['rank'])
-                tweet_min = obj['tweet_min']
-                tweet_max = obj['tweet_max']
-                refreshh = obj['refresh']
-                sql = """INSERT INTO user_tweet_ass(tweet_id,user_id,is_favorited_before,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,tweet_min,tweet_max,refreshh,rank,page)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
-                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,tweet_seen,retweet_now,favorite_now,tweet_min,tweet_max,refreshh,rank,page,))
+                sql = """INSERT INTO user_tweet_association_and_engagements(tweet_id,user_id,is_favorited_before,has_retweet_before,tweet_retweeted,tweet_favorited,rank,page)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,retweet_now,favorite_now,rank,page,))
             connection.commit()
 
             for obj in payload[2]: # Take care of tweet in attention here.
@@ -208,9 +204,9 @@ def get_worker_tweet():
         tries = -1
     try:
         conn_cur = connection.cursor()
-        sql = """SELECT UA.tweet_id,UA.tweet_min,UA.tweet_max,UA.refreshh,T.tweet_json FROM user_tweet_ass UA,tweet T 
-        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s AND UA.refreshh = (SELECT MAX(refreshh) from user_tweet_ass where user_id = %s)"""
-        conn_cur.execute(sql, (worker_id,page,worker_id))     
+        sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_ass UA,tweet T 
+        WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
+        conn_cur.execute(sql, (worker_id,page))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
@@ -264,63 +260,6 @@ def get_worker_attention_tweet():
     #    print(error)
     return "Done!"
 
-@app.route('/set_deleted_tweets', methods=['POST']) # Should the method be GET?
-def set_deleted_tweets():
-    connection = None
-    try:
-        connection = accessPool.getconn()
-        if connection is not False:
-            payload = request.json
-            conn_cur = connection.cursor()
-            for obj in payload:
-                tweet_id = obj['del_tweet']
-                sql = """UPDATE tweet SET tweet_deleted = %s WHERE tweet_id = %s"""
-                conn_cur.execute(sql, (True,tweet_id))
-            connection.commit()
-    except Exception as error:
-        print(error)
-    return "Done"
-#@app.route('/insert_tweet_session', methods=['POST'])
-#def insert_tweet_session(): # This will take many arguments and takes logic in the guest access twitter to work
-#    favorite_now = False
-#    retweet_now = False
-#    tweet_seen = False
-#    connection = None
-#    try:
-#        #Getting connection from pool
-#        connection = accessPool.getconn()
-#        if connection is not False:
-#            payload = request.json
-#            cursor = connection.cursor()
-#            for obj in payload:
-#                # continue here
-#                fav_before = obj['fav_before']
-#                sid = obj['sid']
-#                tid = obj['tid']
-#                rtbefore = obj['rtbefore']
-#                rank = obj['rank']
-#                sql = """INSERT INTO tweet_in_session(is_favorited_before,session_id,tweet_id,has_retweet_before,tweet_seen,tweet_retweeted,tweet_favorited,rank)
-#                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
-#                cursor.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
-#                #returnData = cursor.fetchall()
-#                connection.commit()
-#            cursor.close()
-#            accessPool.putconn(connection) #closing the connection
-#        else:   #Indicates the pool is full
-#            print("Coming here")
-#            data = []
-#            data.append("insert_tweet_session")
-#            data.append(fav_before)
-#            data.append(sid)
-#            data.append(tid)
-#            data.append(rtbefore)
-#            data.append(rank)
-#            universal_buffer.append(data) # offload it to the queue.
-#            #return "Full"
-#    except Exception as error:
-#        print(error)
-#    return "Done!"
-
 @app.route('/tracking_save', methods=['POST'])
 def save_tracking():
     tries = 5
@@ -328,8 +267,34 @@ def save_tracking():
     worker_id = ''
     
 
+@app.route('/engagements_save', methods=['GET','POST']) # Should the method be GET?
+def save_all_engagements_new():
+    tries = 5
+    connection = None
+    worker_id = 0
+    page = 0
+    retweet_map = []
+    like_map = []
+    seen_map = []
+    click_map_url = []
+    try:
+        worker_id = int(request.args.get('worker_id'))
+        page = int(request.args.get('page'))
+        tweetRetweets = request.args.get('tweetRetweets')
+        tweetLikes = request.args.get('tweetLikes')
+        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+        print("Tweet view time stamps : ")
+        print(tweetViewTimeStamps)
+        for tweet_rank in tweetRetweets:
+            retweet_map.append(int(tt))
+        for tweet_rank in tweetLikes:
+            like_map.append(int(tweet_rank))
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    return "Done!"
 
-@app.route('/engagements_save', methods=['POST']) # Should the method be GET?
+@app.route('/engagements_save_prev', methods=['POST']) # Should the method be GET?
 def save_all_engagements():
     tries = 5
     connection = None
@@ -386,48 +351,12 @@ def save_all_engagements():
         print(error)
     return "Done!"
 
-@app.route('/update_tweet_retweet', methods=['POST'])
-def update_tweet_retweet():
-    connection = None
-    try:
-        connection = accessPool.getconn()
-        if connection is not False:
-            session_id = request.args.get('session_id')
-            tweet_id = request.args.get('tweet_id')
-            sql = """UPDATE tweet_in_session SET tweet_retweeted = %s WHERE session_id = %s and tweet_id = %s"""
-            cursor = connection.cursor()
-            cursor.execute(sql,(str(True),session_id,tweet_id,))
-            cursor.close()
-            connection.commit()
-            accessPool.putconn(connection)
-    except Exception as error:
-        print(error)
-    return "Done!"
-
-@app.route('/update_tweet_like', methods=['POST'])
-def update_tweet_like():
-    connection = None
-    try:
-        connection = accessPool.getconn()
-        if connection is not False:
-            session_id = request.args.get('session_id')
-            tweet_id = request.args.get('tweet_id')
-            sql = """UPDATE tweet_in_session SET tweet_favorited = %s WHERE session_id = %s and tweet_id = %s"""
-            cursor = connection.cursor()
-            cursor.execute(sql,(str(True),session_id,tweet_id,))
-            cursor.close()
-            connection.commit()
-            accessPool.putconn(connection)
-    except Exception as error:
-        print(error)
-    return "Done!"
-
 @app.route('/insert_user', methods=['GET'])
 def insert_user():
     """ insert a new vendor into the vendors table """
     retVal123 = -1
-    sql = """INSERT INTO rockwell_user(twitter_id,session_start,account_settings)
-         VALUES(%s,%s,%s) RETURNING user_id;"""
+    sql = """INSERT INTO rockwell_user(yougov_ref_id,mturk_ref_id,twitter_id,session_start,account_settings)
+         VALUES(1,1,%s,%s,%s) RETURNING user_id;"""
     try:
         connection = accessPool.getconn()
         if connection is not False: 
