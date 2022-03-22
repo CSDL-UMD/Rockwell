@@ -8,6 +8,7 @@ const writeOut = async (writeObject, twitterId) => {
     if (err) {
       return console.log(err);
     }
+    /*
     const fileContents = fs.createReadStream(jsonPath);
     const zip = zlib.createGzip();
     let jsonPathZip = path.join(__dirname, '..', 'User_Data', twitterId + '.json.gz');
@@ -27,8 +28,9 @@ const writeOut = async (writeObject, twitterId) => {
         if (err) return console.log(err);
       });
   });;
-
+  */
   });
+
 };
 
 module.exports = writeOut;

@@ -27,7 +27,8 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
 
   const user = await client.v2.me();
   const userId = user.data.id;
-
+  const v1User = await client.v1.user({user_id: userId});
+  const userFriends = v1User.friends_count;
   let tweetCount = 0;
   let favoriteCount = 0;
   let retweetCount = 0;
@@ -101,7 +102,8 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
     homeTimelineRetweetCount: retweetCount,
     homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
     likedTweetsListCount: likedTweetsListCount,
-    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount
+    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount,
+    userFriends: userFriends
   }
 
   response.write(JSON.stringify(json_response));
