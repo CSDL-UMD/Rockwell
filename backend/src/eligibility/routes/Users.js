@@ -15,19 +15,30 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
-
-  const client = new TwitterApi({
+  let errorMessage = "";
+  let client;
+  let user;
+  let userId;
+  let v1User;
+  try {
+  client = new TwitterApi({
     appKey: config.key,
     appSecret: config.key_secret,
     accessToken: token,
     accessSecret: token_secret,
   });
 
-  const user = await client.v2.me();
-  const userId = user.data.id;
-  const v1User = await client.v1.user({ user_id: userId });
-  delete v1User.status; // Cut down on user object size
+  user = await client.v2.me();
+  userId = user.data.id;
+  v1User = await client.v1.user({ user_id: userId });
+  v1User.status;
 
+} catch (Error) {
+  console.log("Error authenticating.");
+  response.write(JSON.stringify({error: true, errorMessage: "Unable to authenticate using user keys.\n"})); // Different error types may be good or an error message
+  response.send();
+  return;
+}
   // Hometimeline variables
   const userHomeTimelineTweets = [];
   let homeTimelineTweetCount = 0;
@@ -81,64 +92,89 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
             console.log("String parsing error.");
           }
       }
-      /*if (homeTimelineTweetCount == 18) // For dev so limit isn't hit
-        break;*/
+      /* if (homeTimelineTweetCount == 18) // For dev so limit isn't hit
+        break; */
     }
-    // Get users liked tweets and parse as well.
-    /* Commented to save rate limit. Will use later.
-    const userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true }); // Can get 75 pages of this with max_id
-    for (let i = 0; i < userLikes.length; ++i) {
-      likedTweetsListCount++;
-      userLikedTweets.push(userLikes[i]);
-      // Look for newsguard links in the liked tweets
-      for (const url of userLikes[i].entities.urls) {
-        for (let i = 0; i < domainList.length; i++)
-          try {
-            if (url.expanded_url.includes(domainList[i])) {
-              likedTweetsNewsGuardLinkCount++;
-              break; // If it matches one stop looking, increase speed.
-            }
-          } catch {
-            console.log("String parsing error.");
-          }
-      }
-    } 
-    */
   } catch (Error) {
     console.log(Error);
     error = true;
+    errorMessage += "Error occured fetching hometimeline";
   }
 
-  const userTimeline = await client.v1.userTimeline(userId, { include_entities: true, count: 200 });
-  for await (const tweet of userTimeline) {
-    userTimelineTweets.push(tweet);
-    userTimelineTweetCount++;
-
-        if (tweet.favorited)
-          userTimelineLikeCount++;
-        if (tweet.retweeted)
-          userTimelineRetweetCount++;
-    
-        for (const url of tweet.entities.urls) {
+  // Get users liked tweets and parse as well.
+  let minId;
+  const likeLimit = 10;
+  let currentPage = 0;
+  try {
+    let userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
+    while (currentPage < likeLimit) {
+      minId = userLikes[0].id;
+      for (let i = 0; i < userLikes.length; ++i) {
+        likedTweetsListCount++;
+        userLikedTweets.push(userLikes[i]);
+        if (userLikes[i].id < minId)
+          minId = userLikes[i].id;
+        // Look for newsguard links in the liked tweets
+        for (const url of userLikes[i].entities.urls) {
           for (let i = 0; i < domainList.length; i++)
             try {
               if (url.expanded_url.includes(domainList[i])) {
-                if (tweet.favorited)
-                  newsGuardUserTimelineLikeCount++;
-                if (tweet.retweeted)
-                  newsGuardUserTimelineRetweetCount++;
-    
-                userTimelineNewsGuardLinkCount++;
+                likedTweetsNewsGuardLinkCount++;
                 break;
               }
             } catch {
               console.log("String parsing error.");
             }
         }
+      }
+      // Next fetch here, also need to check for no tweets returned and stop.
+      userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId + '&max_id=' + minId, { full_text: true });
+      if (!userLikes.length)
+        break;
+      currentPage++;
+    }
+  } catch (Error) {
+    console.log(Error);
+    errorMessage += "Error occured fetching favorites.";
+    error = true;
+  }
+  try {
+    const userTimeline = await client.v1.userTimeline(userId, { include_entities: true, count: 200 });
+    for await (const tweet of userTimeline) {
+      userTimelineTweets.push(tweet);
+      userTimelineTweetCount++;
+
+      if (tweet.favorited)
+        userTimelineLikeCount++;
+      if (tweet.retweeted)
+        userTimelineRetweetCount++;
+
+      for (const url of tweet.entities.urls) {
+        for (let i = 0; i < domainList.length; i++)
+          try {
+            if (url.expanded_url.includes(domainList[i])) {
+              if (tweet.favorited)
+                newsGuardUserTimelineLikeCount++;
+              if (tweet.retweeted)
+                newsGuardUserTimelineRetweetCount++;
+
+              userTimelineNewsGuardLinkCount++;
+              break;
+            }
+          } catch {
+            console.log("String parsing error.");
+          }
+      }
+    }
+  } catch (Error) {
+    console.log(Error);
+    errorMessage += "Error occured fetching usertimeline.";
+    error = true;
   }
 
   const json_response = {
     error: error,
+    errorMessage: errorMessage,
     homeTimelineTweetCount: homeTimelineTweetCount,
     homeTimelineFavoriteCount: homeTimelineFavoriteCount,
     homeTimelineRetweetCount: homeTimelineRetweetCount,
