@@ -1,9 +1,11 @@
 import os
+import sys
+sys.path.insert(1, '../databaseAccess')
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
 import requests
 import datetime
 from requests_oauthlib import OAuth1Session
-from src.databaseAccess.database_config import config
+from database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -27,9 +29,10 @@ account_settings_url = str(webInformation['account_settings_url'])
 oauth_store = {}
 screenname_store = {}
 
-@app.route('/')
+@app.route('/auth/')
 def start():
     app_callback_url = url_for('callback', _external=True)
+    print(app_callback_url, file = sys.stderr)
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
@@ -162,8 +165,9 @@ def callback():
     #rockwell_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
 
     del oauth_store[oauth_token]
-
+    print(rockwell_url, file = sys.stderr)
     redirect(rockwell_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+
 
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
     return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
