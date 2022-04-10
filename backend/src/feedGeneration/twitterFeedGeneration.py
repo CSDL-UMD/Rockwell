@@ -1,10 +1,12 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
+import sys
+sys.path.insert(1, '../feedGeneration')
 import re
 import numpy as np
 import datetime
 import json
-import src.feedGeneration.CardInfo as Cardinfo
+import CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from collections import defaultdict
@@ -44,7 +46,6 @@ def get_feed():
 	access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))
 	page = int(request.args.get('page'))
-	cookiee = request.args.get('cookiee')
 	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
@@ -55,11 +56,6 @@ def get_feed():
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
 	refresh = 0
-	#check cookie here and set attn and page to 0 and increment refresh
-	if cookiee == "NO":
-		attn = 0
-		page = 0
-		refresh = refresh + 1
 	new_session = False
 	if attn == 0 and page == 0:
 		new_session = True
@@ -75,17 +71,9 @@ def get_feed():
 		rankk = 0
 		tweetids_by_page = defaultdict(list)
 		all_tweet_ids = [tweet['id'] for tweet in public_tweets]
-		min_tweet_id = min(all_tweet_ids)
-		max_tweet_id = max(all_tweet_ids)
 		for tweet in public_tweets:
 			page = int(rankk/10)
 			rank_in_page = (rankk%10) + 1
-			if_min_tweet_id = False
-			if tweet["id"] == min_tweet_id:
-				if_min_tweet_id = True
-			if_max_tweet_id = False
-			if tweet["id"] == max_tweet_id:
-				if_max_tweet_id = True
 			db_tweet = {
 				'tweet_id':tweet["id"],
 				'tweet_json':tweet
@@ -96,15 +84,11 @@ def get_feed():
 				'tid':str(tweet["id"]),
 				'rtbefore':str(tweet['retweeted']),
 				'page':page,
-				'rank':rank_in_page,
-				'tweet_min':str(if_min_tweet_id),
-				'tweet_max':str(if_max_tweet_id),
-				'refresh':str(refresh)
+                                'rank':rank_in_page
 			}
 			db_tweet_session_payload.append(db_tweet_session)
 			tweetids_by_page[page].append(tweet["id"])
 			rankk = rankk + 1
-		print(tweetids_by_page)
 		for attn_page in range(5):
 			present_tweets = tweetids_by_page[attn_page]
 			absent_tweets = all_tweet_ids[(attn_page+1)*10+1:]
@@ -389,7 +373,7 @@ def get_feed():
 		profile_link = ""
 		if tweet["user"]["url"]:
 			profile_link = tweet["user"]["url"]
-		
+
 		feed = {
 			'body':body,
 			'body_json':full_text_json,
@@ -402,14 +386,14 @@ def get_feed():
 			'worker_id':str(worker_id),
 			'refreshh':str(refresh),
 			'rank':str(rankk),
-			'picture':image_raw,
+			'picture':image_raw.replace("http:", "https:"),
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture': actor_picture,
+			'actor_picture': actor_picture.replace("http:", "https:"),
 			'actor_username': actor_username,
 			'time':time,
-			'embedded_image': eimage[0],
+			'embedded_image': eimage[0].replace("http:", "https:"),
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
 			'user_retweet': str(tweet['retweeted']),
@@ -418,7 +402,7 @@ def get_feed():
 			'quoted_by': quoted_by,
 			'quoted_by_text' : quoted_by_text,
 			'quoted_by_actor_username' : quoted_by_actor_username,
-			'quoted_by_actor_picture' : quoted_by_actor_picture
+			'quoted_by_actor_picture' : quoted_by_actor_picture.replace("http:", "https:")
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
