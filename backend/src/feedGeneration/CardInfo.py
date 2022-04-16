@@ -1,128 +1,160 @@
-""" Read the credentials from credentials.txt and place them into the `cred` dictionary """
-#import tweepy
+#Function to get the card info from a website for a tweet.
+#Requires full tweet links in order to work as anticipated.
+import html # This may not be needed and can be removed if you take out line 18. Im not sure it actually does anything.
+import requests as rq
+import time
+#import asgiref # pip install asgiref
+from bs4 import BeautifulSoup
+import asyncio
 import sys
 sys.path.insert(1, '../databaseAccess')
-from requests_oauthlib import OAuth1Session
 from database_config import config
-from configparser import ConfigParser
-import requests
-import json
-from flask import Flask, render_template, request, url_for, jsonify
 
-app = Flask(__name__)
-
-app.debug = False
-
-@app.route('/retweet', methods=['POST'])
-def retweet():
-    tweet_id = request.args.get('tweet_id')
-    session_id = request.args.get('session_id')
-    access_token = request.args.get('access_token')
-    access_token_secret = request.args.get('access_token_secret')
-
-    cred = config('../configuration/config.ini','twitterapp')
-
-    oauth = OAuth1Session(cred['key'],
-                       client_secret=cred['key_secret'],
-                       resource_owner_key=access_token,
-                       resource_owner_secret=access_token_secret)
-    print(oauth, file = sys.stderr)
+# no longer fetches the actual image this should increase the speed of execution by alot. !!
+#@async_to_sync
+def fetchWebpage(link):
     try:
-        #api.retweet(int(tweet_id))
-        #params = {"id": int(tweet_id)}
-        response_retweet = oauth.post("https://api.twitter.com/1.1/statuses/retweet/"+tweet_id+".json")
-        print(response_retweet, file = sys.stderr)
-        #requests.post('http://127.0.0.1:5052/update_tweet_retweet?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
-        return jsonify({"success":1}) # Retweet successful
-    except Exception as e:
-        print(e, file = sys.stderr)
-        return jsonify({"success":0}) # Retweet failed
+        content = rq.get(link)
+        searchMe = content.text
+        return searchMe
+    except:
+        return None
+    
+def getCardData(link) -> dict: 
+    failCounter = 0
+    searchMe = None
+    while(failCounter < 3):
+        searchMe = fetchWebpage(link) # changed this call to async to make the fetching of webpages asyncronus.
+        if(searchMe == None):
+            time.sleep(0.1) # This can be adjusted and async may be desirable.
+            failCounter = failCounter + 1
+        else:
+            break
 
-@app.route('/like', methods=['POST'])
-def like():
-    tweet_id = request.args.get('tweet_id')
-    session_id = request.args.get('session_id')
-    access_token = request.args.get('access_token')
-    access_token_secret = request.args.get('access_token_secret')
-    cred = config('../configuration/config.ini','twitterapp')
+    out = {}
+    params = config('../configuration/config.ini','twitterapp')
+    titleMax = int(params['title_max'])
+    descriptionMax = int(params['description_max'])
 
-    #auth = tweepy.OAuthHandler(cred["key"], cred["key_secret"])
-    #auth.set_access_token(cred["token"], cred["token_secret"])
-    #api = tweepy.API(auth)
-    oauth = OAuth1Session(cred['key'],
-                       client_secret=cred['key_secret'],
-                       resource_owner_key=access_token,
-                       resource_owner_secret=access_token_secret)
-    try:
-        #tweet = api.get_status(int(tweet_id))
-        #tweet.favorite()
-        response_like = oauth.post("https://api.twitter.com/1.1/favorites/create.json",params = {"id":int(tweet_id)})
-        #requests.post('http://127.0.0.1:5052/update_tweet_like?tweet_id='+str(tweet_id)+'&session_id='+str(session_id))
-        return jsonify({"success":1}) # Retweet successful
-    except Exception as e:
-        print(e)
-        return jsonify({"success":0}) # Retweet failed
+    if(searchMe is not None): # Check if our request passed.
+        soup = ""
+        try: # Create our BeautifulSoup parser "soup"
+            soup = BeautifulSoup(searchMe,"html.parser")
+        except:
+            print("Very unexpected error. Log this")
+            return out
+        try:
+            meta_tag_image = soup.find("meta", {"property": "twitter:image"}) # Could be None even in this tag scope, if below.
+            meta_tag_title = soup.find("meta", {"property": "twitter:title"})
+            meta_tag_description = soup.find("meta", {"property": "twitter:description"})
 
-@app.route('/link', methods=['POST'])
-def link():
-    data = request.get_json()
-    data_arg = data['arguments']
-    tweet_id = data_arg.split(',')[0].strip()
-    session_id = data_arg.split(',')[1].strip()
-    urll = data_arg.split(',')[2].strip()
-    iscard = data_arg.split(',')[3].strip()
+            if meta_tag_image is None:
+                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
+            
+            imageLink = meta_tag_image.get('content')
 
-    try:
-        #tweet = api.get_status(int(tweet_id))
-        #tweet.favorite()
-        requests.post('http://127.0.0.1:5052/insert_click?tweet_id='+str(tweet_id)+'&session_id='+str(session_id)+'&urll='+str(urll)+'&iscard='+str(iscard))
-        return jsonify({"success":1}) # Retweet successful
-    except Exception as e:
-        print(e)
-        return jsonify({"success":0}) # Retweet failed
+            articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered)
+            articleTitleFiltered = titleSoup.get_text()
 
-@app.route('/tracking', methods=['POST'])
-def tracking():
-    data = request.get_json()
-    session_id = data['session_id']
-    furthestSeen = data['furthestSeen']
-    try:
-        #tweet = api.get_status(int(tweet_id))
-        #tweet.favorite()
-        requests.post('http://127.0.0.1:5052/insert_tracking?session_id='+str(session_id)+'&furthestSeen='+str(furthestSeen))
-        return jsonify({"success":1}) # Retweet successful
-    except Exception as e:
-        print(e)
-        return jsonify({"success":0}) # Retweet failed
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
 
-@app.route('/check_attn', methods=['GET','POST'])
-def check_attn():
-    data = request.get_json()
-    worker_id = data['worker_id']
-    page = int(data['page'])
-    attn_map = data['attn_map']
-    print(attn_map)
-    try:
-        db_response = requests.get('http://127.0.0.1:5052/get_prereg_tweets?worker_id='+str(worker_id)+'&attnlevel='+str(page+1))
-        db_response = db_response.json()['data']
-        actual_ans = [d[1] for d in db_response]
-        print(actual_ans)
-        check = "Correct"
-        for i in range(4):
-            if bool(attn_map[i]) != actual_ans[i]:
-                check = "Incorrect"
-                break
-        return jsonify({"check":check})
-    except Exception as e:
-        print(e)
-        return jsonify({"success":0}) # Retweet failed
+            articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
 
-@app.after_request
-def add_headers(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    return response
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
 
-if __name__ == "__main__":
-    app.run(host = "0.0.0.0", port = 5050)
-    # app.run(ssl_context='adhoc', host = "0.0.0.0", port = 5050) To add SSL
+            #Creating the return dictonary if all actions worked.
+            out = {
+                "image": imageLink,
+                "title": articleTitleFiltered,
+                "description": articleDescriptionFiltered
+            }
+
+            return out # Returning a dictonary with all neccessary information
+            
+        except:
+            pass # Did not discover, not an error just no twitter tag.
+            
+        try: #try twitter tag under <meta name> if <meta property> didn't work
+            meta_tag_image = soup.find("meta", {"name": "twitter:image"}) # Could be None even in this tag scope, if below.
+            meta_tag_title = soup.find("meta", {"name": "twitter:title"})
+            meta_tag_description = soup.find("meta", {"name": "twitter:description"})
+
+            if meta_tag_image is None:
+                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
+            
+            imageLink = meta_tag_image.get('content')
+
+            articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
+            articleTitleFiltered = titleSoup.get_text()
+
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
+
+            articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
+
+
+            #Creating the return dictonary if all actions worked.
+            out = {
+                "image": imageLink,
+                "title": articleTitleFiltered,
+                "description": articleDescriptionFiltered
+            }
+
+            return out # Returning a dictonary with all neccessary information
+            
+        except:
+            pass # Did not discover, not an error just no twitter tag under meta name.
+        
+        try: # Try the default og: tags if twitter: does not work.
+            meta_tag_image = soup.find("meta", {"property": "og:image"})
+            meta_tag_title = soup.find("meta", {"property": "og:title"})
+            meta_tag_description = soup.find("meta", {"property": "og:description"})
+
+            imageLink = meta_tag_image.get('content')
+            
+            articleTitleFiltered = meta_tag_title.get('content')
+            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
+            articleTitleFiltered = titleSoup.get_text()
+
+            if (len(articleTitleFiltered) > titleMax):
+                articleTitleFiltered = articleTitleFiltered[0:titleMax]
+                articleTitleFiltered = articleTitleFiltered + "..."
+
+            articleDescriptionFiltered = meta_tag_description.get('content')
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
+            articleDescriptionFiltered = descriptionSoup.get_text()
+
+            if (len(articleDescriptionFiltered) > descriptionMax):
+                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
+                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+
+
+            #Creating the return dictonary if all actions worked.
+            out = {
+                "image": imageLink,
+                "title": articleTitleFiltered,
+                "description": articleDescriptionFiltered
+            }
+            return out
+        except:
+            pass
+        
+
+    else: # REQUEST FAILED.
+        return out
