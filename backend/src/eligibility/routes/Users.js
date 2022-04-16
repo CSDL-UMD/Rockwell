@@ -3,13 +3,14 @@ const { TwitterApi } = require('twitter-api-v2');
 const config = require('../../configuration/config');
 const router = express.Router();
 const fs = require('fs');
-const writeOut = require('../FileIO/WriteOut');
+var path = require('path');
+var https = require('follow-redirects').https;
 
 // Configure the domains collection for matching relevant URLs
 let rawData = fs.readFileSync('./Resources/domains.json');
 const domainList = JSON.parse(rawData).Domains;
 
-router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -20,25 +21,28 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   let user;
   let userId;
   let v1User;
+  let error = false;
+
   try {
-  client = new TwitterApi({
-    appKey: config.key,
-    appSecret: config.key_secret,
-    accessToken: token,
-    accessSecret: token_secret,
-  });
+    client = new TwitterApi({
+      appKey: config.key,
+      appSecret: config.key_secret,
+      accessToken: token,
+      accessSecret: token_secret,
+    });
 
-  user = await client.v2.me();
-  userId = user.data.id;
-  v1User = await client.v1.user({ user_id: userId });
-  v1User.status;
+    user = await client.v2.me();
+    userId = user.data.id;
+    v1User = await client.v1.user({ user_id: userId });
+    delete v1User.status;
 
-} catch (Error) {
-  console.log("Error authenticating.");
-  response.write(JSON.stringify({error: true, errorMessage: "Unable to authenticate using user keys.\n"})); // Different error types may be good or an error message
-  response.send();
-  return;
-}
+  } catch (Error) {
+    console.log("Error authenticating.");
+    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    response.send();
+    return;
+  }
+
   // Hometimeline variables
   const userHomeTimelineTweets = [];
   let homeTimelineTweetCount = 0;
@@ -47,21 +51,6 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   let newsGuardHomeTimelineLikeCount = 0;
   let newsGuardHomeTimelineRetweetCount = 0;
   let homeTimelineNewsGuardLinkCount = 0;
-  let error = false;
-
-  // favorites/list variables
-  const userLikedTweets = [];
-  let likedTweetsListCount = 0;
-  let likedTweetsNewsGuardLinkCount = 0;
-
-  // Usertimeline variables
-  const userTimelineTweets = [];
-  let userTimelineTweetCount = 0;
-  let userTimelineNewsGuardLinkCount = 0;
-  let userTimelineLikeCount = 0;
-  let userTimelineRetweetCount = 0;
-  let newsGuardUserTimelineLikeCount = 0;
-  let newsGuardUserTimelineRetweetCount = 0;
 
   try {
     const homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200 });
@@ -101,43 +90,82 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
     errorMessage += "Error occured fetching hometimeline";
   }
 
-  // Get users liked tweets and parse as well.
-  let minId;
-  const likeLimit = 10;
-  let currentPage = 0;
-  try {
-    let userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
-    while (currentPage < likeLimit) {
-      minId = userLikes[0].id;
-      for (let i = 0; i < userLikes.length; ++i) {
-        likedTweetsListCount++;
-        userLikedTweets.push(userLikes[i]);
-        if (userLikes[i].id < minId)
-          minId = userLikes[i].id;
-        // Look for newsguard links in the liked tweets
-        for (const url of userLikes[i].entities.urls) {
-          for (let i = 0; i < domainList.length; i++)
-            try {
-              if (url.expanded_url.includes(domainList[i])) {
-                likedTweetsNewsGuardLinkCount++;
-                break;
-              }
-            } catch {
-              console.log("String parsing error.");
-            }
-        }
-      }
-      // Next fetch here, also need to check for no tweets returned and stop.
-      userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId + '&max_id=' + minId, { full_text: true });
-      if (!userLikes.length)
-        break;
-      currentPage++;
-    }
-  } catch (Error) {
-    console.log(Error);
-    errorMessage += "Error occured fetching favorites.";
-    error = true;
+  const json_response = {
+    error: error,
+    errorMessage: errorMessage,
+    homeTimelineTweetCount: homeTimelineTweetCount,
+    homeTimelineFavoriteCount: homeTimelineFavoriteCount,
+    homeTimelineRetweetCount: homeTimelineRetweetCount,
+    homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
+    newsGuardHomeTimelineRetweetCount: newsGuardHomeTimelineRetweetCount,
+    newsGuardHomeTimelineLikeCount: newsGuardHomeTimelineLikeCount,
+    userObject: v1User
   }
+
+  const writeObject = {
+    MTurkId: mturk_id,
+    MTurkHitId: mturk_hit_id,
+    MTurkAssignmentId: mturk_assignment_id,
+    userObject: v1User,
+    ResponseObject: json_response
+  };
+
+  if (!error) {
+    //writeOut(writeObject, userId + '-home');
+    try {
+      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-home.json');
+      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
+      console.log("Success!\n");
+    } catch (err) {
+      console.error(err + '\n');
+    }
+  }
+
+
+  response.write(JSON.stringify(json_response));
+  response.send();
+});
+
+router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+  const token = request.params.access_token;
+  const token_secret = request.params.access_token_secret;
+  const mturk_id = request.params.mturk_id;
+  const mturk_hit_id = request.params.mturk_hit_id;
+  const mturk_assignment_id = request.params.mturk_assignment_id;
+  let errorMessage = "";
+  let client;
+  let user;
+  let userId;
+  let v1User;
+  let error = false;
+
+  try {
+    client = new TwitterApi({
+      appKey: config.key,
+      appSecret: config.key_secret,
+      accessToken: token,
+      accessSecret: token_secret,
+    });
+
+    user = await client.v2.me();
+    userId = user.data.id;
+    v1User = await client.v1.user({ user_id: userId });
+    delete v1User.status;
+
+  } catch (Error) {
+    console.log("Error authenticating.");
+    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    response.send();
+    return;
+  }
+  const userTimelineTweets = [];
+  let userTimelineTweetCount = 0;
+  let userTimelineLikeCount = 0;
+  let userTimelineRetweetCount = 0;
+  let userTimelineNewsGuardLinkCount = 0;
+  let newsGuardUserTimelineLikeCount = 0;
+  let newsGuardUserTimelineRetweetCount = 0;
+
   try {
     const userTimeline = await client.v1.userTimeline(userId, { include_entities: true, count: 200 });
     for await (const tweet of userTimeline) {
@@ -175,14 +203,6 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   const json_response = {
     error: error,
     errorMessage: errorMessage,
-    homeTimelineTweetCount: homeTimelineTweetCount,
-    homeTimelineFavoriteCount: homeTimelineFavoriteCount,
-    homeTimelineRetweetCount: homeTimelineRetweetCount,
-    homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
-    newsGuardHomeTimelineRetweetCount: newsGuardHomeTimelineRetweetCount,
-    newsGuardHomeTimelineLikeCount: newsGuardHomeTimelineLikeCount,
-    likedTweetsListCount: likedTweetsListCount,
-    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount,
     userTimelineTweetCount: userTimelineTweetCount,
     userTimelineLikeCount: userTimelineLikeCount,
     userTimelineRetweetCount: userTimelineRetweetCount,
@@ -193,22 +213,155 @@ router.get('/eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit
   }
 
   const writeObject = {
-    "userHomeTimelineTweets": userHomeTimelineTweets,
-    "likedTweets": userLikedTweets,
-    "userTimelineTweets": userTimelineTweets,
-    "MTurkId": mturk_id,
-    "MTurkHitId": mturk_hit_id,
-    "MTurkAssignmentId": mturk_assignment_id,
-    "userObject": v1User,
-    "ResponseObject": json_response
+    MTurkId: mturk_id,
+    MTurkHitId: mturk_hit_id,
+    MTurkAssignmentId: mturk_assignment_id,
+    userObject: v1User,
+    ResponseObject: json_response
   };
 
-  if (!error)
-    await writeOut(writeObject, userId); // Synchronous call to see if it fixes write issues.
+  if (!error) {
+    //  writeOut(writeObject, userId + '-user');
+    try {
+      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-user.json');
+      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
+      console.log("Success!\n");
+    } catch (err) {
+      console.error(err + '\n');
+    }
+  }
 
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
+router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+  const token = request.params.access_token;
+  const token_secret = request.params.access_token_secret;
+  const mturk_id = request.params.mturk_id;
+  const mturk_hit_id = request.params.mturk_hit_id;
+  const mturk_assignment_id = request.params.mturk_assignment_id;
+  let errorMessage = "";
+  let client;
+  let user;
+  let userId;
+  let v1User;
+  let error = false;
 
+  try {
+    client = new TwitterApi({
+      appKey: config.key,
+      appSecret: config.key_secret,
+      accessToken: token,
+      accessSecret: token_secret,
+    });
+
+    user = await client.v2.me();
+    userId = user.data.id;
+    v1User = await client.v1.user({ user_id: userId });
+    delete v1User.status;
+
+  } catch (Error) {
+    console.log("Error authenticating.");
+    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    response.send();
+    return;
+  }
+  // favorites/list variables
+  const userLikedTweets = [];
+  let likedTweetsListCount = 0;
+  let likedTweetsNewsGuardLinkCount = 0;
+
+  // Get users liked tweets and parse as well.
+  let minId;
+  const likeLimit = 10;
+  let currentPage = 0;
+  try {
+    let userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
+    while (currentPage < likeLimit) {
+      minId = userLikes[0].id;
+      for (let i = 0; i < userLikes.length; ++i) {
+        likedTweetsListCount++;
+        userLikedTweets.push(userLikes[i]);
+        if (userLikes[i].id < minId)
+          minId = userLikes[i].id;
+        // Look for newsguard links in the liked tweets
+        for (const url of userLikes[i].entities.urls) {
+          for (let i = 0; i < domainList.length; i++)
+            try {
+              if (url.expanded_url.includes(domainList[i])) {
+                likedTweetsNewsGuardLinkCount++;
+                break;
+              }
+            } catch {
+              console.log("String parsing error.");
+            }
+        }
+      }
+      // Next fetch here, also need to check for no tweets returned and stop.
+      userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId + '&max_id=' + minId, { full_text: true });
+      if (!userLikes.length)
+        break;
+      currentPage++;
+    }
+  } catch (Error) {
+    console.log(Error);
+    errorMessage += "Error occured fetching favorites.";
+    error = true;
+  }
+
+  const json_response = {
+    error: error,
+    errorMessage: errorMessage,
+    likedTweetsListCount: likedTweetsListCount,
+    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount,
+    userObject: v1User
+  }
+
+  const writeObject = {
+    MTurkId: mturk_id,
+    MTurkHitId: mturk_hit_id,
+    MTurkAssignmentId: mturk_assignment_id,
+    userObject: v1User,
+    likedTweets: userLikedTweets,
+    ResponseObject: json_response
+  };
+
+  if (!error) {
+    //  writeOut(writeObject, userId + '-fave');
+    try {
+      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-fave.json');
+      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
+      console.log("Success!\n");
+    } catch (err) {
+      console.error(err + '\n');
+    }
+  }
+
+  response.write(JSON.stringify(json_response));
+  response.send();
+});
+
+/*
+const resolveURL = (hostname) => {
+  const options = {
+    //hostname: hostname,
+    // port: 443,
+    //path: '/todos',
+    method: 'HEAD'
+  }
+
+  const req = https.request(hostname ,options, res => {
+    console.log(`statusCode: ${res.statusCode}`)
+    console.log(res.headers);
+  })
+
+  req.on('error', error => {
+    console.error(error);
+  })
+
+  req.end()
+};
+resolveURL('https://cnn.it/3rnezkS');
+*/
 module.exports = router;
