@@ -86,6 +86,7 @@ function Tweet(props) {
         <div style={{ marginLeft: '5%'}}>
           <b>{localTweet.actor_name /* Line this up with actor photo */}</b>
           {' @' + localTweet.actor_username}
+          <em>{' NewsGuard: ' + localTweet.is_newsguard}</em>
         </div>
       </div>
       <div className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>

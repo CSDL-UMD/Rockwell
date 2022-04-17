@@ -12,6 +12,7 @@ from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
 import xml
 import xml.sax.saxutils
+import src.feedGeneration.ranking as ranking
 
 #import requests as rq
 
@@ -152,6 +153,7 @@ def get_feed():
 		url_display = []
 		url_extend = []
 		url_actual = []
+		is_newsguard = False
 		if "entities" in tweet.keys():
 			if "urls" in tweet["entities"]:
 				for url_dict in tweet["entities"]["urls"]:
@@ -160,6 +162,10 @@ def get_feed():
 					url_display.append(url_dict["display_url"])
 					url_extend.append(url_dict["expanded_url"])
 					url_actual.append(url_dict["url"])
+					if is_newsguard == False:
+						is_newsguard = ranking.ngCheck(url_dict)
+		print("Tweet NG Status: " + str(is_newsguard))
+		print("")
 
 		last_url_arr = re.findall("(?P<url>https?://[^\s]+)", full_text)
 		if last_url_arr:
@@ -400,7 +406,8 @@ def get_feed():
 			'quoted_by': quoted_by,
 			'quoted_by_text' : quoted_by_text,
 			'quoted_by_actor_username' : quoted_by_actor_username,
-			'quoted_by_actor_picture' : quoted_by_actor_picture
+			'quoted_by_actor_picture' : quoted_by_actor_picture,
+			'is_newsguard' : is_newsguard
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1

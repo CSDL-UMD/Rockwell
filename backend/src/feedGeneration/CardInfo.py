@@ -37,7 +37,7 @@ def getCardData(link) -> dict:
     if(searchMe is not None): # Check if our request passed.
         soup = ""
         try: # Create our BeautifulSoup parser "soup"
-            soup = BeautifulSoup(searchMe,"html.parser")
+            soup = BeautifulSoup(searchMe,features="html.parser")
         except:
             print("Very unexpected error. Log this")
             return out
@@ -52,7 +52,7 @@ def getCardData(link) -> dict:
             imageLink = meta_tag_image.get('content')
 
             articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered)
+            titleSoup = BeautifulSoup(articleTitleFiltered, features="html.parser")
             articleTitleFiltered = titleSoup.get_text()
 
             if (len(articleTitleFiltered) > titleMax):
@@ -60,7 +60,7 @@ def getCardData(link) -> dict:
                 articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered, features="html.parser")
             articleDescriptionFiltered = descriptionSoup.get_text()
 
             if (len(articleDescriptionFiltered) > descriptionMax):
@@ -98,7 +98,7 @@ def getCardData(link) -> dict:
                 articleTitleFiltered = articleTitleFiltered + "..."
 
             articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
+            descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
             articleDescriptionFiltered = descriptionSoup.get_text()
 
             if (len(articleDescriptionFiltered) > descriptionMax):
