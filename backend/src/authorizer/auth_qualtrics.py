@@ -67,6 +67,7 @@ def start():
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
     oauth_store[oauth_token] = oauth_token_secret
+    screenname_store[oauth_token] = "####"
     start_url = authorize_url+"?oauth_token="+oauth_token
     return oauth_token
     #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
@@ -101,11 +102,16 @@ def callback():
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
 
+    print(oauth_token)
+    print(oauth_denied)
+
     if oauth_denied:
         if oauth_denied in oauth_store:
             del oauth_store[oauth_denied]
+        #screenname_store[oauth_token] = "#DENIED#"
         #return render_template('error.html', error_message="the OAuth request was denied by this user")
-        return redirect('http://' + str(webInformation['url']) + ':5000')
+        #return redirect('http://' + str(webInformation['url']) + ':5000')
+        return "<script>window.onload = window.close();</script>"
 
     #if not oauth_token or not oauth_verifier:
     #    return render_template('error.html', error_message="callback param(s) missing")
@@ -169,9 +175,8 @@ def callback():
 
 @app.route('/getscreenname')
 def screenname():
-    print("CALLED GET SCREEN NAME!!!!")
+    print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
-    print(oauth_token_qualtrics)
     screen_name_return = screenname_store[oauth_token_qualtrics]
     return screen_name_return
 
@@ -187,4 +192,4 @@ def add_headers(response):
 
   
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",ssl_context='adhoc')
+    app.run(host="0.0.0.0")
