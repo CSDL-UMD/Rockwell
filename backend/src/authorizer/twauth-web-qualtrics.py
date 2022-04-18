@@ -1,11 +1,7 @@
 import os
-import sys
-sys.path.insert(1, '../databaseAccess')
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
-import requests
 import datetime
 from requests_oauthlib import OAuth1Session
-from database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -16,6 +12,23 @@ app.debug = True
 
 #log_level = logging.DEBUG
 #logging.basicConfig(filename='authorizer.log', level=log_level)
+
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -28,8 +41,10 @@ account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
 screenname_store = {}
+access_token_store = {}
+access_token_secret_store = {}
 
-@app.route('/auth/')
+@app.route('/')
 def start():
     app_callback_url = url_for('callback', _external=True)
     print(app_callback_url)
@@ -63,6 +78,7 @@ def start():
     #res.set_cookie('exp','infodiversity',max_age=1800)
     #return res
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
+
 
 @app.route('/cookie', methods=['GET']) # This is a function to set a flask cookie
 def index():
@@ -137,7 +153,10 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
 
+    
     screenname_store[oauth_token] = screen_name
+    access_token_store[oauth_token] = real_oauth_token
+    access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
     return "<script>window.onload = window.close();</script>"
@@ -159,14 +178,14 @@ def callback():
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
     #return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
 
-@app.route('/auth/getscreenname')
+@app.route('/getscreenname')
 def screenname():
-    print("GET SCREEN NAME CALLED!!!")
+    print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
-    print(oauth_token_qualtrics)
     screen_name_return = screenname_store[oauth_token_qualtrics]
-    return screen_name_return
-
+    access_token_return = access_token_store[oauth_token_qualtrics]
+    access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
+    return screen_name_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
 
 @app.errorhandler(500)
 def internal_server_error(e):
