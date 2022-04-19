@@ -36,7 +36,6 @@ source .venv/bin/activate
 A single nginx (.nginx) file is required, and will be located in /etc/nginx/sites-available/. The following are the steps:
 ```
 sudo rm /etc/nginx/sites-enabled/default
-sudo vi /etc/nginx/sites-available/[nginx file name].nginx
 sudo ln -s /etc/nginx/sites-available/[nginx file name].nginx /etc/nginx/sites-enabled/[nginx file name].nginx
 ```
 
