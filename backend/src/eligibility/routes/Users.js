@@ -350,13 +350,16 @@ const resolveURL = (hostname) => {
     //path: '/todos',
     method: 'HEAD'
   }
+
   const req = https.request(hostname ,options, res => {
     console.log(`statusCode: ${res.statusCode}`)
     console.log(res.headers);
   })
+
   req.on('error', error => {
     console.error(error);
   })
+
   req.end()
 };
 resolveURL('https://cnn.it/3rnezkS');
