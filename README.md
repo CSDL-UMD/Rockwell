@@ -27,7 +27,7 @@ tables in the DatabaseScript must be placed on a postgresql database.
 # Deployment
 Deployment to a server requires the use of tmux, nginx and gunicorn.
 
-Each Flask API requires it's own gunicorn service file. Each file must be placed in /etc/systemd/system/, and the service file will have extension .service. Must install the python dependencies, as well as gunicorn, Flask, python-dotenv, flask-cors and requests in a virtual environment (requires python3-venv):
+Each Flask API requires its own gunicorn service file. Each file must be placed in /etc/systemd/system/, and the service file will have extension .service. Must install the python dependencies, as well as gunicorn, Flask, python-dotenv, flask-cors and requests in a virtual environment (requires python3-venv):
 ```
 python3 -m venv .venv
 source .venv/bin/activate
