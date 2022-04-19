@@ -1,0 +1,59 @@
+server{
+        listen 443 ssl http2;
+        listen [::]:443;
+    	ssl_certificate [INSERT certificate file]; 
+    	ssl_certificate_key [INSERT certificate key file];
+	server_name [INSERT URL];
+        root [DIRECTORY OF NPM BUILD];
+        index index.html;
+        access_log /var/log/nginx/reverse-access.log;
+        error_log /var/log/nginx/reverse-error.log debug;
+
+        location /{
+                try_files $uri $uri/ /index.html =404;
+                add_header Cache-Control "no-cache";
+        }
+        location /static{
+                expires 1y;
+                add_header cache-Control "public";
+        }
+        location /getfeed{
+                include proxy_params;
+                proxy_pass [INSERT local host port];
+        }
+
+        location /retweet{
+                include proxy_params;
+                proxy_pass [INSERT local host port];
+        }
+        location /auth{
+                include proxy_params;
+                proxy_pass [INSERT local host port];
+        }
+        location /callback{
+                include proxy_params;
+                proxy_pass [INSERT local host port];
+        }
+        location /like{
+                include proxy_params;
+                proxy_pass [INSERT local host port];
+        }
+
+
+}
+
+
+
+server{
+        listen 80;
+        listen [::]:80;
+        server_name [INSERT URL];
+        location /{
+                return 301 https://$host$request_uri;
+        }
+        client_max_body_size 20M;
+        proxy_connect_timeout 600s;
+        proxy_read_timeout 600s;
+
+
+}
