@@ -51,4 +51,4 @@ sudo systemctl daemon-reload
 sudo systemctl start [app name, without the .service extension]
 ```
 
-Sample files are provided in the scriptsAndFiles folder
+Sample files are provided in the scriptsAndFiles folder.
