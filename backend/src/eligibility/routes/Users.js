@@ -4,11 +4,31 @@ const config = require('../../configuration/config');
 const router = express.Router();
 const fs = require('fs');
 var path = require('path');
+const writeOut = require('../FileIO/WriteOut');
 var https = require('follow-redirects').https;
 
 // Configure the domains collection for matching relevant URLs
 let rawData = fs.readFileSync('./Resources/domains.json');
 const domainList = JSON.parse(rawData).Domains;
+
+/*
+const resolveURL = (hostname) => {
+  const options = {
+    method: 'HEAD'
+  }
+
+  const req = https.request(hostname, options, res => {
+    return (res.responseUrl);
+  })
+
+  req.on('error', error => {
+    console.error(error);
+    return hostname;
+  })
+
+  req.end()
+};
+*/
 
 router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
@@ -111,16 +131,8 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   };
 
   if (!error) {
-    //writeOut(writeObject, userId + '-home');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-home.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-home');
   }
-
 
   response.write(JSON.stringify(json_response));
   response.send();
@@ -221,14 +233,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   };
 
   if (!error) {
-    //  writeOut(writeObject, userId + '-user');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-user.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-user');
   }
 
   response.write(JSON.stringify(json_response));
@@ -282,6 +287,7 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
       minId = userLikes[0].id;
       for (let i = 0; i < userLikes.length; ++i) {
         likedTweetsListCount++;
+
         userLikedTweets.push(userLikes[i]);
         if (userLikes[i].id < minId)
           minId = userLikes[i].id;
@@ -328,40 +334,11 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
   };
 
   if (!error) {
-    //  writeOut(writeObject, userId + '-fave');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-fave.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-fave');
   }
-
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
-/*
-const resolveURL = (hostname) => {
-  const options = {
-    //hostname: hostname,
-    // port: 443,
-    //path: '/todos',
-    method: 'HEAD'
-  }
-
-  const req = https.request(hostname ,options, res => {
-    console.log(`statusCode: ${res.statusCode}`)
-    console.log(res.headers);
-  })
-
-  req.on('error', error => {
-    console.error(error);
-  })
-
-  req.end()
-};
-resolveURL('https://cnn.it/3rnezkS');
-*/
 module.exports = router;
+

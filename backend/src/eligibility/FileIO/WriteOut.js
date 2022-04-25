@@ -4,11 +4,11 @@ const zlib = require('zlib');
 
 const writeOut = async (writeObject, twitterId) => {
   let jsonPath = path.join(__dirname, '..', 'User_Data', twitterId + '.json');
-  fs.writeFileSync(jsonPath, JSON.stringify(writeObject, null, 4), function (err, data) {
+  fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4), function (err, data) {
     if (err) {
-      return console.log(err);
-    }
-    /*
+      console.log(err);
+    } 
+
     const fileContents = fs.createReadStream(jsonPath);
     const zip = zlib.createGzip();
     let jsonPathZip = path.join(__dirname, '..', 'User_Data', twitterId + '.json.gz');
@@ -23,12 +23,11 @@ const writeOut = async (writeObject, twitterId) => {
       writeStream.destroy();
 
       // Attempt to delete file
-    }).on('close', function (err) { // further test this
+    }).on('close', function (err) {
       fs.unlink(jsonPath, (err) => {
         if (err) return console.log(err);
       });
   });;
-  */
   });
 
 };
