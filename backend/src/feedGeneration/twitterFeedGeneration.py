@@ -40,7 +40,6 @@ def config(filename,section):
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
-
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))
@@ -69,8 +68,23 @@ def get_feed():
 		db_tweet_attn_payload = []
 		rankk = 0
 		tweetids_by_page = defaultdict(list)
-		all_tweet_ids = [tweet['id'] for tweet in public_tweets]
+		all_tweet_ids = [tweet['id'] for tweet in public_tweets] #######
+		if len(all_tweet_ids) == len(set(all_tweet_ids)):
+			print("No duplicate tweets found")
+		else:
+			print("Duplicate tweets found")
+		# tweets_with_ng = []
 		for tweet in public_tweets:
+			# is_newsguard = False
+			# tweet_rank = None
+			# if "entities" in tweet.keys():
+			# 	if "urls" in tweet["entities"]:
+			# 		for url_dict in tweet["entities"]["urls"]:
+			# 			if is_newsguard == False:
+			# 				is_newsguard = ranking.ngCheck(url_dict)
+			# tweets_with_ng.append((tweet, is_newsguard)) # append tweet with ranking to structure
+			# print("Tweet NG Status: " + str(is_newsguard))
+			# print("")
 			page = int(rankk/10)
 			rank_in_page = (rankk%10) + 1
 			db_tweet = {
@@ -88,6 +102,7 @@ def get_feed():
 			db_tweet_session_payload.append(db_tweet_session)
 			tweetids_by_page[page].append(tweet["id"])
 			rankk = rankk + 1
+		# ranking.tweetRank(tweets_with_ng) # send tweet structure with rankings to ranking function
 		for attn_page in range(5):
 			present_tweets = tweetids_by_page[attn_page]
 			absent_tweets = all_tweet_ids[(attn_page+1)*10+1:]
@@ -154,6 +169,7 @@ def get_feed():
 		url_extend = []
 		url_actual = []
 		is_newsguard = False
+		tweet_rank = None
 		if "entities" in tweet.keys():
 			if "urls" in tweet["entities"]:
 				for url_dict in tweet["entities"]["urls"]:
@@ -407,10 +423,12 @@ def get_feed():
 			'quoted_by_text' : quoted_by_text,
 			'quoted_by_actor_username' : quoted_by_actor_username,
 			'quoted_by_actor_picture' : quoted_by_actor_picture,
-			'is_newsguard' : is_newsguard
+			'is_newsguard' : is_newsguard,
+			'tweet_rank' : tweet_rank
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
+	ranking.tweetRank(feed_json) # call ranking function here and send feed_json?
 	return jsonify(feed_json)
 
 @app.after_request

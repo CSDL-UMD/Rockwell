@@ -1,5 +1,6 @@
 import json
 import requests
+import random
 
 from requests import request
 
@@ -21,6 +22,29 @@ def ngCheck(url_dict):
             break
     print(str(result) + " " + ngLink + " " + h.url)
     return result
+
+
+def tweetRank(tweets):
+    ng_tweets = []
+    non_ng_tweets = []
+    ng_count = 0
+    non_ng_count = 0
+    for tweet in tweets:
+        if tweet["is_newsguard"] == True:
+            ng_count = ng_count + 1
+            tweet["tweet_rank"] = round(random.uniform(0, 1), 2)
+            print("This is a NG tweet and its ranking is " + str(tweet["tweet_rank"]))
+            ng_tweets.append(tweet)
+        else:
+            non_ng_count = non_ng_count + 1
+            non_ng_tweets.append(tweet)
+        
+    
+    # pt = ng_count / (non_ng_count + ng_count)
+    # if pt > 0.5:
+    #     pt = 0.5
+
+    
 
 
     # query = url_dict["expanded_url"]
