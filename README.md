@@ -35,19 +35,19 @@ tables in the DatabaseScript must be placed on a postgresql database.
   sudo apt install npm
   ```
   
-3. Clone your repository into your server if you have not already done so already, using: 
+3. Clone your repository into your server if you have not already done so, using: 
   ```
-  git clone [insert .git URL here]
+  git clone https://github.com/CSDL-USF/Rockwell.git
   ```
   
 4. Ensure that your directory has read and write permissions:
   ```
-  sudo chmod 777 [insert root directory of app here]
-  cd [insert root directory of app here]
+  sudo chmod 777 Rockwell 
+  cd Rockwell
   ```
   
 The following steps are used to host the front-end:
-1. cd into the front-end portion of your project
+1. cd frontend
 
 2. Install npm files, and build:
   ```
@@ -59,13 +59,13 @@ The following steps are used to host the front-end:
   ```
   cd ~
   sudo rm /etc/nginx/sites-enabled/default
-  sudo vi /etc/nginx/sites-available/[insert project name here].nginx
+  sudo vi /etc/nginx/sites-available/Rockwell.nginx
   ```
 4. Please refer to this [sample nginx file](/scripts/Deployment/sample.nginx) for the contents of the nginx file
 
 5.Link the sites-available and sites-enabled config files
   ```
-  sudo ln -s /etc/nginx/sites-available/[insert project name here].nginx /etc/nginx/sites-enabled/[insert project name here].nginx
+  sudo ln -s /etc/nginx/sites-available/Rockwell.nginx /etc/nginx/sites-enabled/Rockwell.nginx
   ```
   
 6. Now start the nginx server:
@@ -76,7 +76,10 @@ The following steps are used to host the front-end:
 7. Important note, you must rebuild the app and reload nginx whenever the frontend is modified
   
 The following steps are used to host the back-end:
-1. cd into the backend portion of your project\
+1. cd into the backend portion of the project
+  ```
+  cd Rockwell/backend
+  ```
 
 2. Create the pythonn virtual environment and install the python packages:
   ```
