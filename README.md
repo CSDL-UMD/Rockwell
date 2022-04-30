@@ -35,7 +35,7 @@ tables in the DatabaseScript must be placed on a postgresql database.
   sudo apt install npm
   ```
   
-3. Clone your repository into your server if you have not already done so, using: 
+3. Clone the repository into your server if you have not already done so, using: 
   ```
   git clone https://github.com/CSDL-USF/Rockwell.git
   ```
