@@ -1,0 +1,61 @@
+version: "3"
+services:
+        frontend:
+                container_name: frontend
+                build:
+                        context: ./frontend
+                        dockerfile: Dockerfile
+                ports:
+                        - 80:80
+                        - 443:443
+                volumes:
+                        - /home/ubuntu/ssl:/etc/nginx/certs
+        twauth:
+                restart: always
+                container_name: twauth
+                build: ./backend/src/authorizer
+                expose:
+                        - 5000
+                volumes:
+                        - ./backend/src/authorizer:/usr/src/app
+                environment:
+                        - FLASK_ENV=development
+                        - FLASK_APP=twauth-web.py
+                        - FLASK_DEBUG=1
+        feed_generation:           
+                restart: always
+                container_name: feedGeneration
+                build: ./backend/src/feedGeneration
+                expose:
+                        - 5051
+                volumes:  
+                        - ./backend/src/feedGeneration:/usr/src/app
+                environment:
+                        - FLASK_ENV=development
+                        - FLASK_APP=twitterFeedGeneration.py
+                        - FLASK_DEBUG=1
+        database_access:           
+                restart: always
+                container_name: databaseAccess
+                build: ./backend/src/databaseAccess
+                expose:
+                        - 5052
+                volumes:  
+                        - ./backend/src/databaseAccess:/usr/src/app
+                environment:
+                        - FLASK_ENV=development
+                        - FLASK_APP=database_access.py
+                        - FLASK_DEBUG=1
+        retweet:           
+                restart: always
+                container_name: retweet
+                build: ./backend/src/engagements
+                expose:
+                        - 5050
+                volumes:  
+                        - ./backend/src/authorizer:/usr/src/app
+                environment:
+                        - FLASK_ENV=development
+                        - FLASK_APP=Retweet.py
+                        - FLASK_DEBUG=1
+

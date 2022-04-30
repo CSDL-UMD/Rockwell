@@ -6,9 +6,7 @@ import time
 #import asgiref # pip install asgiref
 from bs4 import BeautifulSoup
 import asyncio
-import sys
-sys.path.insert(1, '../databaseAccess')
-from database_config import config
+from src.databaseAccess.database_config import config
 
 # no longer fetches the actual image this should increase the speed of execution by alot. !!
 #@async_to_sync
