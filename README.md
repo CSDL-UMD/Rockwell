@@ -47,7 +47,10 @@ tables in the DatabaseScript must be placed on a postgresql database.
   ```
   
 The following steps are used to host the front-end:
-1. cd frontend
+1. cd into the frontend portion of the app:
+  ```
+  cd frontend
+  ```
 
 2. Install npm files, and build:
   ```
