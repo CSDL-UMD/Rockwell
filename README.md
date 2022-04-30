@@ -24,30 +24,95 @@ The config files in both the front and backend must also be filled out and the d
 tables in the DatabaseScript must be placed on a postgresql database.
 
 
-# Deployment
-Deployment to a server requires the use of tmux, nginx and gunicorn.
+# Deployment Steps
+1. SSH into the your server where the app is located (or where you intend to clone it) (we assume Ubuntu):
 
-Each Flask API requires its own gunicorn service file. Each file must be placed in /etc/systemd/system/, and the service file will have extension .service. Must install the python dependencies, as well as gunicorn, Flask, python-dotenv, flask-cors and requests in a virtual environment (requires python3-venv):
-```
-python3 -m venv .venv
-source .venv/bin/activate
-```
+2. Ensure that you have pip, nginx and npm installed:
+  ```
+  sudo apt-get update
+  sudo apt install python3-pip
+  sudo apt-get install nginx
+  sudo apt install npm
+  ```
+  
+3. Clone your repository into your server if you have not already done so already, using: 
+  ```
+  git clone [insert .git URL here]
+  ```
+  
+4. Ensure that your directory has read and write permissions:
+  ```
+  sudo chmod 777 [insert root directory of app here]
+  cd [insert root directory of app here]
+  ```
+  
+The following steps are used to host the front-end:
+1. cd into the front-end portion of your project
 
-A single nginx (.nginx) file is required, and will be located in /etc/nginx/sites-available/. The following are the steps:
-```
-sudo rm /etc/nginx/sites-enabled/default
-sudo ln -s /etc/nginx/sites-available/[nginx file name].nginx /etc/nginx/sites-enabled/[nginx file name].nginx
-```
+2. Install npm files, and build:
+  ```
+  sudo npm install
+  sudo npm run build
+  ```
+  
+3. We will now configure nginx:
+  ```
+  cd ~
+  sudo rm /etc/nginx/sites-enabled/default
+  sudo vi /etc/nginx/sites-available/[insert project name here].nginx
+  ```
+4. Please refer to this sample nginx file for the contents of the nginx file
 
-To start the nginx server, run:
-```
-sudo systemctl reload nginx
-```
+5.Link the sites-available and sites-enabled config files
+  ```
+  sudo ln -s /etc/nginx/sites-available/[insert project name here].nginx /etc/nginx/sites-enabled/[insert project name here].nginx
+  ```
+  
+6. Now start the nginx server:
+  ```
+  sudo systemctl reload nginx
+  ```
 
-To start the gunicorn service, run (for each app):
-```
-sudo systemctl daemon-reload
-sudo systemctl start [app name, without the .service extension]
-```
+7. Important note, you must rebuild the app and reload nginx whenever the frontend is modified
+  
+The following steps are used to host the back-end:
+1. cd into the backend portion of your project\
 
-Sample files are provided in the scripts folder.
+2. Create the pythonn virtual environment and install the python packages:
+  ```
+  sudo apt install python3-venv
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -e .
+  deactivate
+  cd ~
+  ```
+  
+3. We will now configure the gunicorn servers for all apps, starting with twauth-web
+  ```
+  sudo vi /etc/systemd/system/twauth-web.service
+  ```
+
+4. Please refer to the sample file for this service file's contents
+
+5. Repeat steps 3 and 4, but now for twitterFeedGeneration.service, Retweet.service, and database_access.service
+
+6. Now start the gunicorn servers for these apps:
+  ```
+  sudo systemctl daemon-reload
+  sudo systemctl start twauth-web
+  sudo systemctl start twitterFeedGeneration
+  sudo systemctl start Retweet
+  sudo systemctl start database_access
+  ```
+ 
+7. In order to check the statuses of these apps:
+  ```
+  sudo systemctl status twauth-web
+  sudo systemctl status twitterFeedGeneration
+  sudo systemctl status Retweet
+  sudo systemctl status database_access
+  ```
+8. Important note: You must restart the services whenever the backend app is modified
+
+The following information describes the use of tmux in order to run the eligibility app:
