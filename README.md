@@ -122,3 +122,29 @@ The following steps are used to host the back-end:
 8. Important note: You must restart the services whenever the backend app is modified
 
 The following information describes the use of tmux in order to run the eligibility app:
+1. cd into the eligibility folder (assuming you are in the home directory):
+  ```
+  cd Rockwell/backend/src/eligibility
+  ```
+
+2. Run npm install to obtain all necessary dependencies
+  ```
+  sudo npm install
+  ```
+  
+3. Install tmux:
+  ```
+  sudo apt-get update
+  sudo apt-get install tmux
+  ```
+  
+ 4. Start a tmux session, titled eligibility for appropriate naming convention:
+   ```
+   tmux new -S eligibility
+   ```
+ 5. Now run the eligiblity app:
+  ```
+  sudo npm start
+  ```
+ You may not exit the terminal. This concludes the tutorial for deployment. 
+
