@@ -146,5 +146,5 @@ The following information describes the use of tmux in order to run the eligibil
   ```
   sudo npm start
   ```
- You may not exit the terminal. This concludes the tutorial for deployment. 
+ You may now exit the terminal. This concludes the tutorial for deployment. 
 
