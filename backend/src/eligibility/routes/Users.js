@@ -30,7 +30,7 @@ const resolveURL = (hostname) => {
 };
 */
 
-router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -139,7 +139,7 @@ router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
   response.send();
 });
 
-router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -247,7 +247,7 @@ router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
   response.send();
 });
 
-router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
