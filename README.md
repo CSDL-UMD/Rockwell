@@ -101,7 +101,7 @@ The following steps are used to host the back-end:
 
 4. Please refer to the [service file](scripts/Deployment/twauth-web.service) for this service file's contents
 
-5. Repeat steps 3 and 4, but now for [twitterFeedGeneration.service](scripts/Deployment/twitterFeedGeneration.service), [Retweet.service](scripts/Deployment/twitterFeedGeneration.service), and [database_access.service](scripts/Deployment/database_access.service)
+5. Repeat steps 3 and 4, but now for [twitterFeedGeneration.service](scripts/Deployment/twitterFeedGeneration.service), [Retweet.service](scripts/Deployment/Retweet.service), and [database_access.service](scripts/Deployment/database_access.service)
 
 6. Now start the gunicorn servers for these apps:
   ```
