@@ -41,6 +41,8 @@ account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
 screenname_store = {}
+access_token_store = {}
+access_token_secret_store = {}
 
 @app.route('/')
 def start():
@@ -151,7 +153,10 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
 
+    
     screenname_store[oauth_token] = screen_name
+    access_token_store[oauth_token] = real_oauth_token
+    access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
     return "<script>window.onload = window.close();</script>"
@@ -178,7 +183,11 @@ def screenname():
     print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
     screen_name_return = screenname_store[oauth_token_qualtrics]
-    return screen_name_return
+    if screen_name_return == "####":
+        return screen_name_return
+    access_token_return = access_token_store[oauth_token_qualtrics]
+    access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
+    return screen_name_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
 
 @app.errorhandler(500)
 def internal_server_error(e):

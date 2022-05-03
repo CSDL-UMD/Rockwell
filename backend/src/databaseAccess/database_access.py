@@ -204,7 +204,7 @@ def get_worker_tweet():
         tries = -1
     try:
         conn_cur = connection.cursor()
-        sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_ass UA,tweet T 
+        sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_association_and_engagements UA,tweet T 
         WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
         conn_cur.execute(sql, (worker_id,page))     
         if conn_cur.rowcount > 0:

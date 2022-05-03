@@ -115,7 +115,7 @@ def get_feed():
 		else:	
 			db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)+"&page="+str(page)) # This definetely doesnt work right now.
 			db_response = db_response.json()['data']
-			public_tweets = [d[4] for d in db_response]
+			public_tweets = [d[1] for d in db_response]
 	"""
 	This is for refresh
 	if data_db != 'NEW':
