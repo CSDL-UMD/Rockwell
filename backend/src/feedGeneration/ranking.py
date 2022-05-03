@@ -4,40 +4,73 @@ import random
 
 from requests import request
 
-ng_tweets = []
-non_ng_tweets = []
+# ng_tweets = []
+# non_ng_tweets = []
 
 with open('..\eligibility\Resources\domains.json', 'r') as ngdomains:
 	domain_list = json.load(ngdomains)
 
 #Splits dictionary of tweets into newsGuard tweets and non newsGuard tweets
-def ngCheck(url_dict): 
-    result = False
-    h = requests.head(url_dict["expanded_url"], allow_redirects=True) #requests.get returns final link after all redirects (why not use this?)
-    ngLink = ""
-    for each_ng_domain in domain_list["Domains"]:
-        if each_ng_domain in h.url:
-            result = True
-            ngLink = each_ng_domain
-            break
-    print(str(result) + " " + ngLink + " " + h.url)
-    return result
-
-
-def tweetRank(tweets):
+def ngCheck(public_tweets):
+    count = 0
     ng_tweets = []
     non_ng_tweets = []
-    ng_count = 0
-    non_ng_count = 0
-    for tweet in tweets:
-        if tweet["is_newsguard"] == True:
-            ng_count = ng_count + 1
-            tweet["tweet_rank"] = round(random.uniform(0, 1), 2)
-            print("This is a NG tweet and its ranking is " + str(tweet["tweet_rank"]))
+    for tweet in public_tweets:
+        is_newsguard = False
+        if "entities" in tweet.keys():
+            if "urls" in tweet["entities"]:
+                ngLink = ""
+                for url_dict in tweet["entities"]["urls"]:
+                    h = requests.head(url_dict["expanded_url"], allow_redirects=True)
+                    for each_ng_domain in domain_list["Domains"]:
+                        if each_ng_domain in h.url:
+                            ngLink = each_ng_domain
+                            is_newsguard = True
+                    print(str(is_newsguard) + " " + ngLink + " " + h.url + "\n")
+        if is_newsguard == True:
             ng_tweets.append(tweet)
         else:
-            non_ng_count = non_ng_count + 1
             non_ng_tweets.append(tweet)
+    print("Ranking count: " + str(count))
+    return ng_tweets, non_ng_tweets
+
+
+
+
+
+# def ngCheck(url_dict): 
+#     result = False
+#     h = requests.head(url_dict["expanded_url"], allow_redirects=True) #requests.get returns final link after all redirects (why not use this?)
+#     ngLink = ""
+#     for each_ng_domain in domain_list["Domains"]:
+#         if each_ng_domain in h.url:
+#             result = True
+#             ngLink = each_ng_domain
+#             break
+#     print(str(result) + " " + ngLink + " " + h.url)
+#     return result
+
+
+
+
+def tweetRank():
+    return round(random.uniform(0, 1), 2)
+
+
+# def tweetRank(tweets):
+#     ng_tweets = []
+#     non_ng_tweets = []
+#     ng_count = 0
+#     non_ng_count = 0
+#     for tweet in tweets:
+#         if tweet["is_newsguard"] == True:
+#             ng_count = ng_count + 1
+#             tweet["tweet_rank"] = round(random.uniform(0, 1), 2)
+#             print("This is a NG tweet and its ranking is " + str(tweet["tweet_rank"]))
+#             ng_tweets.append(tweet)
+#         else:
+#             non_ng_count = non_ng_count + 1
+#             non_ng_tweets.append(tweet)
         
     
     # pt = ng_count / (non_ng_count + ng_count)
