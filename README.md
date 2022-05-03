@@ -64,7 +64,7 @@ The following steps are used to host the front-end:
   sudo rm /etc/nginx/sites-enabled/default
   sudo vi /etc/nginx/sites-available/Rockwell.nginx
   ```
-4. Please refer to this [sample nginx file](/scripts/Deployment/sample.nginx) for the contents of the nginx file
+4. Please refer to this [nginx file](/scripts/Deployment/sample.nginx) for the contents of the nginx file
 
 5.Link the sites-available and sites-enabled config files
   ```
@@ -99,9 +99,9 @@ The following steps are used to host the back-end:
   sudo vi /etc/systemd/system/twauth-web.service
   ```
 
-4. Please refer to the [sample file](scripts/Deployment/sample.service) for this service file's contents
+4. Please refer to the [service file](scripts/Deployment/twauth-web.service) for this service file's contents
 
-5. Repeat steps 3 and 4, but now for twitterFeedGeneration.service, Retweet.service, and database_access.service
+5. Repeat steps 3 and 4, but now for [twitterFeedGeneration.service](scripts/Deployment/twitterFeedGeneration.service), [Retweet.service](scripts/Deployment/twitterFeedGeneration.service), and [database_access.service](scripts/Deployment/database_access.service)
 
 6. Now start the gunicorn servers for these apps:
   ```
