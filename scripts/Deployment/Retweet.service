@@ -1,0 +1,12 @@
+[Unit]
+Description=Retweet.py service file
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Rockwell/backend/src/engagements
+ExecStart=/home/ubuntu/Rockwell/backend/.venv/bin/gunicorn -b 0.0.0.0:5050 -t 600 "Retweet:app"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
