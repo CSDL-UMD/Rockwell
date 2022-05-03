@@ -22,7 +22,7 @@ const writeOut = async (writeObject, twitterId) => {
       fileContents.destroy();
       writeStream.destroy();
 
-      // Attempt to delete file
+      // Delete file
     }).on('close', function (err) {
       fs.unlink(jsonPath, (err) => {
         if (err) return console.log(err);

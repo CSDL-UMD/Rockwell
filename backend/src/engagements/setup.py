@@ -15,8 +15,11 @@ setup(
          "psycopg2-binary",
          "configparser",
          "flask",
+         "flask-cors",
          "requests-oauthlib",
          "numpy",
-         "bs4"
+         "bs4",
+         "gunicorn",
+         "python-dotenv"
     ],
 )

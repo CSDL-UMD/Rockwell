@@ -1,5 +1,5 @@
 const express = require('express');
-const { TwitterApi } = require('twitter-api-v2');
+const { TwitterApi, ApiResponseError } = require('twitter-api-v2');
 const config = require('../../configuration/config');
 const router = express.Router();
 const fs = require('fs');
@@ -11,7 +11,7 @@ var https = require('follow-redirects').https;
 let rawData = fs.readFileSync('./Resources/domains.json');
 const domainList = JSON.parse(rawData).Domains;
 
-/*
+/* This can be used to resolve domain names but currently is not working, returns undefined in loop function calls however on a one by one it works.
 const resolveURL = (hostname) => {
   const options = {
     method: 'HEAD'
@@ -30,7 +30,7 @@ const resolveURL = (hostname) => {
 };
 */
 
-router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -101,13 +101,14 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
             console.log("String parsing error.");
           }
       }
-      /* if (homeTimelineTweetCount == 18) // For dev so limit isn't hit
-        break; */
     }
   } catch (Error) {
-    console.log(Error);
     error = true;
-    errorMessage += "Error occured fetching hometimeline";
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching hometimeline";
+    }
   }
 
   const json_response = {
@@ -138,7 +139,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   response.send();
 });
 
-router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -205,11 +206,17 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
             console.log("String parsing error.");
           }
       }
+      if(userTimelineTweetCount >= 1000) {
+        break;
+      }
     }
   } catch (Error) {
-    console.log(Error);
-    errorMessage += "Error occured fetching usertimeline.";
     error = true;
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching usertimeline";
+    }
   }
 
   const json_response = {
@@ -240,7 +247,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   response.send();
 });
 
-router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -311,9 +318,12 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
       currentPage++;
     }
   } catch (Error) {
-    console.log(Error);
-    errorMessage += "Error occured fetching favorites.";
     error = true;
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching favorites";
+    }
   }
 
   const json_response = {
@@ -341,4 +351,3 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
 });
 
 module.exports = router;
-
