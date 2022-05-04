@@ -58,13 +58,19 @@ The following steps are used to host the front-end:
   sudo npm run build
   ```
   
-3. We will now configure nginx:
+3. Create the pem files to allow for ssl_certificates (for https encryption):
   ```
   cd ~
+  openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+  ```
+4. Answer the questions that are asked after running the above command.
+
+5. We will now configure nginx:
+  ```
   sudo rm /etc/nginx/sites-enabled/default
   sudo vi /etc/nginx/sites-available/Rockwell.nginx
   ```
-4. Please refer to this [nginx file](/scripts/Deployment/sample.nginx) for the contents of the nginx file
+4. Please refer to this [nginx file](/scripts/Deployment/sample.nginx) for the contents of the nginx file. It contains the ability to enable https encryption.
 
 5.Link the sites-available and sites-enabled config files
   ```
@@ -146,5 +152,19 @@ The following information describes the use of tmux in order to run the eligibil
   ```
   sudo npm start
   ```
- You may now exit the terminal. This concludes the tutorial for deployment. 
+  
+ This last part of the tutorial is about enabling https encryption:
 
+1. Previously we have already set up the pem files and the nginx file to allow for https encryption. We will now use certbot to allow for proper encryption:
+  ```
+  sudo snap -install --classic certbot
+  ```
+2. Now create a symbolic link:
+  ```
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+  ```
+3. Now load the configuration to your nginx file:
+  ```
+  sudo certbot --nginx -d (your_domain) -d (your_domain)
+  ```
+4. You may be asked if you would like to redirect http accesses to https. If so, say yes
