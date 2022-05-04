@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, mak
 import requests
 import datetime
 from requests_oauthlib import OAuth1Session
-from database_config import config
+from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import logging
 import json
