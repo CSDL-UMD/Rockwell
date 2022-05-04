@@ -384,14 +384,14 @@ def get_feed():
 			'worker_id':str(worker_id),
 			'refreshh':str(refresh),
 			'rank':str(rankk),
-			'picture':image_raw,
+			'picture':image_raw.replace("http:", "https:"),
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture': actor_picture,
+			'actor_picture': actor_picture.replace("http:", "https:"),
 			'actor_username': actor_username,
 			'time':time,
-			'embedded_image': eimage[0],
+			'embedded_image': eimage[0].replace("http:", "https:"),
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
 			'user_retweet': str(tweet['retweeted']),
@@ -400,7 +400,7 @@ def get_feed():
 			'quoted_by': quoted_by,
 			'quoted_by_text' : quoted_by_text,
 			'quoted_by_actor_username' : quoted_by_actor_username,
-			'quoted_by_actor_picture' : quoted_by_actor_picture
+			'quoted_by_actor_picture' : quoted_by_actor_picture.replace("http:", "https:")
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
