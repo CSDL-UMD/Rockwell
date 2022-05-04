@@ -203,9 +203,10 @@ def get_worker_tweet():
             continue
         tries = -1
     try:
-        sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_ass UA,tweet T
+        conn_cur = connection.cursor()
+        sql = """SELECT UA.tweet_id,T.tweet_json FROM user_tweet_association_and_engagements UA,tweet T 
         WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
-        conn_cur.execute(sql, (worker_id,page))
+        conn_cur.execute(sql, (worker_id,page))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
@@ -216,8 +217,7 @@ def get_worker_tweet():
             accessPool.putconn(connection)
             return jsonify(data="NEW") #Meaning we need to fetch new tweets.
     except Exception as error:
-        print(error, file = sys.stderr)
-        exit()
+        print(error)
     return "Done!"
 
 @app.route('/get_existing_attn_tweets', methods=['GET','POST']) # Should the method be GET?
@@ -266,6 +266,7 @@ def save_tracking():
     connection = None
     worker_id = ''
     
+
 @app.route('/engagements_save', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new():
     tries = 5
@@ -355,7 +356,7 @@ def insert_user():
     """ insert a new vendor into the vendors table """
     retVal123 = -1
     sql = """INSERT INTO rockwell_user(yougov_ref_id,mturk_ref_id,twitter_id,session_start,account_settings)
-    VALUES(1,1,%s,%s,%s) RETURNING user_id;"""
+         VALUES(1,1,%s,%s,%s) RETURNING user_id;"""
     try:
         connection = accessPool.getconn()
         if connection is not False: 
@@ -372,7 +373,6 @@ def insert_user():
             return jsonify(data=retVal123)
     except (Exception, psycopg2.DatabaseError) as error:
         print("ERROR!!!!",error)
-
     return retVal123
 
 

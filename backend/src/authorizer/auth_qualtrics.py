@@ -1,6 +1,5 @@
 import os
 import sys
-sys.path.insert(1, '../databaseAccess')
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
 import requests
 import datetime
@@ -28,6 +27,8 @@ account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
 screenname_store = {}
+access_token_store = {}
+access_token_secret_store = {}
 
 @app.route('/auth/')
 def start():
@@ -63,6 +64,7 @@ def start():
     #res.set_cookie('exp','infodiversity',max_age=1800)
     #return res
     #return render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
+
 
 @app.route('/cookie', methods=['GET']) # This is a function to set a flask cookie
 def index():
@@ -167,10 +169,11 @@ def screenname():
     print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
     screen_name_return = screenname_store[oauth_token_qualtrics]
+    if screen_name_return == "####":
+        return screen_name_return
     access_token_return = access_token_store[oauth_token_qualtrics]
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
     return screen_name_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
-
 
 @app.errorhandler(500)
 def internal_server_error(e):

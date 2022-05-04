@@ -1,12 +1,10 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 import os
-import sys
-sys.path.insert(1, '../feedGeneration')
 import re
 import numpy as np
 import datetime
 import json
-import CardInfo as Cardinfo
+import src.feedGeneration.CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from collections import defaultdict
@@ -84,7 +82,7 @@ def get_feed():
 				'tid':str(tweet["id"]),
 				'rtbefore':str(tweet['retweeted']),
 				'page':page,
-                                'rank':rank_in_page
+				'rank':rank_in_page
 			}
 			db_tweet_session_payload.append(db_tweet_session)
 			tweetids_by_page[page].append(tweet["id"])
@@ -117,7 +115,7 @@ def get_feed():
 		else:	
 			db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets?worker_id='+str(worker_id)+"&page="+str(page)) # This definetely doesnt work right now.
 			db_response = db_response.json()['data']
-			public_tweets = [d[4] for d in db_response]
+			public_tweets = [d[1] for d in db_response]
 	"""
 	This is for refresh
 	if data_db != 'NEW':
@@ -373,7 +371,7 @@ def get_feed():
 		profile_link = ""
 		if tweet["user"]["url"]:
 			profile_link = tweet["user"]["url"]
-
+		
 		feed = {
 			'body':body,
 			'body_json':full_text_json,
@@ -386,14 +384,14 @@ def get_feed():
 			'worker_id':str(worker_id),
 			'refreshh':str(refresh),
 			'rank':str(rankk),
-			'picture':image_raw.replace("http:", "https:"),
+			'picture':image_raw,
 			'picture_heading':picture_heading,
 			'picture_description':picture_description,
 			'actor_name':actor_name,
-			'actor_picture': actor_picture.replace("http:", "https:"),
+			'actor_picture': actor_picture,
 			'actor_username': actor_username,
 			'time':time,
-			'embedded_image': eimage[0].replace("http:", "https:"),
+			'embedded_image': eimage[0],
 			'retweet_count': finalRetweets,
 			'profile_link': profile_link,
 			'user_retweet': str(tweet['retweeted']),
@@ -402,7 +400,7 @@ def get_feed():
 			'quoted_by': quoted_by,
 			'quoted_by_text' : quoted_by_text,
 			'quoted_by_actor_username' : quoted_by_actor_username,
-			'quoted_by_actor_picture' : quoted_by_actor_picture.replace("http:", "https:")
+			'quoted_by_actor_picture' : quoted_by_actor_picture
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
