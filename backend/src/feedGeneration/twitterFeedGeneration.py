@@ -66,6 +66,8 @@ def get_feed():
 			#3. send ng tweets to tweetRank []
 			#4. get a tuple array (?) back of tweets and their rank []
 		ng_tweets, non_ng_tweets = ranking.ngCheck(public_tweets)
+		#store newly arranged tweets here?
+		public_tweets = ranking.pageArrangement(ng_tweets, non_ng_tweets)
 		print("Count of All Tweets: " + str(len(public_tweets)))
 		print("NG Tweet Count: " + str(len(ng_tweets)))
 		print("Non-NG Tweet Count: " + str(len(non_ng_tweets)))

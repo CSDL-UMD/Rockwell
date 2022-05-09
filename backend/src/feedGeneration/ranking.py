@@ -1,8 +1,10 @@
 import json
 import requests
 import random
+import math
 
-from requests import request
+# from requests.adapters import HTTPAdapter #??
+# from requests.packages.urllib3.util.retry import Retry #??
 
 # ng_tweets = []
 # non_ng_tweets = []
@@ -21,7 +23,12 @@ def ngCheck(public_tweets):
             if "urls" in tweet["entities"]:
                 ngLink = ""
                 for url_dict in tweet["entities"]["urls"]:
-                    h = requests.head(url_dict["expanded_url"], allow_redirects=True)
+                    # session = requests.Session() #??
+                    # retry = Retry(connect=3, backoff_factor=0.5) #??
+                    # adapter = HTTPAdapter(max_retries=retry) #??
+                    # session.mount('http://', adapter) #??
+                    # session.mount('https://', adapter) #??
+                    h = requests.head(url_dict["expanded_url"], allow_redirects=True) #?? (Replace requests with session)
                     for each_ng_domain in domain_list["Domains"]:
                         if each_ng_domain in h.url:
                             ngLink = each_ng_domain
@@ -35,26 +42,48 @@ def ngCheck(public_tweets):
     return ng_tweets, non_ng_tweets
 
 
-
-
-
-# def ngCheck(url_dict): 
-#     result = False
-#     h = requests.head(url_dict["expanded_url"], allow_redirects=True) #requests.get returns final link after all redirects (why not use this?)
-#     ngLink = ""
-#     for each_ng_domain in domain_list["Domains"]:
-#         if each_ng_domain in h.url:
-#             result = True
-#             ngLink = each_ng_domain
-#             break
-#     print(str(result) + " " + ngLink + " " + h.url)
-#     return result
-
-
-
-
 def tweetRank():
     return round(random.uniform(0, 1), 2)
+
+
+def pageArrangement(ng_tweets, non_ng_tweets):
+    ranked_ng_tweets = []
+    resultant_feed = [None] * 50
+    pt = len(ng_tweets) / (len(non_ng_tweets) + len(non_ng_tweets))
+
+    #We do not want more than 50% NewsGuard tweets on the feed
+    if pt > 0.5:
+        pt = 0.5
+
+    #Rank the NG tweets
+    for tweet in ng_tweets:
+        rank = tweetRank()
+        ranked_ng_tweets.append((tweet, rank))
+    
+    #Top 50 tweets from NewsGuard
+    ranked_ng_tweets.sort(key=lambda a: a[1], reverse=True)
+    selection_threshold_rnk = 50 * pt
+    top_50 = [None] * math.ceil(selection_threshold_rnk) #ranked_ng_tweets[0:selection_threshold_rnk]
+    for i in range(len(top_50)):
+        top_50[i] = ranked_ng_tweets[i]
+
+    #50 other tweets
+    selection_threshold = 50 * (1 - pt)
+    other_tweets = non_ng_tweets[0:math.floor(selection_threshold)]
+
+    #Assign positions in feed to the NG and non NG tweets
+    for i in range(len(resultant_feed)):
+        chance = random.randint(1, 100)
+        if chance < (pt * 100):
+            if len(top_50) != 0:
+                resultant_feed[i] = top_50[0][0]
+                top_50.pop(0)
+        else:
+            if len(other_tweets) != 0:
+                resultant_feed[i] = other_tweets[0]
+                other_tweets.pop(0)
+
+    return resultant_feed
 
 
 # def tweetRank(tweets):
@@ -141,3 +170,16 @@ def tweetRank():
     # #print("Expanded URL: " + str(url_dict["expanded_url"]))
     # #print(str(result) + " " + ngLink + " " + link)
     # return result
+
+
+# def ngCheck(url_dict): 
+#     result = False
+#     h = requests.head(url_dict["expanded_url"], allow_redirects=True) #requests.get returns final link after all redirects (why not use this?)
+#     ngLink = ""
+#     for each_ng_domain in domain_list["Domains"]:
+#         if each_ng_domain in h.url:
+#             result = True
+#             ngLink = each_ng_domain
+#             break
+#     print(str(result) + " " + ngLink + " " + h.url)
+#     return result
