@@ -5,7 +5,7 @@ setup(
     version='2.0.0',
     author='Robert Andion, Saumya Bhadani, Thomas Bivins, Giovanni Luca Ciampaglia',
     author_email='randion@usf.edu, sbhadani@usf.edu, thomasbivins@usf.edu, glc3@MAIL.USF.EDU',
-    packages=['src'],
+   package_dir={".":"src"},
     scripts=[],
     url='https://github.com/glciampaglia/infodiversity-mock-social-media',
     license='LICENSE.md',
