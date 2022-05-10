@@ -1,16 +1,37 @@
 const express = require('express');
-const { TwitterApi } = require('twitter-api-v2');
+const { TwitterApi, ApiResponseError } = require('twitter-api-v2');
 const config = require('../../configuration/config');
 const router = express.Router();
 const fs = require('fs');
 var path = require('path');
+const writeOut = require('../FileIO/WriteOut');
 var https = require('follow-redirects').https;
 
 // Configure the domains collection for matching relevant URLs
 let rawData = fs.readFileSync('./Resources/domains.json');
 const domainList = JSON.parse(rawData).Domains;
 
-router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+/* This can be used to resolve domain names but currently is not working, returns undefined in loop function calls however on a one by one it works.
+const resolveURL = (hostname) => {
+  const options = {
+    method: 'HEAD'
+  }
+
+  const req = https.request(hostname, options, res => {
+    return (res.responseUrl);
+  })
+
+  req.on('error', error => {
+    console.error(error);
+    return hostname;
+  })
+
+  req.end()
+};
+*/
+
+
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -81,13 +102,14 @@ router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
             console.log("String parsing error.");
           }
       }
-      /* if (homeTimelineTweetCount == 18) // For dev so limit isn't hit
-        break; */
     }
   } catch (Error) {
-    console.log(Error);
     error = true;
-    errorMessage += "Error occured fetching hometimeline";
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching hometimeline";
+    }
   }
 
   const json_response = {
@@ -111,22 +133,14 @@ router.get('/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
   };
 
   if (!error) {
-    //writeOut(writeObject, userId + '-home');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-home.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-home');
   }
-
 
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
-router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -193,11 +207,17 @@ router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
             console.log("String parsing error.");
           }
       }
+      if(userTimelineTweetCount >= 1000) {
+        break;
+      }
     }
   } catch (Error) {
-    console.log(Error);
-    errorMessage += "Error occured fetching usertimeline.";
     error = true;
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching usertimeline";
+    }
   }
 
   const json_response = {
@@ -221,21 +241,14 @@ router.get('/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hi
   };
 
   if (!error) {
-    //  writeOut(writeObject, userId + '-user');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-user.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-user');
   }
 
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
-router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -282,6 +295,7 @@ router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_i
       minId = userLikes[0].id;
       for (let i = 0; i < userLikes.length; ++i) {
         likedTweetsListCount++;
+
         userLikedTweets.push(userLikes[i]);
         if (userLikes[i].id < minId)
           minId = userLikes[i].id;
@@ -305,9 +319,12 @@ router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_i
       currentPage++;
     }
   } catch (Error) {
-    console.log(Error);
-    errorMessage += "Error occured fetching favorites.";
     error = true;
+    if (Error instanceof ApiResponseError) {
+      errorMessage += "Rate limit Exceeded";
+    } else {
+      errorMessage += "Unknown error occured fetching favorites";
+    }
   }
 
   const json_response = {
@@ -328,40 +345,10 @@ router.get('/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_i
   };
 
   if (!error) {
-    //  writeOut(writeObject, userId + '-fave');
-    try {
-      let jsonPath = path.join(__dirname, '..', 'User_Data', userId + '-fave.json');
-      fs.writeFile(jsonPath, JSON.stringify(writeObject, null, 4));
-      console.log("Success!\n");
-    } catch (err) {
-      console.error(err + '\n');
-    }
+    writeOut(writeObject, userId + '-fave');
   }
-
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
-/*
-const resolveURL = (hostname) => {
-  const options = {
-    //hostname: hostname,
-    // port: 443,
-    //path: '/todos',
-    method: 'HEAD'
-  }
-
-  const req = https.request(hostname ,options, res => {
-    console.log(`statusCode: ${res.statusCode}`)
-    console.log(res.headers);
-  })
-
-  req.on('error', error => {
-    console.error(error);
-  })
-
-  req.end()
-};
-resolveURL('https://cnn.it/3rnezkS');
-*/
 module.exports = router;

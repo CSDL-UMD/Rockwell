@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
 import requests
 import datetime
@@ -26,10 +27,13 @@ account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
 screenname_store = {}
+access_token_store = {}
+access_token_secret_store = {}
 
-@app.route('/')
+@app.route('/auth/')
 def start():
     app_callback_url = url_for('callback', _external=True)
+    print(app_callback_url)
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
@@ -46,9 +50,12 @@ def start():
 
     data_tokens = content.text.split("&")
 
+    print(data_tokens)
+
     oauth_token = data_tokens[0].split("=")[1]
     oauth_token_secret = data_tokens[1].split("=")[1] 
     oauth_store[oauth_token] = oauth_token_secret
+    screenname_store[oauth_token] = "####"
     start_url = authorize_url+"?oauth_token="+oauth_token
     return oauth_token
     #res = make_response(render_template('index.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url))
@@ -83,11 +90,16 @@ def callback():
     oauth_verifier = request.args.get('oauth_verifier')
     oauth_denied = request.args.get('denied')
 
+    print(oauth_token)
+    print(oauth_denied)
+
     if oauth_denied:
         if oauth_denied in oauth_store:
             del oauth_store[oauth_denied]
+        #screenname_store[oauth_token] = "#DENIED#"
         #return render_template('error.html', error_message="the OAuth request was denied by this user")
-        return redirect('http://' + str(webInformation['url']) + ':5000')
+        #return redirect('http://' + str(webInformation['url']) + ':5000')
+        return "<script>window.onload = window.close();</script>"
 
     #if not oauth_token or not oauth_verifier:
     #    return render_template('error.html', error_message="callback param(s) missing")
@@ -127,7 +139,10 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
 
+    
     screenname_store[oauth_token] = screen_name
+    access_token_store[oauth_token] = real_oauth_token
+    access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
     return "<script>window.onload = window.close();</script>"
@@ -149,13 +164,16 @@ def callback():
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
     #return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
 
-@app.route('/getscreenname')
+@app.route('/auth/getscreenname')
 def screenname():
-    print("CALLED GET SCREEN NAME!!!!")
+    print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
-    print(oauth_token_qualtrics)
     screen_name_return = screenname_store[oauth_token_qualtrics]
-    return screen_name_return
+    if screen_name_return == "####":
+        return screen_name_return
+    access_token_return = access_token_store[oauth_token_qualtrics]
+    access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
+    return screen_name_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
 
 @app.errorhandler(500)
 def internal_server_error(e):

@@ -14,6 +14,7 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
+  const [tweetViewTimeStamps, setTweetViewTimeStamps] = useState([]);
   const [tweetRetweets, setTweetRetweets] = useState([]);
   const [tweetLikes, setTweetLikes] = useState([]);
   // const [page, setPage] = useState(null);
@@ -185,6 +186,9 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
+ 	fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+        return resp.json();
+      })
     window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
   };
 

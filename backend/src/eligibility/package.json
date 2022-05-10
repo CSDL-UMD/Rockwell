@@ -12,6 +12,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
+    "follow-redirects": "^1.14.9",
     "twitter-api-v2": "^1.11.0"
   },
   "devDependencies": {
