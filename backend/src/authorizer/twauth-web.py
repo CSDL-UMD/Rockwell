@@ -30,7 +30,6 @@ screenname_store = {}
 @app.route('/auth/')
 def start():
     app_callback_url = url_for('callback', _external=True)
-    print(app_callback_url, file = sys.stderr)
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
@@ -163,7 +162,6 @@ def callback():
     #rockwell_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
 
     del oauth_store[oauth_token]
-    print(rockwell_url, file = sys.stderr)
     redirect(rockwell_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
 
 
