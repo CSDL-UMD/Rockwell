@@ -48,6 +48,7 @@ def tweetRank():
 
 def pageArrangement(ng_tweets, non_ng_tweets):
     ranked_ng_tweets = []
+    final_resultant_feed = []
     resultant_feed = [None] * 50
     pt = len(ng_tweets) / (len(non_ng_tweets) + len(non_ng_tweets))
 
@@ -83,7 +84,11 @@ def pageArrangement(ng_tweets, non_ng_tweets):
                 resultant_feed[i] = other_tweets[0]
                 other_tweets.pop(0)
 
-    return resultant_feed
+    for tweet in resultant_feed:
+        if tweet != None:
+            final_resultant_feed.append(tweet)
+
+    return final_resultant_feed
 
 
 # def tweetRank(tweets):
