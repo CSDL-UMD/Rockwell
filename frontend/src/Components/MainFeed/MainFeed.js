@@ -28,7 +28,7 @@ function MainFeed(props) {
     let startTime = Date.now();
     let feedSize = [];
     let currentTweet = [1, 0];
-    let hasReachedEndOfFeed = false; 
+    let hasReachedEndOfFeed = false;
     const tweetViewTimeStamps = [];
     // const tweetClicks = [];
 
@@ -41,6 +41,9 @@ function MainFeed(props) {
         beginTimer();
       }
       // page = argumentObject.page;
+      //let tempObject = Object.assign([], tweetViewTimeStamps);
+      //tempObject.push([1, 0]);
+      //setTweetViewTimeStamps(tempObject);
       tweetViewTimeStamps.push([1, 0]);
     };
 
@@ -98,7 +101,9 @@ function MainFeed(props) {
         setEndOfFeedCondition(true);
         console.log(tweetViewTimeStamps);
       }
-
+      //let tempObject = Object.assign([], tweetViewTimeStamps);
+      //tempObject.push([feedIndex, time - startTime]);
+      //setTweetViewTimeStamps(tempObject);
       tweetViewTimeStamps.push([feedIndex, time - startTime]);
       return [feedIndex, time - startTime];
     };
@@ -106,9 +111,15 @@ function MainFeed(props) {
     document.addEventListener("visibilitychange", event => {
       const time = Date.now()
       if (document.visibilityState === "visible") {
+        //let tempObject = Object.assign([], tweetViewTimeStamps);
+        //tempObject.push([-2, time - startTime]);
+        //setTweetViewTimeStamps(tempObject);
         tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
         console.log('Tab Activity Logged. Time: ' + (time - startTime))
       } else {
+        //let tempObject = Object.assign([], tweetViewTimeStamps);
+        //tempObject.push([-1, time - startTime]);
+        //setTweetViewTimeStamps(tempObject);
         tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
         console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
       }
