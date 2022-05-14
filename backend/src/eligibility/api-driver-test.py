@@ -1,12 +1,17 @@
 import requests as rq
-import json
 import time
+import os
 
 def current_milli_time():
     return round(time.time() * 1000)
 
-KEY = ''
-KEY_SECRET = ''
+try:
+    KEY = os.environ['KEY']
+    KEY_SECRET = os.environ['KEY_SECRET']
+except KeyError as e:
+    print(f"Error: no {e.args[0]} found in the environment. Please export it.")
+    import sys
+    sys.exit(1)
 
 # eligibility/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id
 
