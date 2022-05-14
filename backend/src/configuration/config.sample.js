@@ -3,4 +3,4 @@ const config = {
     key_secret: ''
 }
 
-export default config;
+module.exports = config;
