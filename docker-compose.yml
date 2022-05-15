@@ -16,9 +16,9 @@ services:
                 build: 
                         context: ./backend
                         dockerfile: Dockerfile
-                expose:
-                        - 5000
-                        - 5050
-                        - 5051
-                        - 5052
+                ports:
+                    - 5000:5000
+                    - 5050:5050
+                    - 5051:5051
+                    - 5052:5052
 
