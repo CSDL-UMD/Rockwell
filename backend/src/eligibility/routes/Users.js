@@ -129,6 +129,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
     userObject: v1User,
+    homeTweets: userHomeTimelineTweets,
     ResponseObject: json_response
   };
 
@@ -237,6 +238,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
     userObject: v1User,
+    userTweets: userTimelineTweets,
     ResponseObject: json_response
   };
 
