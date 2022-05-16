@@ -38,7 +38,7 @@ def ngCheck(public_tweets):
             ng_tweets.append(tweet)
         else:
             non_ng_tweets.append(tweet)
-    print("Ranking count: " + str(count))
+    #print("Ranking count: " + str(count))
     return ng_tweets, non_ng_tweets
 
 
@@ -75,10 +75,9 @@ def pageArrangement(ng_tweets, non_ng_tweets):
     #Assign positions in feed to the NG and non NG tweets
     for i in range(len(resultant_feed)):
         chance = random.randint(1, 100)
-        if chance < (pt * 100):
-            if len(top_50) != 0:
-                resultant_feed[i] = top_50[0][0]
-                top_50.pop(0)
+        if chance < (pt * 100) and len(top_50) != 0:
+            resultant_feed[i] = top_50[0][0]
+            top_50.pop(0)
         else:
             if len(other_tweets) != 0:
                 resultant_feed[i] = other_tweets[0]
@@ -88,6 +87,7 @@ def pageArrangement(ng_tweets, non_ng_tweets):
         if tweet != None:
             final_resultant_feed.append(tweet)
 
+    #print("Res Feed Len: " + str(len(final_resultant_feed)))
     return final_resultant_feed
 
 

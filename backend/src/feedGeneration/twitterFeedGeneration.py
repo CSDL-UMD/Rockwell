@@ -67,10 +67,12 @@ def get_feed():
 			#4. get a tuple array (?) back of tweets and their rank []
 		ng_tweets, non_ng_tweets = ranking.ngCheck(public_tweets)
 		#store newly arranged tweets here?
+		print("Length of public_tweets before arrangement: " + str(len(public_tweets)))
 		public_tweets = ranking.pageArrangement(ng_tweets, non_ng_tweets)
-		print("Count of All Tweets: " + str(len(public_tweets)))
-		print("NG Tweet Count: " + str(len(ng_tweets)))
-		print("Non-NG Tweet Count: " + str(len(non_ng_tweets)))
+		#print(public_tweets[0])
+		print("Length of public_tweets after arrangement: " + str(len(public_tweets)))
+		#print("NG Tweet Count: " + str(len(ng_tweets)))
+		#print("Non-NG Tweet Count: " + str(len(non_ng_tweets)))
 		tot_tweets = len(public_tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
@@ -80,6 +82,7 @@ def get_feed():
 		rankk = 0
 		tweetids_by_page = defaultdict(list)
 		all_tweet_ids = [tweet['id'] for tweet in public_tweets] #######
+		#print("\nTweet ID's Length: " + str(len(all_tweet_ids)))
 		# if len(all_tweet_ids) == len(set(all_tweet_ids)):
 		# 	print("No duplicate tweets found")
 		# else:
@@ -121,6 +124,7 @@ def get_feed():
 		for attn_page in range(5):
 			present_tweets = tweetids_by_page[attn_page]
 			absent_tweets = all_tweet_ids[(attn_page+1)*10+1:]
+			print("Absent tweets length: " + str(len(absent_tweets)))
 			present_tweets_select = np.random.choice(present_tweets,size=3,replace=False)
 			absent_tweets_select = np.random.choice(absent_tweets,size=2,replace=False)
 			all_attn_tweets = np.concatenate((present_tweets_select,absent_tweets_select),axis=0)
