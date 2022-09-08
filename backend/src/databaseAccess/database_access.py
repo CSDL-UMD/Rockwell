@@ -283,8 +283,8 @@ def save_all_engagements_new():
         tweetRetweets = request.args.get('tweetRetweets')
         tweetLikes = request.args.get('tweetLikes')
         tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
-        print("Tweet view time stamps : ")
-        print(tweetViewTimeStamps)
+        print("Tweet Retweets : ")
+        print(tweetRetweets)
         for tweet_rank in tweetRetweets:
             retweet_map.append(int(tt))
         for tweet_rank in tweetLikes:

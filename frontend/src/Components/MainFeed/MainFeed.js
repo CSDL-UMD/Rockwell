@@ -29,7 +29,7 @@ function MainFeed(props) {
     let feedSize = [];
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false;
-    const tweetViewTimeStamps = [];
+    //const tweetViewTimeStamps = [];
     // const tweetClicks = [];
 
     const handleFirstRender = (argumentObject) => {
@@ -41,10 +41,10 @@ function MainFeed(props) {
         beginTimer();
       }
       // page = argumentObject.page;
-      //let tempObject = Object.assign([], tweetViewTimeStamps);
-      //tempObject.push([1, 0]);
-      //setTweetViewTimeStamps(tempObject);
-      tweetViewTimeStamps.push([1, 0]);
+      let tempObject = Object.assign([], tweetViewTimeStamps);
+      tempObject.push([1, 0]);
+      setTweetViewTimeStamps(tempObject);
+      //tweetViewTimeStamps.push([1, 0]);
     };
 
     const fetchTweets = (argumentObject) => {
@@ -101,26 +101,27 @@ function MainFeed(props) {
         setEndOfFeedCondition(true);
         console.log(tweetViewTimeStamps);
       }
-      //let tempObject = Object.assign([], tweetViewTimeStamps);
-      //tempObject.push([feedIndex, time - startTime]);
-      //setTweetViewTimeStamps(tempObject);
-      tweetViewTimeStamps.push([feedIndex, time - startTime]);
+      let tempObject = Object.assign([], tweetViewTimeStamps);
+      tempObject.push([feedIndex, time - startTime]);
+      setTweetViewTimeStamps(tempObject);
+      console.log(tweetViewTimeStamps);
+      //tweetViewTimeStamps.push([feedIndex, time - startTime]);
       return [feedIndex, time - startTime];
     };
 
     document.addEventListener("visibilitychange", event => {
       const time = Date.now()
       if (document.visibilityState === "visible") {
-        //let tempObject = Object.assign([], tweetViewTimeStamps);
-        //tempObject.push([-2, time - startTime]);
-        //setTweetViewTimeStamps(tempObject);
-        tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
+        let tempObject = Object.assign([], tweetViewTimeStamps);
+        tempObject.push([-2, time - startTime]);
+        setTweetViewTimeStamps(tempObject);
+        //tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
         console.log('Tab Activity Logged. Time: ' + (time - startTime))
       } else {
-        //let tempObject = Object.assign([], tweetViewTimeStamps);
-        //tempObject.push([-1, time - startTime]);
-        //setTweetViewTimeStamps(tempObject);
-        tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
+        let tempObject = Object.assign([], tweetViewTimeStamps);
+        tempObject.push([-1, time - startTime]);
+        setTweetViewTimeStamps(tempObject);
+        //tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
         console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
       }
     })
@@ -184,6 +185,8 @@ function MainFeed(props) {
     document.getElementById('root').style.filter = 'blur(5px)'
   };
 
+  
+
   const handleRetweet = (feedIndex) => {
     let tempObject = Object.assign([], tweetRetweets);
     tempObject.push(feedIndex);
@@ -197,10 +200,11 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
+    console.log(tweetLikes);
     fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
         return resp.json();
       })
-    window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
+    //window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
   };
 
   return (
