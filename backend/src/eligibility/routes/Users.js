@@ -58,8 +58,9 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     delete v1User.status;
 
   } catch (Error) {
-    console.log("Error authenticating.");
-    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    errorMessage = "Error while authenticating: " + Error.message;
+    console.log(errorMessage);
+    response.write(JSON.stringify({ error: true, errorMessage: errorMessage }));
     response.send();
     return;
   }
@@ -98,18 +99,17 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
               homeTimelineNewsGuardLinkCount++;
               break;
             }
-          } catch {
-            console.log("String parsing error.");
+          } catch(Error) {
+            error = true;
+            errorMessage = "Error while parsing URLs: " + Error.message;
+            console.log(errorMessage);
           }
       }
     }
   } catch (Error) {
     error = true;
-    if (Error instanceof ApiResponseError) {
-      errorMessage += "Rate limit Exceeded";
-    } else {
-      errorMessage += "Unknown error occured fetching hometimeline";
-    }
+    errorMessage = "Error while collecting tweets: " + Error.message;
+    console.log(errorMessage);
   }
 
   const json_response = {
@@ -133,10 +133,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     ResponseObject: json_response
   };
 
-  if (!error) {
-    writeOut(writeObject, userId + '-home');
-  }
-
+  writeOut(writeObject, userId + '-home');
   response.write(JSON.stringify(json_response));
   response.send();
 });
@@ -168,8 +165,9 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     delete v1User.status;
 
   } catch (Error) {
-    console.log("Error authenticating.");
-    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    errorMessage = "Error while authenticating: " + Error.message;
+    console.log(errorMessage);
+    response.write(JSON.stringify({ error: true, errorMessage: errorMessage }));
     response.send();
     return;
   }
@@ -204,8 +202,10 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
               userTimelineNewsGuardLinkCount++;
               break;
             }
-          } catch {
-            console.log("String parsing error.");
+          } catch (Error) {
+            error = true;
+            errorMessage = "Error while parsing URLs: " + Error.message;
+            console.log(errorMessage);
           }
       }
       if(userTimelineTweetCount >= 1000) {
@@ -214,11 +214,8 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     }
   } catch (Error) {
     error = true;
-    if (Error instanceof ApiResponseError) {
-      errorMessage += "Rate limit Exceeded";
-    } else {
-      errorMessage += "Unknown error occured fetching usertimeline";
-    }
+    errorMessage = "Error while collecting tweets: " + Error.message;
+    console.log(errorMessage);
   }
 
   const json_response = {
@@ -242,10 +239,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     ResponseObject: json_response
   };
 
-  if (!error) {
-    writeOut(writeObject, userId + '-user');
-  }
-
+  writeOut(writeObject, userId + '-user');
   response.write(JSON.stringify(json_response));
   response.send();
 });
@@ -277,8 +271,9 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
     delete v1User.status;
 
   } catch (Error) {
-    console.log("Error authenticating.");
-    response.write(JSON.stringify({ error: true, errorMessage: "Unable to authenticate using user keys.\n" })); // Different error types may be good or an error message
+    errorMessage = "Error while authenticating: " + Error.message;
+    console.log(errorMessage);
+    response.write(JSON.stringify({ error: true, errorMessage: errorMessage }));
     response.send();
     return;
   }
@@ -309,8 +304,10 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
                 likedTweetsNewsGuardLinkCount++;
                 break;
               }
-            } catch {
-              console.log("String parsing error.");
+            } catch(Error) {
+              error = true;
+              errorMessage = "Error while parsing URLs: " + Error.message;
+              console.log(errorMessage);
             }
         }
       }
@@ -322,11 +319,8 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
     }
   } catch (Error) {
     error = true;
-    if (Error instanceof ApiResponseError) {
-      errorMessage += "Rate limit Exceeded";
-    } else {
-      errorMessage += "Unknown error occured fetching favorites";
-    }
+    errorMessage = "Error while collecting tweets: " + Error.message;
+    console.log(errorMessage);
   }
 
   const json_response = {
@@ -346,9 +340,7 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
     ResponseObject: json_response
   };
 
-  if (!error) {
-    writeOut(writeObject, userId + '-fave');
-  }
+  writeOut(writeObject, userId + '-fave');
   response.write(JSON.stringify(json_response));
   response.send();
 });
