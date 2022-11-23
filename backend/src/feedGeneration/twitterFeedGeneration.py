@@ -53,6 +53,8 @@ def get_feed():
 						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
+	print("Worker Id in Twitter feed generation : "+str(worker_id))
+	print("Attention : "+str(attn)+" Page : "+str(page))
 	refresh = 0
 	new_session = False
 	if attn == 0 and page == 0:

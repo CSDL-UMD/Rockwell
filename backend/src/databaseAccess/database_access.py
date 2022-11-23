@@ -12,7 +12,7 @@ pool_is_full = False
 MIN = 5
 MAX = 100
 universal_buffer = []
-params = config('../configuration/config.ini','postgresql')
+params = config('../configuration/config.ini','postgresql_local')
 accessPool =  psycopg2.pool.SimpleConnectionPool(MIN, MAX,host=params["host"],database=params["database"],user=params["user"],password=params["password"],port=params["port"])# Maybe make 2 pools and half the functions use each or make this one huge.
 print("Access Pool object")
 print(accessPool)
@@ -183,10 +183,12 @@ async def tweet_session(tweets, conn_cur) -> None:
 
 @app.route('/get_existing_tweets', methods=['GET','POST']) # Should the method be GET?
 def get_worker_tweet():
+    print("In get existing tweets")
     tries = 5
     connection = None
     worker_id = ''
     page = ''
+    worker_id = request.args.get('worker_id').strip()
     try:
         #Getting connection from pool
         worker_id = request.args.get('worker_id').strip()
@@ -222,10 +224,13 @@ def get_worker_tweet():
 
 @app.route('/get_existing_attn_tweets', methods=['GET','POST']) # Should the method be GET?
 def get_worker_attention_tweet():
+    print("In get existing attention tweets")
     tries = 5
     connection = None
     worker_id = ''
     page = ''
+    worker_id = request.args.get('worker_id').strip()
+    print("Worker Id in attention check : "+str(worker_id))
     try:
         #Getting connection from pool
         worker_id = request.args.get('worker_id').strip()
@@ -277,21 +282,22 @@ def save_all_engagements_new():
     like_map = []
     seen_map = []
     click_map_url = []
-    try:
-        worker_id = int(request.args.get('worker_id'))
-        page = int(request.args.get('page'))
-        tweetRetweets = request.args.get('tweetRetweets')
-        tweetLikes = request.args.get('tweetLikes')
-        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
-        print("Tweet Retweets : ")
-        print(tweetRetweets)
-        for tweet_rank in tweetRetweets:
-            retweet_map.append(int(tt))
-        for tweet_rank in tweetLikes:
-            like_map.append(int(tweet_rank))
-    except:
-        print("Failed to recieve the worker id.") # Log this
-        return "Failed"
+    #try:
+    worker_id = int(request.args.get('worker_id'))
+    page = int(request.args.get('page'))
+    tweetRetweets = request.args.get('tweetRetweets')
+    tweetLikes = request.args.get('tweetLikes')
+    tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+    for tweet_rank in tweetRetweets:
+        retweet_map.append(int(tweet_rank))
+    for tweet_rank in tweetLikes:
+        like_map.append(int(tweet_rank))
+    print(tweetRetweets)
+    print(tweetLikes)
+    print(tweetViewTimeStamps)
+    #except:
+    #    print("Failed to recieve the worker id.") # Log this
+    #    return "Failed"
     return "Done!"
 
 @app.route('/engagements_save_prev', methods=['POST']) # Should the method be GET?
