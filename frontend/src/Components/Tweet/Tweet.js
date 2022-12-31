@@ -59,8 +59,8 @@ function Tweet(props) {
     }
   };
 
-  const handleLinkClicked = () => {
-    console.log('Link was clicked.');
+  const handleLinkClicked = (url,tweet_id,is_card) => {
+    props.handleLinkClicked(url,tweet_id,is_card);
   };
 
   return (
@@ -95,7 +95,7 @@ function Tweet(props) {
             {localTweet.picture_heading !== '' ?
               <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
               : null}
-            <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={handleLinkClicked}>
+            <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={() => handleLinkClicked(localTweet.urls,localTweet.tweet_id,'True')}>
               {localTweet.picture !== '' ?
                 <img className="TweetImage" src={localTweet.picture} alt='Article' />
                 : localTweet.urls}

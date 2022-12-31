@@ -89,8 +89,10 @@ def insert_tweet():
             for obj in payload[2]: # Take care of tweet in attention here.
                 tweet_id = obj['tweet_id']
                 page = str(obj['page'])
-                sql = """INSERT INTO user_tweet_attn(tweet_id,user_id,page) VALUES(%s,%s,%s);"""
-                conn_cur.execute(sql,(tweet_id,worker_id,page,))
+                rank = str(obj['rank'])
+                present = obj['present']
+                sql = """INSERT INTO user_tweet_attn(tweet_id,user_id,page,rank,correct_ans) VALUES(%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tweet_id,worker_id,page,rank,present,))
             connection.commit()
 
             conn_cur.close()
@@ -263,14 +265,7 @@ def get_worker_attention_tweet():
     #except Exception as error:
     #    print("Error in get existing tweets!!!")
     #    print(error)
-    return "Done!"
-
-@app.route('/tracking_save', methods=['POST'])
-def save_tracking():
-    tries = 5
-    connection = None
-    worker_id = ''
-    
+    return "Done!"    
 
 @app.route('/engagements_save', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new():
@@ -278,27 +273,102 @@ def save_all_engagements_new():
     connection = None
     worker_id = 0
     page = 0
-    retweet_map = []
-    like_map = []
-    seen_map = []
-    click_map_url = []
-    #try:
-    worker_id = int(request.args.get('worker_id'))
-    page = int(request.args.get('page'))
-    tweetRetweets = request.args.get('tweetRetweets')
-    tweetLikes = request.args.get('tweetLikes')
-    tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
-    for tweet_rank in tweetRetweets:
-        retweet_map.append(int(tweet_rank))
-    for tweet_rank in tweetLikes:
-        like_map.append(int(tweet_rank))
-    print(tweetRetweets)
-    print(tweetLikes)
-    print(tweetViewTimeStamps)
-    #except:
-    #    print("Failed to recieve the worker id.") # Log this
-    #    return "Failed"
+    try:
+        worker_id = int(request.args.get('worker_id'))
+        page = int(request.args.get('page'))
+        tweetRetweets = request.args.get('tweetRetweets')
+        tweetLikes = request.args.get('tweetLikes')
+        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+        tweetLinkClicks = request.args.get('tweetLinkClicks')
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    try:
+        while(tries > 0):
+            connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+            if connection is None:
+                time.sleep(0.2)
+                tries = tries - 1
+                continue
+            tries = -1
+        conn_cur = connection.cursor()
+        sql_retweet = """UPDATE user_tweet_association_and_engagements 
+        SET tweet_retweeted = %s WHERE user_id = %s and page = %s and rank = %s"""
+        sql_like = """UPDATE user_tweet_association_and_engagements 
+        SET tweet_favorited = %s WHERE user_id = %s and page = %s and rank = %s"""
+        sql_telemetry = """UPDATE user_tweet_association_and_engagements 
+        SET seen_timestamp = %s WHERE user_id = %s and page = %s and rank = %s"""
+        sql_inactivity = """INSERT INTO user_inactivity(user_id,tab_inactive_timestamp,tab_active_timestamp,page) values(%s,%s,%s,%s);"""
+        sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,user_id) values(%s,%s,%s,%s,%s);"""
+        if len(tweetRetweets) > 0:
+            for tweet_rank in tweetRetweets.split(','):
+                conn_cur.execute(sql_retweet,(True,worker_id,page,tweet_rank))
+        if len(tweetLikes) > 0:
+            for tweet_rank in tweetLikes.split(','):
+                conn_cur.execute(sql_like,(True,worker_id,page,tweet_rank))
+        if len(tweetViewTimeStamps) > 0:
+            timeStampsMap = tweetViewTimeStamps.split(',')
+            tab_inactive = []
+            tab_active = []
+            for i in range(0,len(timeStampsMap),2):
+                if timeStampsMap[i] == '-1':
+                    tab_inactive.append(int(timeStampsMap[i+1]))
+                if timeStampsMap[i] == '-2':
+                    tab_active.append(int(timeStampsMap[i+1]))
+                conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),worker_id,page,timeStampsMap[i]))
+            print("TAB ACTIVE : ")
+            print(tab_active)
+            if len(tab_inactive) > 0:
+                for i in range(len(tab_inactive)):
+                    conn_cur.execute(sql_inactivity,(worker_id,tab_inactive[i],tab_active[i],page))
+        if len(tweetLinkClicks) > 0:
+            tweetLinkClickMap = tweetLinkClicks.split(',')
+            for i in range(0,len(tweetLinkClickMap),4):
+                conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],worker_id))
+        connection.commit()
+        conn_cur.close()
+        accessPool.putconn(connection) #closing the connection
+    except Exception as error:
+        print(str(error) + " Something inside of the insertion failed.") # Log this.
+        return "Failed"
     return "Done!"
+
+@app.route('/attention_save', methods=['GET','POST']) # Should the method be GET?
+def save_all_attention_new():
+    tries = 5
+    connection = None
+    try:
+        worker_id = int(request.args.get('worker_id'))
+        page = int(request.args.get('page'))
+        attnanswers = request.args.get('attnanswers')
+        print(attnanswers)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    try:
+        while(tries > 0):
+            connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+            if connection is None:
+                time.sleep(0.2)
+                tries = tries - 1
+                continue
+            tries = -1
+        conn_cur = connection.cursor()
+        sql_attn_answers = """UPDATE user_tweet_attn SET given_ans = %s where user_id = %s and page = %s and rank = %s"""
+        answers = attnanswers.split(',')
+        for (rankk,ans) in enumerate(answers):
+            bool_answer = False
+            if ans == '1':
+                bool_answer = True
+            conn_cur.execute(sql_attn_answers,(bool_answer,worker_id,page,int(rankk)))
+        connection.commit()
+        conn_cur.close()
+        accessPool.putconn(connection) #closing the connection
+    except Exception as error:
+        print(str(error) + " Something inside of the insertion failed.") # Log this.
+        return "Failed"
+    return "Done!"
+
 
 @app.route('/engagements_save_prev', methods=['POST']) # Should the method be GET?
 def save_all_engagements():
