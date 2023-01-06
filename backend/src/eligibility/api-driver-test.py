@@ -17,8 +17,8 @@ mturk_assignment_id = 789
 
 # get access token and access token secret from environment
 try:
-    access_token = "1308917971444813826-7oLRnqeV6fVgjh8pPXmPN4oPpMeV1l"
-    access_token_secret = "ju2zrmrkqXnqbJK0drbbrPNA0wOWFspOpXsBOQJywQrk6"
+    access_token = ""
+    access_token_secret = ""
 except KeyError as e:
     print(f"Error: no {e.args[0]} found in the environment. Please export it.")
     import sys
