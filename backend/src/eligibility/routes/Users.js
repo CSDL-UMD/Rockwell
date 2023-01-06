@@ -31,12 +31,15 @@ const resolveURL = (hostname) => {
 */
 
 
-router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id', async (request, response) => {
+  console.log("IN HOMETIMELINE");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
+  const since_id = request.params.since_id;
+  const date_str = new Date().toISOString().replace(/\..+/, '');
   let errorMessage = "";
   let client;
   let user;
@@ -67,6 +70,9 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
 
   // Hometimeline variables
   const userHomeTimelineTweets = [];
+  let homeTimeline = null;
+  let latestTweetId = since_id;
+  let initialTweet = 0;
   let homeTimelineTweetCount = 0;
   let homeTimelineFavoriteCount = 0;
   let homeTimelineRetweetCount = 0;
@@ -75,36 +81,45 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   let homeTimelineNewsGuardLinkCount = 0;
 
   try {
-    const homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200 });
+    if (since_id == "INITIAL")
+      homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200 });
+    else
+      homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200, since_id: since_id });
     for await (const tweet of homeTimeline) {
       if (tweet.user.id == userId) // Ignore if we are author
         continue;
 
       userHomeTimelineTweets.push(tweet);
-      homeTimelineTweetCount++;
-      if (tweet.favorited)
-        homeTimelineFavoriteCount++;
-      if (tweet.retweeted)
-        homeTimelineRetweetCount++;
-
-      for (const url of tweet.entities.urls) {
-        for (let i = 0; i < domainList.length; i++)
-          try {
-            if (url.expanded_url.includes(domainList[i])) {
-              if (tweet.favorited)
-                newsGuardHomeTimelineLikeCount++;
-              if (tweet.retweeted)
-                newsGuardHomeTimelineRetweetCount++;
-
-              homeTimelineNewsGuardLinkCount++;
-              break;
-            }
-          } catch(Error) {
-            error = true;
-            errorMessage = "Error while parsing URLs: " + Error.message;
-            console.log(errorMessage);
-          }
+      if (initialTweet == 0){
+        latestTweetId = tweet.id_str;
+        initialTweet = 1;
       }
+
+      // homeTimelineTweetCount++;
+      // if (tweet.favorited)
+      //   homeTimelineFavoriteCount++;
+      // if (tweet.retweeted)
+      //   homeTimelineRetweetCount++;
+
+      // for (const url of tweet.entities.urls) {
+      //   for (let i = 0; i < domainList.length; i++)
+      //     try {
+      //       if (url.expanded_url.includes(domainList[i])) {
+      //         if (tweet.favorited)
+      //           newsGuardHomeTimelineLikeCount++;
+      //         if (tweet.retweeted)
+      //           newsGuardHomeTimelineRetweetCount++;
+
+      //         homeTimelineNewsGuardLinkCount++;
+      //         break;
+      //       }
+      //     } catch(Error) {
+      //       error = true;
+      //       errorMessage = "Error while parsing URLs: " + Error.message;
+      //       console.log(errorMessage);
+      //     }
+      // }
+
     }
   } catch (Error) {
     error = true;
@@ -115,12 +130,12 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   const json_response = {
     error: error,
     errorMessage: errorMessage,
-    homeTimelineTweetCount: homeTimelineTweetCount,
-    homeTimelineFavoriteCount: homeTimelineFavoriteCount,
-    homeTimelineRetweetCount: homeTimelineRetweetCount,
-    homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
-    newsGuardHomeTimelineRetweetCount: newsGuardHomeTimelineRetweetCount,
-    newsGuardHomeTimelineLikeCount: newsGuardHomeTimelineLikeCount,
+    // homeTimelineTweetCount: homeTimelineTweetCount,
+    // homeTimelineFavoriteCount: homeTimelineFavoriteCount,
+    // homeTimelineRetweetCount: homeTimelineRetweetCount,
+    // homeTimelineNewsGuardLinkCount: homeTimelineNewsGuardLinkCount,
+    // newsGuardHomeTimelineRetweetCount: newsGuardHomeTimelineRetweetCount,
+    // newsGuardHomeTimelineLikeCount: newsGuardHomeTimelineLikeCount,
     userObject: v1User
   }
 
@@ -128,17 +143,21 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    accessToken: token,
+    accessTokenSecret: token_secret,
+    latestTweetId: latestTweetId,
     userObject: v1User,
     homeTweets: userHomeTimelineTweets,
     ResponseObject: json_response
   };
 
-  writeOut(writeObject, userId + '-home');
+  writeOut(writeObject, userId + '_home_' + date_str);
   response.write(JSON.stringify(json_response));
   response.send();
 });
 
 router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+  console.log("IN USERTIMELINE");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -172,6 +191,9 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     return;
   }
   const userTimelineTweets = [];
+  let latestTweetId = "";
+  let initialTweet = 0;
+  let userTimeline = null;
   let userTimelineTweetCount = 0;
   let userTimelineLikeCount = 0;
   let userTimelineRetweetCount = 0;
@@ -180,37 +202,37 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   let newsGuardUserTimelineRetweetCount = 0;
 
   try {
-    const userTimeline = await client.v1.userTimeline(userId, { include_entities: true, count: 200 });
+    userTimeline = await client.v1.userTimeline(userId, { include_entities: true, count: 200 });
     for await (const tweet of userTimeline) {
       userTimelineTweets.push(tweet);
-      userTimelineTweetCount++;
+      // userTimelineTweetCount++;
 
-      if (tweet.favorited)
-        userTimelineLikeCount++;
-      if (tweet.retweeted)
-        userTimelineRetweetCount++;
+      // if (tweet.favorited)
+      //   userTimelineLikeCount++;
+      // if (tweet.retweeted)
+      //   userTimelineRetweetCount++;
 
-      for (const url of tweet.entities.urls) {
-        for (let i = 0; i < domainList.length; i++)
-          try {
-            if (url.expanded_url.includes(domainList[i])) {
-              if (tweet.favorited)
-                newsGuardUserTimelineLikeCount++;
-              if (tweet.retweeted)
-                newsGuardUserTimelineRetweetCount++;
+      // for (const url of tweet.entities.urls) {
+      //   for (let i = 0; i < domainList.length; i++)
+      //     try {
+      //       if (url.expanded_url.includes(domainList[i])) {
+      //         if (tweet.favorited)
+      //           newsGuardUserTimelineLikeCount++;
+      //         if (tweet.retweeted)
+      //           newsGuardUserTimelineRetweetCount++;
 
-              userTimelineNewsGuardLinkCount++;
-              break;
-            }
-          } catch (Error) {
-            error = true;
-            errorMessage = "Error while parsing URLs: " + Error.message;
-            console.log(errorMessage);
-          }
-      }
-      if(userTimelineTweetCount >= 1000) {
-        break;
-      }
+      //         userTimelineNewsGuardLinkCount++;
+      //         break;
+      //       }
+      //     } catch (Error) {
+      //       error = true;
+      //       errorMessage = "Error while parsing URLs: " + Error.message;
+      //       console.log(errorMessage);
+      //     }
+      // }
+      // if(userTimelineTweetCount >= 1000) {
+      //   break;
+      // }
     }
   } catch (Error) {
     error = true;
@@ -221,12 +243,12 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   const json_response = {
     error: error,
     errorMessage: errorMessage,
-    userTimelineTweetCount: userTimelineTweetCount,
-    userTimelineLikeCount: userTimelineLikeCount,
-    userTimelineRetweetCount: userTimelineRetweetCount,
-    userTimelineNewsGuardLinkCount: userTimelineNewsGuardLinkCount,
-    newsGuardUserTimelineLikeCount: newsGuardUserTimelineLikeCount,
-    newsGuardUserTimelineRetweetCount: newsGuardUserTimelineRetweetCount,
+    // userTimelineTweetCount: userTimelineTweetCount,
+    // userTimelineLikeCount: userTimelineLikeCount,
+    // userTimelineRetweetCount: userTimelineRetweetCount,
+    // userTimelineNewsGuardLinkCount: userTimelineNewsGuardLinkCount,
+    // newsGuardUserTimelineLikeCount: newsGuardUserTimelineLikeCount,
+    // newsGuardUserTimelineRetweetCount: newsGuardUserTimelineRetweetCount,
     userObject: v1User
   }
 
@@ -245,6 +267,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
 });
 
 router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+  console.log("IN FAVORITES");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -279,6 +302,9 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
   }
   // favorites/list variables
   const userLikedTweets = [];
+  let userLikes = null;
+  let latestTweetId = "";
+  let initialTweet = 0;
   let likedTweetsListCount = 0;
   let likedTweetsNewsGuardLinkCount = 0;
 
@@ -287,29 +313,29 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
   const likeLimit = 10;
   let currentPage = 0;
   try {
-    let userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
+    userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId, { full_text: true });
     while (currentPage < likeLimit) {
       minId = userLikes[0].id;
       for (let i = 0; i < userLikes.length; ++i) {
-        likedTweetsListCount++;
+        // likedTweetsListCount++;
 
         userLikedTweets.push(userLikes[i]);
         if (userLikes[i].id < minId)
           minId = userLikes[i].id;
         // Look for newsguard links in the liked tweets
-        for (const url of userLikes[i].entities.urls) {
-          for (let i = 0; i < domainList.length; i++)
-            try {
-              if (url.expanded_url.includes(domainList[i])) {
-                likedTweetsNewsGuardLinkCount++;
-                break;
-              }
-            } catch(Error) {
-              error = true;
-              errorMessage = "Error while parsing URLs: " + Error.message;
-              console.log(errorMessage);
-            }
-        }
+        // for (const url of userLikes[i].entities.urls) {
+        //   for (let i = 0; i < domainList.length; i++)
+        //     try {
+        //       if (url.expanded_url.includes(domainList[i])) {
+        //         likedTweetsNewsGuardLinkCount++;
+        //         break;
+        //       }
+        //     } catch(Error) {
+        //       error = true;
+        //       errorMessage = "Error while parsing URLs: " + Error.message;
+        //       console.log(errorMessage);
+        //     }
+        // }
       }
       // Next fetch here, also need to check for no tweets returned and stop.
       userLikes = await client.v1.get('favorites/list.json?count=200&user_id=' + userId + '&max_id=' + minId, { full_text: true });
@@ -326,8 +352,8 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
   const json_response = {
     error: error,
     errorMessage: errorMessage,
-    likedTweetsListCount: likedTweetsListCount,
-    likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount,
+    // likedTweetsListCount: likedTweetsListCount,
+    // likedTweetsNewsGuardLinkCount: likedTweetsNewsGuardLinkCount,
     userObject: v1User
   }
 
