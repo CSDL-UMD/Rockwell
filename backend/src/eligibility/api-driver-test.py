@@ -17,8 +17,8 @@ mturk_assignment_id = 789
 
 # get access token and access token secret from environment
 try:
-    access_token = ""
-    access_token_secret = ""
+    access_token = os.environ['KEY']
+    access_token_secret = os.environ['KEY_SECRET']
 except KeyError as e:
     print(f"Error: no {e.args[0]} found in the environment. Please export it.")
     import sys
@@ -31,7 +31,7 @@ except KeyError as e:
 total_time = 0
 for endpoint in endpoints:
     url_path = f"/api/{endpoint}/{access_token}&{access_token_secret}" \
-        "&{mturk_id}&{mturk_hit_id}&{mturk_assignment_id}&INITIAL"
+        "&{mturk_id}&{mturk_hit_id}&{mturk_assignment_id}"
     print(f"Querying {endpoint}...")
     start = current_milli_time()
     res = rq.get(f"http://{host}:{port}{url_path}")
@@ -42,9 +42,10 @@ for endpoint in endpoints:
             print(out)
             print("Elapsed time: " + str(end - start))
         else:
-            print("API Rate-Limit reached")
+            #print("API0I Rate-Limit reached")
+            print(res)
+            print(out)
     else:
-        print(res)
         print(f"Error: response failed with status: {res.status_code}")
     print()
     total_time += (end - start)

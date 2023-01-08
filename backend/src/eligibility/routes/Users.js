@@ -31,8 +31,7 @@ const resolveURL = (hostname) => {
 */
 
 
-router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id', async (request, response) => {
-  console.log("IN HOMETIMELINE");
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id', async (request, response) => {  
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
@@ -143,6 +142,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    source: "pilot2",
     accessToken: token,
     accessTokenSecret: token_secret,
     latestTweetId: latestTweetId,
@@ -256,6 +256,7 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    source: "pilot2",
     userObject: v1User,
     userTweets: userTimelineTweets,
     ResponseObject: json_response
@@ -361,6 +362,7 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    source: "pilot2",
     userObject: v1User,
     likedTweets: userLikedTweets,
     ResponseObject: json_response
