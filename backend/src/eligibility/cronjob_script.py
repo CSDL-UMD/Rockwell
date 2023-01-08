@@ -6,16 +6,22 @@ import glob
 import gzip
 import json
 import logging
-from datetime import datetime
+from itertools import groupby
 from argparse import ArgumentParser
 
 HOST_DEFAULT="127.0.0.1"
 PORT_DEFAULT=5000
-
+LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
 logging.basicConfig(filename="cronjob.log",
-                    format='%(asctime)s %(message)s',
-                    filemode='a')
+                    format=LOG_FMT_DEFAULT,
+                    filemode='a',
+                    level="INFO")
 logger = logging.getLogger()
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+formatter = logging.Formatter(LOG_FMT_DEFAULT)
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 def make_parser():
     parser = ArgumentParser(description=__doc__)
@@ -29,31 +35,23 @@ def make_parser():
 
 
 def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
+    data_dir = os.path.abspath(data_dir)
+    logging.info(f"Cron job started: {data_dir=}, {host=}, {port=}")
     os.chdir(data_dir)
-    home_timeline_files = glob.glob("*_home_*.json.gz")
-
-    users = {f.split('_')[0] for f in home_timeline_files}
-
-    for user in users:
-        times = []
-        user_files = []
-        for fn in home_timeline_files:
-            if fn.split('_')[0] == user and fn.split('_')[1] == 'home':
-                time_str = fn.split('_')[2].split('.')[0]
-                times.append(datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S'))
-                user_files.append(fn)
-        if len(times) > 0:
-            latest_time = max(times)
-            latest_user_file = user_files[times.index(latest_time)]
-        else:
-            logger.error(f"Problem in getting the latest file: User {user}")
-            continue
-        with gzip.open(data_dir + latest_user_file, 'r') as fin:
+    home_timeline_files = sorted(glob.glob("*_home_*.json.gz"))
+    files_by_user = groupby(home_timeline_files, key=lambda k: k.split("_")[0])
+    for user, user_files in files_by_user:
+        logging.info(f"Collecting data for {user=}")
+        latest_user_file = max(user_files, key=lambda fn: fn.split("_")[2])
+        path = os.path.join([data_dir, latest_user_file])
+        with gzip.open(path, 'r') as fin:
             try:
                 data = json.loads(fin.read().decode('utf-8'))
-            except Exception as e:
-                logger.error(f"Problem reading data for user {user}: skipping.", 
-                             exc_info=e)
+            except UnicodeError as e:
+                logger.error(f"Error decoding UTF-8 data: {path}", exc_info=e)
+                continue
+            except IOError as e:
+                logger.error(f"I/O error reading data: {path} ", exc_info=e)
                 continue
         try:
             access_token = data['accessToken']
@@ -62,43 +60,42 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
             mturk_hit_id = data['MTurkHitId']
             mturk_assignment_id = data['MTurkAssignmentId']
             since_id = data['latestTweetId']
-            data_error = data['ResponseObject']['error']
-            data_error_msg = data['ResponseObject']['errorMessage']
+            data_error = data.get('ResponseObject', {})['error']
+            data_error_msg = data.get('ResponseObject', {})['errorMessage']
         except KeyError as e:
-            logger.error(f"Problem in getting fields from the latest file: User"\
-                           f"{user}", exc_info=e)
+            logger.error(f"Problem getting fields for {user=}", exc_info=e)
             continue
-        if data_error:
-            if "Error while authenticating" in data_error_msg:
-                logger.error(f"Ignoring user who revoked access: User {user} "\
-                                f"MturkId {mturk_id} "\
-                                f"MturkHitId {mturk_hit_id} "\
-                                f"MturkAssignmentId {mturk_assignment_id}")
-                continue
+        if data_error and "Error while authenticating" in data_error_msg:
+            # Skip users who revoked access
+            logger.warning(f"Ignoring user who revoked access: user {user} "\
+                            f"MturkId {mturk_id} "\
+                            f"MturkHitId {mturk_hit_id} "\
+                            f"MturkAssignmentId {mturk_assignment_id}")
+            continue
         try:
-            url_path = f"/api/hometimeline/{access_token}&{access_token_secret}"\
-                f"&{mturk_id}&{mturk_hit_id}&{mturk_assignment_id}&{since_id}"
+            url_path = f"/api/hometimeline/{access_token}"\
+                f"&{access_token_secret}"\
+                f"&{mturk_id}"\
+                f"&{mturk_hit_id}"\
+                f"&{mturk_assignment_id}"\
+                f"&{since_id}"
             res = rq.get(f"http://{host}:{port}{url_path}")
             if res.ok:
                 out = res.json()
                 if out['error']:
-                    if "Error while authenticating" in out['errorMessage']:
-                        logger.error(f"Revoked access: User {user} "\
-                                     f"MturkId {mturk_id} "\
-                                     f"MturkHitId {mturk_hit_id} "
-                                     f"MturkAssignmentId {mturk_assignment_id}")
-                    else:
-                        logger.error(f"Other error in getting latest data: "\
-                                     f"User {user} "\
-                                     f"MturkId {mturk_id} "\
-                                     f"MturkHitId {mturk_hit_id} "\
-                                     f"MturkAssignmentId {mturk_assignment_id}")
+                    errorMessage = out['errorMessage']
+                    logger.error(f"Error from Twitter API: user {user} "\
+                                   f"MturkId {mturk_id} "\
+                                   f"MturkHitId {mturk_hit_id} "\
+                                   f"MturkAssignmentId {mturk_assignment_id}:"\
+                                   f"{errorMessage}")
             else:
                 logger.error(f"Eligibility response failed with "\
-                             f"status {res.status_code}: User {user}")
+                               f"status {res.status_code}: user {user}")
         except Exception as e:
             logger.error(f"Problem in requesting eligibility API: "\
-                         f" User {user}", exc_info=e)
+                         f" user {user}", exc_info=e)
+    logger.info("Cron job ended.")
 
 
 if __name__ == '__main__':
