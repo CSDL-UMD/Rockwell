@@ -35,22 +35,26 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
     users = {f.split('_')[0] for f in home_timeline_files}
 
     for user in users:
-        try:
-            times = []
-            user_files = []
-            for fn in home_timeline_files:
-                if fn.split('_')[0] == user and fn.split('_')[1] == 'home':
-                    time_str = fn.split('_')[2].split('.')[0]
-                    times.append(datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S'))
-                    user_files.append(fn)
+        times = []
+        user_files = []
+        for fn in home_timeline_files:
+            if fn.split('_')[0] == user and fn.split('_')[1] == 'home':
+                time_str = fn.split('_')[2].split('.')[0]
+                times.append(datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S'))
+                user_files.append(fn)
+        if len(times) > 0:
             latest_time = max(times)
             latest_user_file = user_files[times.index(latest_time)]
-        except Exception as e:
-            logger.error(f"Problem in getting the latest file: User {user}: "\
-                         f"Exception {str(e)}")
+        else:
+            logger.error(f"Problem in getting the latest file: User {user}")
             continue
         with gzip.open(data_dir + latest_user_file, 'r') as fin:
-            data = json.loads(fin.read().decode('utf-8'))
+            try:
+                data = json.loads(fin.read().decode('utf-8'))
+            except Exception as e:
+                logger.error(f"Problem reading data for user {user}: skipping.", 
+                             exc_info=e)
+                continue
         try:
             access_token = data['accessToken']
             access_token_secret = data['accessTokenSecret']
@@ -60,17 +64,17 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
             since_id = data['latestTweetId']
             data_error = data['ResponseObject']['error']
             data_error_msg = data['ResponseObject']['errorMessage']
-            if data_error:
-                if "Error while authenticating" in data_error_msg:
-                    logger.error(f"Ignoring user who revoked access: User {user} "\
-                                 f"MturkId {mturk_id} "\
-                                 f"MturkHitId {mturk_hit_id} "\
-                                 f"MturkAssignmentId {mturk_assignment_id}")
-                    continue
-        except Exception as e:
-            logger.warning(f"Problem in getting fields from the latest file: User"\
-                           f"{user}: Exception {str(e)}")
+        except KeyError as e:
+            logger.error(f"Problem in getting fields from the latest file: User"\
+                           f"{user}", exc_info=e)
             continue
+        if data_error:
+            if "Error while authenticating" in data_error_msg:
+                logger.error(f"Ignoring user who revoked access: User {user} "\
+                                f"MturkId {mturk_id} "\
+                                f"MturkHitId {mturk_hit_id} "\
+                                f"MturkAssignmentId {mturk_assignment_id}")
+                continue
         try:
             url_path = f"/api/hometimeline/{access_token}&{access_token_secret}"\
                 f"&{mturk_id}&{mturk_hit_id}&{mturk_assignment_id}&{since_id}"
@@ -94,7 +98,7 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
                              f"status {res.status_code}: User {user}")
         except Exception as e:
             logger.error(f"Problem in requesting eligibility API: "\
-                         f" User {user}: Exception {str(e)}")
+                         f" User {user}", exc_info=e)
 
 
 if __name__ == '__main__':
