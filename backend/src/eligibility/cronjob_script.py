@@ -12,16 +12,28 @@ from argparse import ArgumentParser
 HOST_DEFAULT="127.0.0.1"
 PORT_DEFAULT=5000
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
-logging.basicConfig(filename="cronjob.log",
-                    format=LOG_FMT_DEFAULT,
-                    filemode='a',
-                    level="INFO")
-logger = logging.getLogger()
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-formatter = logging.Formatter(LOG_FMT_DEFAULT)
-ch.setFormatter(formatter)
-logger.addHandler(ch)
+LOG_PATH_DEFAULT="./cronjob.log"
+
+
+def make_logger(path=LOG_PATH_DEFAULT):
+    """ 
+    By default, log to file messages at level INFO or above. By default, the
+    log file will be located in same location from where the script is being
+    called. It also adds a stream handler for logging to the console messages
+    at level ERROR and above; these will be logged to stderr.
+    """
+    logging.basicConfig(filename=path,
+                        format=LOG_FMT_DEFAULT,
+                        filemode='a',
+                        level="INFO")
+    logger = logging.getLogger()
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    formatter = logging.Formatter(LOG_FMT_DEFAULT)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    return logger
+
 
 def make_parser():
     parser = ArgumentParser(description=__doc__)
@@ -30,11 +42,16 @@ def make_parser():
                         help=f"eligibility API host (default: {HOST_DEFAULT})")
     parser.add_argument("-p", "--port", 
                         help=f"eligibiility API port (default: {PORT_DEFAULT})")
-    parser.set_defaults(host=HOST_DEFAULT, port=PORT_DEFAULT)
+    parser.add_argument("-l", "--error-log", metavar="PATH",
+                        help=f"log all errors to PATH (default: {LOG_PATH_DEFAULT})")
+    parser.set_defaults(host=HOST_DEFAULT, 
+                        port=PORT_DEFAULT, 
+                        log=LOG_PATH_DEFAULT)
     return parser
 
 
-def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
+def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAULT):
+    logger = make_logger(log_path)
     data_dir = os.path.abspath(data_dir)
     logging.info(f"Cron job started: {data_dir=}, {host=}, {port=}")
     os.chdir(data_dir)
@@ -43,7 +60,7 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
     for user, user_files in files_by_user:
         logging.info(f"Collecting data for {user=}")
         latest_user_file = max(user_files, key=lambda fn: fn.split("_")[2])
-        path = os.path.join([data_dir, latest_user_file])
+        path = os.path.join(data_dir, latest_user_file)
         with gzip.open(path, 'r') as fin:
             try:
                 data = json.loads(fin.read().decode('utf-8'))
@@ -101,4 +118,4 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT):
 if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
-    main(args.data_dir, args.host, args.port)
+    main(args.data_dir, args.host, args.port, args.log)
