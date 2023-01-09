@@ -42,7 +42,7 @@ def make_parser():
                         help=f"eligibility API host (default: {HOST_DEFAULT})")
     parser.add_argument("-p", "--port", 
                         help=f"eligibiility API port (default: {PORT_DEFAULT})")
-    parser.add_argument("-l", "--error-log", metavar="PATH",
+    parser.add_argument("-l", "--log", metavar="PATH",
                         help=f"log all errors to PATH (default: {LOG_PATH_DEFAULT})")
     parser.set_defaults(host=HOST_DEFAULT, 
                         port=PORT_DEFAULT, 
