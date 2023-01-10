@@ -64,6 +64,9 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAU
         with gzip.open(path, 'r') as fin:
             try:
                 data = json.loads(fin.read().decode('utf-8'))
+            except json.JSONDecodeError as e:
+                logger.error(f"Error decoding JSON data: {path}", exc_info=e)
+                continue
             except UnicodeError as e:
                 logger.error(f"Error decoding UTF-8 data: {path}", exc_info=e)
                 continue
