@@ -10,7 +10,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover'
 
 function MainAttentionPage(props) {
-  let attn_marked = [0, 0, 0, 0, 0];
+  const [attnMap, setAttnMap] = useState([0,0,0,0,0]);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
@@ -33,6 +33,7 @@ function MainAttentionPage(props) {
       }).catch(err => {
         window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_attn_check;
       })
+
     }
 
     const getUrlArgs = () => {
@@ -70,19 +71,21 @@ function MainAttentionPage(props) {
   }, [props]);
 
   const handleattncheck = (rank, answer) => {
+    let attn_marked = Object.assign([], attnMap);
     if (answer === 'Y')
       attn_marked[rank - 1] = 1;
     else
       attn_marked[rank - 1] = 2;
     let all_marked = 1;
     for (let i = 0; i < attn_marked.length; i++) {
-      if (attn_marked[i] === 0) {
+      if (attn_marked[i] == 0) {
         all_marked = 0;
         break;
       }
     }
-    if (all_marked === 1)
+    if (all_marked == 1)
       setEndOfFeedCondition(true);
+    setAttnMap(attn_marked);
   };
 
   const popup = () =>(
@@ -95,6 +98,10 @@ function MainAttentionPage(props) {
 
   const nextButtonClickedAttn = () => {
     //alert("Next Button Clicked");
+    console.log(attnMap);
+    fetch(configuration.database_attn_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&attnanswers=' + attnMap).then(resp => {
+        return resp.json();
+      })
     window.location.href = givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)
   };
 

@@ -14,10 +14,11 @@ function MainFeed(props) {
   const [feedInformation, setFeedInformation] = useState({});
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
+  const [starTimeInformation, setStarTimeInformation] = useState(0);
   const [tweetViewTimeStamps, setTweetViewTimeStamps] = useState([]);
   const [tweetRetweets, setTweetRetweets] = useState([]);
   const [tweetLikes, setTweetLikes] = useState([]);
-  // const [page, setPage] = useState(null);
+  const [tweetLinkClicks, setTweetLinkClicks] = useState([]);
 
   async function beginTimer() {
     await new Promise(r => setTimeout(r, 30000));
@@ -29,22 +30,18 @@ function MainFeed(props) {
     let feedSize = [];
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false;
-    const tweetViewTimeStamps = [];
-    // const tweetClicks = [];
+    let tweetViewTimeStamps_local = []
 
     const handleFirstRender = (argumentObject) => {
       let result = handleTotalResize();
       feedSize = (calculateFeedSize(result, window.innerHeight));
+      tweetViewTimeStamps_local.push([1,0]);
       window.scrollTo(0, 0);
       startTime = Date.now();
+      setStarTimeInformation(startTime);
       if (parseInt(argumentObject.page) !== 0) {
         beginTimer();
       }
-      // page = argumentObject.page;
-      //let tempObject = Object.assign([], tweetViewTimeStamps);
-      //tempObject.push([1, 0]);
-      //setTweetViewTimeStamps(tempObject);
-      tweetViewTimeStamps.push([1, 0]);
     };
 
     const fetchTweets = (argumentObject) => {
@@ -76,8 +73,47 @@ function MainFeed(props) {
       return returnObject;
     }
 
+    document.addEventListener("visibilitychange", event => {
+      const time = Date.now()
+      if (document.visibilityState === "visible") {
+        //handleTweetViewTracking(-2,feedSize,currentTweet,startTime);
+        tweetViewTimeStamps_local.push([-2, time - startTime]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        //let tempObject = Object.assign([], tweetViewTimeStamps);
+        //tempObject.push([-2, time - startTime]);
+        //setTweetViewTimeStamps(tempObject);
+      } else {
+        //handleTweetViewTracking(-1,feedSize,currentTweet,startTime);
+        tweetViewTimeStamps_local.push([-1, time - startTime]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        //let tempObject = Object.assign([], tweetViewTimeStamps);
+        //tempObject.push([-1, time - startTime]);
+        //setTweetViewTimeStamps(tempObject);
+      }
+    })
+
+    const debounce = (fn, ms) => {
+      let timer
+      return _ => {
+        clearTimeout(timer)
+        timer = setTimeout(_ => {
+          timer = null
+          fn.apply(this, arguments);
+        }, ms)
+      };
+    };
+
     const handleTweetViewTracking = (clientHeight) => {
       const time = Date.now();
+
+      if (clientHeight < 0) {
+        tweetViewTimeStamps_local.push([clientHeight, time - startTime]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        //let tempObject = Object.assign([], tweetViewTimeStamps);
+        //tempObject.push([clientHeight, time - startTime]);
+        //setTweetViewTimeStamps(tempObject);
+        return null;
+      }
 
       if (!feedSize.length) {
         return null;
@@ -96,44 +132,14 @@ function MainFeed(props) {
         return null;
       }
 
-      if (feedIndex === 10 && !hasReachedEndOfFeed) {
-        hasReachedEndOfFeed = true;
-        setEndOfFeedCondition(true);
-        console.log(tweetViewTimeStamps);
-      }
       //let tempObject = Object.assign([], tweetViewTimeStamps);
       //tempObject.push([feedIndex, time - startTime]);
       //setTweetViewTimeStamps(tempObject);
-      tweetViewTimeStamps.push([feedIndex, time - startTime]);
+      //console.log(tweetViewTimeStamps);
+      tweetViewTimeStamps_local.push([feedIndex, time - startTime]);
+      setTweetViewTimeStamps(tweetViewTimeStamps_local);
+      console.log(tweetViewTimeStamps);
       return [feedIndex, time - startTime];
-    };
-
-    document.addEventListener("visibilitychange", event => {
-      const time = Date.now()
-      if (document.visibilityState === "visible") {
-        //let tempObject = Object.assign([], tweetViewTimeStamps);
-        //tempObject.push([-2, time - startTime]);
-        //setTweetViewTimeStamps(tempObject);
-        tweetViewTimeStamps.push([-2, time - startTime]); //Logging Tab Activity
-        console.log('Tab Activity Logged. Time: ' + (time - startTime))
-      } else {
-        //let tempObject = Object.assign([], tweetViewTimeStamps);
-        //tempObject.push([-1, time - startTime]);
-        //setTweetViewTimeStamps(tempObject);
-        tweetViewTimeStamps.push([-1, time - startTime]); //Logging Tab Inactivity
-        console.log('Tab Inactivity Logged. Time: ' + (time - startTime))
-      }
-    })
-
-    const debounce = (fn, ms) => {
-      let timer
-      return _ => {
-        clearTimeout(timer)
-        timer = setTimeout(_ => {
-          timer = null
-          fn.apply(this, arguments);
-        }, ms)
-      };
     };
 
     const debouncedHandleResize = debounce(function handleResize() {
@@ -146,7 +152,13 @@ function MainFeed(props) {
       if (res !== null) {
         currentTweet = res;
         console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
+      if (res[0] === 10 && !hasReachedEndOfFeed) {
+        hasReachedEndOfFeed = true;
+        setEndOfFeedCondition(true);
+        console.log(tweetViewTimeStamps_local);
       }
+      }
+      
     }, 1);
 
     const urlArgs = getUrlArgs();
@@ -159,6 +171,8 @@ function MainFeed(props) {
       window.removeEventListener('resize', debouncedHandleResize);
       window.removeEventListener('scroll', debouncedHandleScroll);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.location.search]);
 
   const calculateFeedSize = (tweetSizeArray, clientHeight) => {
@@ -194,10 +208,23 @@ function MainFeed(props) {
     let tempObject = Object.assign([], tweetLikes);
     tempObject.push(feedIndex);
     setTweetLikes(tempObject);
+  };
+
+  const handleLinkClicked = (url,tweet_id,is_card) => {
+    let startTimeLinkClicked = starTimeInformation;
+    const timeLinkClicked = Date.now();
+    let tempObject = Object.assign([], tweetLinkClicks);
+    tempObject.push([url, tweet_id, is_card, timeLinkClicked - startTimeLinkClicked]);
+    setTweetLinkClicks(tempObject);
   };  
 
   const nextButtonClicked = () => {
+<<<<<<< HEAD
+    console.log(tweetViewTimeStamps);
+    fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+=======
  	fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+>>>>>>> main
         return resp.json();
       })
     window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
@@ -220,7 +247,7 @@ function MainFeed(props) {
             </div>
             {
               feedInformation.map(tweet => (
-                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike}/>
+                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike} handleLinkClicked={handleLinkClicked}/>
               ))
             }
             <div className="TopInstructions">

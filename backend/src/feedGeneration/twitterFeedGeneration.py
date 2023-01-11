@@ -53,6 +53,8 @@ def get_feed():
 						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
 	worker_id = request.args.get('worker_id')
+	print("Worker Id in Twitter feed generation : "+str(worker_id))
+	print("Attention : "+str(attn)+" Page : "+str(page))
 	refresh = 0
 	new_session = False
 	if attn == 0 and page == 0:
@@ -94,10 +96,15 @@ def get_feed():
 			absent_tweets_select = np.random.choice(absent_tweets,size=2,replace=False)
 			all_attn_tweets = np.concatenate((present_tweets_select,absent_tweets_select),axis=0)
 			np.random.shuffle(all_attn_tweets)
-			for tt in all_attn_tweets:
+			for (attn_rank,tt) in enumerate(all_attn_tweets):
+				present = False
+				if tt in present_tweets_select:
+					present = True
 				db_tweet_attn = {
 					'tweet_id':str(tt),
-					'page':str(attn_page)
+					'page':str(attn_page),
+					'rank':str(attn_rank),
+					'present':present
 				}
 				db_tweet_attn_payload.append(db_tweet_attn)
 		finalJson = []
