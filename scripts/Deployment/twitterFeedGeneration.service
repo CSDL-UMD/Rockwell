@@ -1,0 +1,12 @@
+[Unit]
+Description=twitterFeedGeneration.py service file
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/Rockwell/backend/src/feedGeneration
+ExecStart=/home/ubuntu/Rockwell/backend/.venv/bin/gunicorn -b 0.0.0.0:5051 -t 600 "twitterFeedGeneration:app"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,10 @@
 import os
+import sys
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
+import requests
 import datetime
 from requests_oauthlib import OAuth1Session
+from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -12,23 +15,6 @@ app.debug = True
 
 #log_level = logging.DEBUG
 #logging.basicConfig(filename='authorizer.log', level=log_level)
-
-def config(filename='database.ini', section='postgresql'):
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
-
-    # get section, default to postgresql
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -44,7 +30,7 @@ screenname_store = {}
 access_token_store = {}
 access_token_secret_store = {}
 
-@app.route('/')
+@app.route('/auth/')
 def start():
     app_callback_url = url_for('callback', _external=True)
     print(app_callback_url)
@@ -178,7 +164,7 @@ def callback():
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
     #return render_template('YouGov.html', start_url="###", screenname=screen_name, rockwell_url=rockwell_url_agg)
 
-@app.route('/getscreenname')
+@app.route('/auth/getscreenname')
 def screenname():
     print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')

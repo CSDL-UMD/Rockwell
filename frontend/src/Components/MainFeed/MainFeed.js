@@ -219,8 +219,12 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
+<<<<<<< HEAD
     console.log(tweetViewTimeStamps);
     fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+=======
+ 	fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+>>>>>>> main
         return resp.json();
       })
     window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
