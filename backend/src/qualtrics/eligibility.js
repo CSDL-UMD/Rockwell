@@ -37,15 +37,18 @@ Qualtrics.SurveyEngine.addOnReady(function()
 							setTimeout(function () {jQuery('#NextButton').click();},1000);
 						}
 					}
-					xmlHttp3.open("GET", 'https://rockwell.glciampaglia.com/api/favorites/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}', true); // true for asynchronous
+					xmlHttp3.open("GET", 'https://rockwell.glciampaglia.com/api/favorites/${e://Field/access_token}&${e://Field/access_token_secret}&123&456&789', true); // true for asynchronous
+					//xmlHttp3.open("GET", 'https://rockwell.glciampaglia.com/api/favorites/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}', true); // true for asynchronous
 					xmlHttp3.send(null);
 				}
 			}
-			xmlHttp2.open("GET", 'https://rockwell.glciampaglia.com/api/usertimeline/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}', true); // true for asynchronous
+			xmlHttp2.open("GET", 'https://rockwell.glciampaglia.com/api/usertimeline/${e://Field/access_token}&${e://Field/access_token_secret}&123&456&789', true); // true for asynchronous
+			//xmlHttp2.open("GET", 'https://rockwell.glciampaglia.com/api/usertimeline/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}', true); // true for asynchronous
 			xmlHttp2.send(null);
 		}
 	}
-	xmlHttp1.open("GET", 'https://rockwell.glciampaglia.com/api/hometimeline/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}', true); // true for asynchronous
+	xmlHttp1.open("GET", 'https://rockwell.glciampaglia.com/api/hometimeline/${e://Field/access_token}&${e://Field/access_token_secret}&123&456&789&INITIAL', true); // true for asynchronous
+	//xmlHttp1.open("GET", 'https://rockwell.glciampaglia.com/api/hometimeline/${e://Field/access_token}&${e://Field/access_token_secret}&${e://Field/participantId}&${e://Field/assignmentId}&${e://Field/projectId}&INITIAL', true); // true for asynchronous
     xmlHttp1.send(null);
 });
 Qualtrics.SurveyEngine.addOnUnload(function()
