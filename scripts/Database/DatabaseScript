@@ -1,21 +1,28 @@
-CREATE TABLE rockwell_user (
-   user_id BIGSERIAL PRIMARY KEY,
-   twitter_id bigint NOT NULL,
-   session_start TIME NOT NULL,
-   account_settings JSON
+CREATE TABLE mturk_user (
+   id BIGSERIAL PRIMARY KEY,
+   worker_id bigint NOT NULL,
+   assignment_id bigint NOT NULL
 );
 
-CREATE TABLE mturk_user (
-   worker_id bigint NOT NULL,
-   assignment_id bigint NOT NULL,
-   user_id bigint NOT NULL,
-   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+CREATE TABLE yougov_user (
+   id BIGSERIAL PRIMARY KEY,
+   yougov_id bigint NOT NULL
+);
+
+CREATE TABLE rockwell_user (
+   user_id BIGSERIAL PRIMARY KEY,
+   yougov_ref_id bigint NOT NULL,
+   mturk_ref_id bigint NOT NULL,
+   twitter_id bigint NOT NULL,
+   session_start TIME NOT NULL,
+   account_settings JSON,
+   FOREIGN KEY (yougov_ref_id) REFERENCES yougov_user (id),
+   FOREIGN KEY (mturk_ref_id) REFERENCES mturk_user (id)
 );
 
 CREATE TABLE tweet (
    tweet_id bigint PRIMARY KEY,
-   tweet_json JSON NOT NULL,
-   tweet_deleted boolean NOT NULL
+   tweet_json JSON NOT NULL
 );
 
 CREATE TABLE click (
@@ -23,34 +30,42 @@ CREATE TABLE click (
    tweet_id bigint,
    url VARCHAR(1000) NOT NULL,
    is_card boolean NOT NULL,
-   click_timestamp TIME NOT NULL,
+   click_timestamp bigint NOT NULL,
    user_id bigint NOT NULL,
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id)
 );
 
-CREATE TABLE user_tweet_ass (
+CREATE TABLE user_inactivity (
+   user_id bigint NOT NULL,
+   tab_inactive_timestamp bigint NOT NULL,
+   tab_active_timestamp bigint NOT NULL,
+   page smallint NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+);
+
+CREATE TABLE user_tweet_association_and_engagements (
    tweet_id bigint,
    user_id bigint NOT NULL,
    is_favorited_before boolean NOT NULL,
    has_retweet_before boolean NOT NULL,
-   tweet_seen TIME,
    tweet_retweeted boolean,
    tweet_favorited boolean,
-   tweet_min boolean,
-   tweet_max boolean,
-   refreshh smallint NOT NULL,
+   seen_timestamp bigint,
    rank smallint NOT NULL,
    page smallint NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
-   PRIMARY KEY (user_id,tweet_id,refreshh)
+   PRIMARY KEY (user_id,tweet_id)
 );
 
 CREATE TABLE user_tweet_attn (
    tweet_id bigint,
    user_id bigint NOT NULL,
+   rank smallint NOT NULL,
    page smallint NOT NULL,
+   correct_ans boolean,
+   given_ans boolean,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
 );
