@@ -230,9 +230,11 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
       //       console.log(errorMessage);
       //     }
       // }
-      // if(userTimelineTweetCount >= 1000) {
-      //   break;
-      // }
+      
+      // Do not collect more that 1000 tweets, otherwise endpoint becomes unresponsive 
+      if(userTimelineTweets.length >= 1000) {
+        break;
+      }
     }
   } catch (Error) {
     error = true;
