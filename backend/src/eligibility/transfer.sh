@@ -11,7 +11,7 @@ then
 fi
 DIR=${1}
 DEST=${2}
-MINUTES=$((60*24*3))
+MINUTES=$((60*24*1))
 logger "Starting transfer to ${DEST} from ${DIR}."
 pushd "${DIR}" 1>/dev/null
 mapfile -t FILES < <(find . -type f -cmin +${MINUTES} -and -iname \*.json.gz)
