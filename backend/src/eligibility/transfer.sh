@@ -12,10 +12,12 @@ fi
 DIR=${1}
 DEST=${2}
 MINUTES=$((60*24*3))
-pushd ${DIR} 1>/dev/null
-FILES=($(find . -type f -cmin +${MINUTES} -and -iname \*.json.gz))
-for file in ${FILES[@]};
+logger "Starting transfer to ${DEST} from ${DIR}."
+pushd "${DIR}" 1>/dev/null
+mapfile -t FILES < <(find . -type f -cmin +${MINUTES} -and -iname \*.json.gz)
+for file in "${FILES[@]}";
 do
-    aws s3 mv ${file} ${DEST}
+    aws s3 mv "${file}" "${DEST}"
 done
 popd 1>/dev/null
+logger "Transferred ${#FILES[@]} files."
