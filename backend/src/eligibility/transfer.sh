@@ -12,12 +12,13 @@ fi
 DIR=${1}
 DEST=${2}
 MINUTES=$((60*24*1))
-logger "Starting transfer to ${DEST} from ${DIR}."
+TAG=$0
+logger --id=$$ -t "${TAG}" "Starting transfer to ${DEST} from ${DIR}."
 pushd "${DIR}" 1>/dev/null
-mapfile -t FILES < <(find . -type f -cmin +${MINUTES} -and -iname \*.json.gz)
+mapfile -t FILES < <(find . -maxdepth 1 -type f -cmin +${MINUTES} -and -iname \*.json.gz)
 for file in "${FILES[@]}";
 do
     aws s3 mv "${file}" "${DEST}"
 done
 popd 1>/dev/null
-logger "Transferred ${#FILES[@]} files."
+logger --id=$$ -t "${TAG}" "Transferred ${#FILES[@]} files."
