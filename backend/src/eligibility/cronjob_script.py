@@ -7,10 +7,11 @@ import gzip
 import json
 import logging
 from itertools import groupby
+from datetime import datetime
 from argparse import ArgumentParser
 
 HOST_DEFAULT="127.0.0.1"
-PORT_DEFAULT=5000
+PORT_DEFAULT=6000
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
 LOG_PATH_DEFAULT="./cronjob.log"
 
@@ -38,6 +39,7 @@ def make_logger(path=LOG_PATH_DEFAULT):
 def make_parser():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("data_dir", help="directory with data files")
+    parser.add_argument("collection_days", help="Number of days for collection")
     parser.add_argument("-H", "--host", 
                         help=f"eligibility API host (default: {HOST_DEFAULT})")
     parser.add_argument("-p", "--port", 
@@ -50,7 +52,8 @@ def make_parser():
     return parser
 
 
-def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAULT):
+def main(data_dir, collection_days, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAULT):
+    time_now = datetime.now()
     logger = make_logger(log_path)
     data_dir = os.path.abspath(data_dir)
     logging.info(f"Cron job started: {data_dir=}, {host=}, {port=}")
@@ -80,8 +83,14 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAU
             mturk_hit_id = data['MTurkHitId']
             mturk_assignment_id = data['MTurkAssignmentId']
             since_id = data['latestTweetId']
+            initial_time = data['collectionStarted']
             data_error = data.get('ResponseObject', {})['error']
             data_error_msg = data.get('ResponseObject', {})['errorMessage']
+            time_diff_days = 0
+            if initial_time != "INITIAL":
+                inital_time_datetime = datetime.strptime(initial_time, '%Y-%m-%dT%H:%M:%S')
+                time_diff = (time_now - inital_time_datetime).total_seconds()
+                time_diff_days = time_diff/86400
         except KeyError as e:
             logger.error(f"Problem getting fields for {user=}", exc_info=e)
             continue
@@ -92,13 +101,21 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAU
                             f"MturkHitId {mturk_hit_id} "\
                             f"MturkAssignmentId {mturk_assignment_id}")
             continue
+        if time_diff_days > collection_days:
+            # Skip users whose data was collected for the predefined collection days
+            logger.warning(f"Ignoring user whose data collection is completed: user {user} "\
+                            f"MturkId {mturk_id} "\
+                            f"MturkHitId {mturk_hit_id} "\
+                            f"MturkAssignmentId {mturk_assignment_id}")
+            continue
         try:
             url_path = f"/api/hometimeline/{access_token}"\
                 f"&{access_token_secret}"\
                 f"&{mturk_id}"\
                 f"&{mturk_hit_id}"\
                 f"&{mturk_assignment_id}"\
-                f"&{since_id}"
+                f"&{since_id}"\
+                f"&{initial_time}"
             res = rq.get(f"http://{host}:{port}{url_path}")
             if res.ok:
                 out = res.json()
@@ -121,4 +138,4 @@ def main(data_dir, host=HOST_DEFAULT, port=PORT_DEFAULT, log_path=LOG_PATH_DEFAU
 if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
-    main(args.data_dir, args.host, args.port, args.log)
+    main(args.data_dir, args.collection_days, args.data_dir, args.host, args.port, args.log)

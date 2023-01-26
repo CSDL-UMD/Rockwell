@@ -31,13 +31,15 @@ const resolveURL = (hostname) => {
 */
 
 
-router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id', async (request, response) => {  
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id&:collection_started', async (request, response) => {  
+  console.log("IN HOMETIMELINE");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
   const since_id = request.params.since_id;
+  const collection_started = request.params.collection_started;
   const date_str = new Date().toISOString().replace(/\..+/, '');
   let errorMessage = "";
   let client;
@@ -71,6 +73,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   const userHomeTimelineTweets = [];
   let homeTimeline = null;
   let latestTweetId = since_id;
+  let collectionStartedStr = collection_started;
   let initialTweet = 0;
   let homeTimelineTweetCount = 0;
   let homeTimelineFavoriteCount = 0;
@@ -80,8 +83,13 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   let homeTimelineNewsGuardLinkCount = 0;
 
   try {
-    if (since_id == "INITIAL")
+    if (since_id == "INITIAL"){
       homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200 });
+      collectionStartedStr = date_str
+      collectionStartedStr = "2023-01-26T14:27:53"
+      print("HERE!!")
+      print(collectionStartedStr)
+    }
     else
       homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200, since_id: since_id });
     for await (const tweet of homeTimeline) {
@@ -142,6 +150,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    collectionStarted: collectionStartedStr,
     source: "pilot2",
     accessToken: token,
     accessTokenSecret: token_secret,
