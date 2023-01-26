@@ -86,9 +86,6 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     if (since_id == "INITIAL"){
       homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200 });
       collectionStartedStr = date_str
-      collectionStartedStr = "2023-01-26T14:27:53"
-      print("HERE!!")
-      print(collectionStartedStr)
     }
     else
       homeTimeline = await client.v1.homeTimeline({ exclude_replies: true, count: 200, since_id: since_id });
