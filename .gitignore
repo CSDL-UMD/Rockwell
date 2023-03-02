@@ -40,3 +40,8 @@ backend/src/eligibility/Resources/domains.json
 
 # data from eligibility API
 backend/src/eligibility/User_Data/*.json.gz
+
+# data, model and newsguard domains from recsys
+backend/src/recsys/data/*
+backend/src/recsys/model/*
+backend/src/recsys/NewsGuardIffy/*

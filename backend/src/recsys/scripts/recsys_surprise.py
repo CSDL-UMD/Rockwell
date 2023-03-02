@@ -67,5 +67,5 @@ algo = surprise.SVD()
 trainset = data.build_full_trainset()
 algo.fit(trainset)
 
-model_filename = '../data/hoaxy_recsys_model.sav'
+model_filename = '../model/hoaxy_recsys_model.sav'
 joblib.dump(algo,model_filename)
