@@ -38,7 +38,7 @@ def precision_at_k(pd_prediction):
     users = pd_prediction['Users'].unique().tolist()
     precision_array = []
     precision_array_err = []
-    for k in range(1,6):
+    for k in range(1,11):
         print(k)
         precision_at_k = []
         for i in range(len(users)):
@@ -61,6 +61,38 @@ def precision_at_k(pd_prediction):
         else:
             precision_array.append(sum(precision_at_k)/len(precision_at_k))
             precision_array_err.append(stats.sem(precision_at_k))
+
+def rmse_at_k(pd_prediction):
+    users = pd_prediction['Users'].unique().tolist()
+    rmse_array = []
+    rmse_array_err = []
+    for k in range(1,11):
+        print(k)
+        rmse_at_k = []
+        for i in range(len(users)):
+            domains = pd_prediction.loc[pd_prediction['Users'] == users[i]]['Domains'].values.tolist()
+            if len(domains) < k:
+                continue
+            actual_ratings = pd_prediction.loc[pd_prediction['Users'] == users[i]]['Ratings'].values.tolist()
+            predicted_ratings = pd_prediction.loc[pd_prediction['Users'] == users[i]]['Predicted'].values.tolist()
+            actual_ratings_map = {}
+            predicted_ratings_map = {}
+            for j in range(len(domains)):
+                actual_ratings_map[domains[j]] = actual_ratings[j]
+                predicted_ratings_map[domains[j]] = predicted_ratings[j]
+            predicted_domains_ranked = [x for _, x in sorted(zip(predicted_ratings, domains), key=lambda pair: pair[0])]
+            predicted_domains_ranked = predicted_domains_ranked[0:k]
+            tot_rmse = 0.0
+            for j in range(k):
+                tot_rmse = tot_rmse + math.pow((actual_ratings_map[predicted_domains_ranked[j]] - predicted_ratings_map[predicted_domains_ranked[j]]),2)
+            tot_rmse = float(tot_rmse)/float(k)
+            tot_rmse = math.sqrt(tot_rmse)
+            rmse_at_k.append(tot_rmse)
+        if not rmse_at_k:
+            break
+        else:
+            rmse_array.append(sum(rmse_at_k)/len(rmse_at_k))
+            rmse_array_err.append(stats.sem(rmse_at_k))
 
 recsys_engagement = pd.read_csv('/home/saumya/Documents/USF/Project/ASD/recommendation_surprise/user_domain_reaction.csv',sep='\t')
 domain_rating_json_column = recsys_engagement.groupby('Users').Domains.agg(rating_calculate)

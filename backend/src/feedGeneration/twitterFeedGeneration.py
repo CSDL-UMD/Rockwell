@@ -60,8 +60,14 @@ def get_feed():
 	if attn == 0 and page == 0:
 		new_session = True
 		params = {"count": "80","tweet_mode": "extended"}
+		params_user = {"count": "200","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
+		response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
+		timeline_json = [response.text,response_user.text]
+		xx = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
 		public_tweets = json.loads(response.text)
+		public_tweets_user = json.loads(response_user.text)
+		print(len(public_tweets_user))
 		tot_tweets = len(public_tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
