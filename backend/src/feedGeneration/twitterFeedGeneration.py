@@ -63,11 +63,12 @@ def get_feed():
 		params_user = {"count": "200","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
 		response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
-		timeline_json = [response.text,response_user.text]
-		xx = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
 		public_tweets = json.loads(response.text)
 		public_tweets_user = json.loads(response_user.text)
-		print(len(public_tweets_user))
+		timeline_json = [public_tweets,public_tweets_user]
+		recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
+		public_tweets = recsys_response.json()['data']
+		print(len(public_tweets))
 		tot_tweets = len(public_tweets)
 		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
@@ -95,7 +96,7 @@ def get_feed():
 			db_tweet_session_payload.append(db_tweet_session)
 			tweetids_by_page[page].append(tweet["id"])
 			rankk = rankk + 1
-		for attn_page in range(5):
+		for attn_page in range(3):
 			present_tweets = tweetids_by_page[attn_page]
 			absent_tweets = all_tweet_ids[(attn_page+1)*10+1:]
 			present_tweets_select = np.random.choice(present_tweets,size=3,replace=False)

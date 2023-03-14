@@ -5,6 +5,7 @@ import gzip
 import json
 import requests
 import joblib
+import random
 import numpy as np
 import pandas as pd
 from itertools import groupby
@@ -97,8 +98,6 @@ def init(queue):
 
 def unshortenone(urlidx):
     global idx
-    if urlidx[0] % 100 == 0:
-        print(urlidx[0])
     u = urlidx[1]
     uk = u.encode('utf-8')
     if uk in _CACHE:
@@ -191,14 +190,55 @@ def unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains):
             urls_tagged.append("NA")
     return urls_tagged
 
+def pageArrangement(ng_tweets, ng_tweets_ratings, non_ng_tweets):
+    ranked_ng_tweets = []
+    final_resultant_feed = []
+    resultant_feed = [None] * 50
+    pt = len(ng_tweets) / (len(non_ng_tweets) + len(non_ng_tweets))
+
+    #We do not want more than 50% NewsGuard tweets on the feed
+    if pt > 0.5:
+        pt = 0.5
+
+    #Rank the NG tweets
+    for i in range(len(ng_tweets)):
+        ranked_ng_tweets.append((ng_tweets[i], ng_tweets_ratings[i]))
+    
+    #Top 50 tweets from NewsGuard
+    ranked_ng_tweets.sort(key=lambda a: a[1], reverse=True)
+    selection_threshold_rnk = 50 * pt
+    top_50 = [None] * math.ceil(selection_threshold_rnk) #ranked_ng_tweets[0:selection_threshold_rnk]
+    for i in range(len(top_50)):
+        top_50[i] = ranked_ng_tweets[i]
+
+    #50 other tweets
+    selection_threshold = 50 * (1 - pt)
+    other_tweets = non_ng_tweets[0:math.floor(selection_threshold)]
+
+    #Assign positions in feed to the NG and non NG tweets
+    for i in range(len(resultant_feed)):
+        chance = random.randint(1, 100)
+        if chance < (pt * 100) and len(top_50) != 0:
+            resultant_feed[i] = top_50[0][0]
+            top_50.pop(0)
+        else:
+            if len(other_tweets) != 0:
+                resultant_feed[i] = other_tweets[0]
+                other_tweets.pop(0)
+
+    for tweet in resultant_feed:
+        if tweet != None:
+            final_resultant_feed.append(tweet)
+
+    #print("Res Feed Len: " + str(len(final_resultant_feed)))
+    return final_resultant_feed
+
 @app.route('/recsys_rerank', methods=['GET'])
 def recsys_rerank():
 	print("HERE!!!!")
 	payload = request.json
-	hometimeline_str = payload[0]
-	usertimeline_str = payload[1]
-	hometimeline = json.loads(hometimeline_str)
-	usertimeline = json.loads(usertimeline_str)
+	hometimeline = payload[0]
+	usertimeline = payload[1]
 
 	hometimeline_urls = []
 	hometimeline_tweets = {}
@@ -298,11 +338,23 @@ def recsys_rerank():
 	for index,row in pd_hometimeline_urls.iterrows():
 	    if row['tagged_urls'] != 'NA':
 	        inner_iid = trainset.to_inner_iid(row['tagged_urls'])
-	        predicted_rating.append(predicted_vector[inner_iid])
-	    else:
-	        predicted_rating.append(-1000)
+	        predicted_rating[row['tweet_id']] = predicted_vector[inner_iid]
 
-	return "Done!"
+	predicted_rating_tweets = predicted_rating.keys()
+	NG_tweets = []
+	NG_tweets_ratings = []
+	non_NG_tweets = []
+
+	for tweet_id in hometimeline_tweets.keys():
+		if tweet_id in predicted_rating_tweets:
+			NG_tweets.append(hometimeline_tweets[tweet_id])
+			NG_tweets_ratings.append(predicted_rating[tweet_id])
+		else:
+			non_NG_tweets.append(hometimeline_tweets[tweet_id])
+
+	final_resultant_feed = pageArrangement(NG_tweets,NG_tweets_ratings,non_NG_tweets)
+
+	return jsonify(data=final_resultant_feed)
 
 @app.after_request
 def add_headers(response):
