@@ -1,0 +1,12 @@
+[Unit]
+Description=Retweet.py service file
+After=network.target
+
+[Service]
+User=
+WorkingDirectory=
+ExecStart=
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -22,28 +22,55 @@ server{
                 proxy_pass http://127.0.0.1:5051;
         }
 
+        location /feed{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:3000;
+        }
+
+        location /attention{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:3000/attention;
+        }
+
+        location /error{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:3000/error;
+        }
+
         location /retweet{
                 include proxy_params;
                 proxy_pass http://127.0.0.1:5050;
         }
+
         location /auth{
                 include proxy_params;
                 proxy_pass http://127.0.0.1:5000;
         }
+
         location /callback{
                 include proxy_params;
                 proxy_pass http://127.0.0.1:5000;
-	}
-	location /like{
-		include proxy_params;
-		proxy_pass http://127.0.0.1:5050;
-	}
+        }
+
+        location /like{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:5050;
+        }
+
+        location /engagements_save{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:5052;
+        }
+
+        location /attention_save{
+                include proxy_params;
+                proxy_pass http://127.0.0.1:5052;
+        }
+
 	location /api{
 		include proxy_params;
 		proxy_pass http://127.0.0.1:6000;
-
 	}
-
 }
 
 server{

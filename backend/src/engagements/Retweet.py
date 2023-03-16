@@ -1,7 +1,7 @@
 """ Read the credentials from credentials.txt and place them into the `cred` dictionary """
 #import tweepy
 from requests_oauthlib import OAuth1Session
-from src.databaseAccess.database_config import config
+#from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import requests
 import json
@@ -10,6 +10,23 @@ from flask import Flask, render_template, request, url_for, jsonify
 app = Flask(__name__)
 
 app.debug = False
+
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 @app.route('/retweet', methods=['POST'])
 def retweet():

@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, url_for, redirect, flash, mak
 import requests
 import datetime
 from requests_oauthlib import OAuth1Session
-from src.databaseAccess.database_config import config
+#from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 import logging
 import json
@@ -12,8 +12,25 @@ app = Flask(__name__)
 
 app.debug = True
 
-log_level = logging.DEBUG
-logging.basicConfig(filename='authorizer.log', level=log_level)
+#log_level = logging.DEBUG
+#logging.basicConfig(filename='authorizer.log', level=log_level)
+
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -30,6 +47,7 @@ screenname_store = {}
 @app.route('/auth/')
 def start():
     app_callback_url = url_for('callback', _external=True)
+    app_callback_url = "https://colon.umd.edu/callback"
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
@@ -149,9 +167,9 @@ def callback():
     oauth_account_settings = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'],resource_owner_key=real_oauth_token,resource_owner_secret=real_oauth_token_secret)
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
-    
+
     insert_user_payload = {'twitter_id': str(user_id), 'account_settings': account_settings_user}
-    resp_worker_id = requests.get('http://' + webInformation['url'] + ':5052/insert_user',params=insert_user_payload)
+    resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user',params=insert_user_payload)
     worker_id = resp_worker_id.json()["data"]
 
     attn = 0

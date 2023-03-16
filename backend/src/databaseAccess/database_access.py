@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, jsonify
 import json
-from src.databaseAccess.database_config import config
+from database_config import config
 import psycopg2
 from psycopg2 import pool
 import datetime

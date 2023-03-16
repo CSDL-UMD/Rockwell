@@ -4,7 +4,7 @@ import re
 import numpy as np
 import datetime
 import json
-import src.feedGeneration.CardInfo as Cardinfo
+import CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
 from collections import defaultdict
