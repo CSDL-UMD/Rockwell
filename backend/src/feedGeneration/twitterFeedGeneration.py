@@ -39,11 +39,14 @@ def config(filename,section):
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
-
+	print("Reached Here???")
 	access_token = request.args.get('access_token')
 	access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))
 	page = int(request.args.get('page'))
+	feedtype = str(request.args.get('feedtype')).strip()
+	screen_name = request.args.get('screen_name')
+	user_id = request.args.get('user_id')
 	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
@@ -60,18 +63,31 @@ def get_feed():
 	if attn == 0 and page == 0:
 		new_session = True
 		params = {"count": "80","tweet_mode": "extended"}
-		params_user = {"count": "200","tweet_mode": "extended"}
 		response = oauth.get("https://api.twitter.com/1.1/statuses/home_timeline.json", params = params)
-		response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
-		public_tweets = json.loads(response.text)
-		public_tweets_user = json.loads(response_user.text)
-		timeline_json = [public_tweets,public_tweets_user]
-		recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
-		public_tweets = recsys_response.json()['data']
-		print(len(public_tweets))
-		tot_tweets = len(public_tweets)
-		if public_tweets == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
+		if response.text == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
 			print("Rate limit exceeded.")
+		public_tweets = json.loads(response.text)
+		if feedtype == "M":
+			print("In M")
+			timeline_json = [public_tweets,screen_name]
+			recsys_response = requests.get('http://127.0.0.1:5054/recsys_rerank',json=timeline_json)
+			public_tweets = recsys_response.json()['data']
+		elif feedtype == "S":
+			print("in S")
+			params_user = {"count": "200","tweet_mode": "extended"}
+			#params_fav = {"count": "200", "user_id":user_id, "tweet_mode": "extended"}
+			response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
+			#response_fav = oauth.get("https://api.twitter.com/1.1/statuses/favorites/list.json", params = params_user)
+			#response_fav = oauth.get("https://api.twitter.com/2/users/"+str(user_id)+"/liked_tweets")
+			#print("FAVORITES!!!!")
+			#print(response_fav.text)
+			public_tweets_user = json.loads(response_user.text)
+			#public_tweets_fav = json.loads(response_fav.text)
+			#timeline_json = [public_tweets,public_tweets_user,public_tweets_fav]
+			timeline_json = [public_tweets,public_tweets_user]
+			recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
+			public_tweets = recsys_response.json()['data']
+		tot_tweets = len(public_tweets)
 		db_tweet_payload = []
 		db_tweet_session_payload = []
 		db_tweet_attn_payload = []

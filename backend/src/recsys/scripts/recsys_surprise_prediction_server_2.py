@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 20 10:51:27 2023
+
+@author: saumya
+"""
+
 import re
 import math
 import glob
@@ -238,8 +246,7 @@ def recsys_rerank():
 	print("HERE!!!!")
 	payload = request.json
 	hometimeline = payload[0]
-	usertimeline = payload[1]
-	#favtimeline = payload[2]
+	screen_name = payload[1]
 
 	hometimeline_urls = []
 	hometimeline_tweets = {}
@@ -265,105 +272,19 @@ def recsys_rerank():
 				hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
 
 	pd_hometimeline_urls = pd.DataFrame(hometimeline_urls)
-
-	engaged_urls = []
-
-	for tweet in usertimeline:
-		tweet_id = tweet["id_str"]
-		if 'retweeted_status' in tweet:
-			urls_extracted = extractfromentities(tweet['retweeted_status'])
-			for url in urls_extracted:
-				engaged_urls.append(url)
-			if 'quoted_status' in tweet['retweeted_status']:
-				urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
-				for url in urls_extracted:
-					engaged_urls.append(url)
-		else:
-			if 'quoted_status' in tweet:
-				urls_extracted = extractfromentities(tweet['quoted_status'])
-				for url in urls_extracted:
-					engaged_urls.append(url)
-			urls_extracted = extractfromentities(tweet)
-			for url in urls_extracted:
-				engaged_urls.append(url)
-
-	"""
-	for tweet in favtimeline:
-		tweet_id = tweet["id_str"]
-		if 'retweeted_status' in tweet:
-			urls_extracted = extractfromentities(tweet['retweeted_status'])
-			for url in urls_extracted:
-				engaged_urls.append(url)
-			if 'quoted_status' in tweet['retweeted_status']:
-				urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
-				for url in urls_extracted:
-					engaged_urls.append(url)
-		else:
-			if 'quoted_status' in tweet:
-				urls_extracted = extractfromentities(tweet['quoted_status'])
-				for url in urls_extracted:
-					engaged_urls.append(url)
-			urls_extracted = extractfromentities(tweet)
-			for url in urls_extracted:
-				engaged_urls.append(url)
-	"""
-
-	hometimeline_urls_length = len(pd_hometimeline_urls)
-
-	all_urls = pd_hometimeline_urls['url'].values.tolist() + engaged_urls
-
-	all_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
-
-	hometimeline_urls_tagged = all_urls_tagged[0:hometimeline_urls_length]
-	engaged_urls_tagged = all_urls_tagged[hometimeline_urls_length:]
-
+	all_urls = pd_hometimeline_urls['url'].values.tolist()
+	hometimeline_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
 	pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline_urls_tagged,columns=['tagged_urls'])],axis=1)
 
-	domains = []
-	ratings = []
-	engaged_urls_tagged = [url for url in engaged_urls_tagged if url != 'NA']
-	total = len(engaged_urls_tagged)
-	if total == 0:
-		for dd in training_ng_domains:
-			domains.append(dd)
-			ratings.append(0.000005)
-	if total == 1:
-	    domains.append(engaged_urls_tagged[0])
-	    ratings.append(1.0)
-	else:
-	    total_log = math.log10(total)
-	    domain_counter = Counter(engaged_urls_tagged)
-	    for dd in domain_counter.keys():
-	        fracc = 0.1
-	        if domain_counter[dd] > 1:
-	            fracc = math.log10(domain_counter[dd])
-	            rating_log = float(fracc)/float(total_log)
-	            domains.append(dd)
-	            ratings.append(rating_log)
-	        else:
-	            domains.append(dd)
-	            ratings.append(0.005)
-
-	item_latent = algo.qi
-	item_latent_transpose = np.matrix.transpose(item_latent)
-	vector_len = item_latent.shape[0]
-
-	user_vector = np.zeros(vector_len)
-	for idx in range(len(domains)):
-	    domain = domains[idx]
-	    rating = ratings[idx]
-	    try:
-	        inner_iid = trainset.to_inner_iid(domain)
-	        user_vector[inner_iid] = rating
-	    except ValueError:
-	        continue
-	predicted_vector = np.matmul(np.matmul(user_vector,item_latent),item_latent_transpose)
+	inner_uid = trainset.to_inner_uid(screen_name)
 
 	predicted_rating = {}
 	for index,row in pd_hometimeline_urls.iterrows():
-	    if row['tagged_urls'] != 'NA':
-	        inner_iid = trainset.to_inner_iid(row['tagged_urls'])
-	        predicted_rating[row['tweet_id']] = predicted_vector[inner_iid]
+		if row['tagged_urls'] != 'NA':
+			try:
+				predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+			except ValueError:
+				continue
 
 	predicted_rating_tweets = predicted_rating.keys()
 	NG_tweets = []
@@ -391,12 +312,12 @@ if __name__ == "__main__":
 	print("Reading NewsGuard, Iffy and training domains")
 	ng_fn = "../NewsGuardIffy/label-2022101916.json"
 	iffyfile = "../NewsGuardIffy/iffy.csv"
-	training_ng_domains_file = '../data/hoaxy_dataset_training_domains.csv'
+	training_ng_domains_file = '../data/hoaxy_dataset_training_domains_2.csv'
 	ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
 	training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
 
 	print("Preparing Training set")
-	hoaxy_training_file = '../data/hoaxy_dataset_training.csv'
+	hoaxy_training_file = '../data/hoaxy_dataset_training_2.csv'
 	pd_hoaxy_training_dataset = pd.read_csv(hoaxy_training_file)
 	pd_hoaxy_training_dataset = pd_hoaxy_training_dataset.drop(columns=['Unnamed: 0'])
 	reader = surprise.reader.Reader(rating_scale=(0, 1))
@@ -404,7 +325,7 @@ if __name__ == "__main__":
 	trainset = training_data.build_full_trainset()
 
 	print("Preparing model")
-	model_file = '../model/hoaxy_recsys_model.sav'
+	model_file = '../model/hoaxy_recsys_model_2.sav'
 	algo = joblib.load(model_file)
 
-	app.run(host = "0.0.0.0", port = 5053)
+	app.run(host = "0.0.0.0", port = 5054)

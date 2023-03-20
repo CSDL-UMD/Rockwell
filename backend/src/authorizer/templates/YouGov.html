@@ -12,14 +12,38 @@
 <p><b>Please log in with Twitter so we can fetch your Twitter handle.</b><br>
 <button type="button" id="twitter-login-btn" onclick="start('{{ start_url }}')">Fetch handle</button></p>
 <input type="text" id="fname" name="fname" disabled><br>
+
+<p id="radio_para" style="display: none;">Please select the type to feed.</p>
+
+<div id="radiooo_XS" style="display: none;">
+<input type="radio" name="size" value="XS" id="xs" checked>
+<label for="xs">Reverse Chronological</label>
+</div>
+<div id="radiooo_S" style="display: none;">
+<input type="radio" name="size" value="S" id="s">
+<label for="s">Latent Factors</label>
+</div>
+<div id="radiooo_M" style="display: none;">
+<input type="radio" name="size" value="M" id="m">
+<label for="m">Normal Matriix Factorization</label>
+</div>
+
 <p><button type="button" id="loadfeed" onclick="load_feed('{{ rockwell_url }}')" style="display: none;">Load Feed</button></p>
 <p id="loader" style="display: none;">Please wait while your feed loads.....</p> 
 
 <script type="text/javascript">
     var inputF = document.getElementById("fname");
+    var radio_para = document.getElementById("radio_para");
+    var radiooo_XS = document.getElementById("radiooo_XS");
+    var radiooo_S = document.getElementById("radiooo_S");
+    var radiooo_M = document.getElementById("radiooo_M");
     var load_feed_button = document.getElementById("loadfeed");
     if ('{{screenname}}' != "###"){
         inputF.setAttribute('value', '{{screenname}}');
+        radio_para.style.display = "block";
+        radiooo_XS.style.display = "block";
+        radiooo_S.style.display = "block";
+        radiooo_M.style.display = "block";
         load_feed_button.style.display = "block";
     }
     function start(url){
@@ -29,7 +53,14 @@
     function load_feed(url){
         var p_loader = document.getElementById("loader");
         p_loader.style.display = "block";
-        location.replace(url);
+        const radioButtons = document.querySelectorAll('input[name="size"]');
+        for (const radioButton of radioButtons) {
+            if (radioButton.checked) {
+                selectedSize = radioButton.value;
+                break;
+            }
+        }
+        location.replace(url + '&feedtype=' + selectedSize);
     }
 </script>
 
