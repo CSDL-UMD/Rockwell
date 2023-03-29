@@ -6,8 +6,11 @@ import json
 import requests
 import joblib
 import random
+import aiohttp
+import asyncio
 import numpy as np
 import pandas as pd
+from urllib.parse import urlsplit
 from itertools import groupby
 from flask import Flask, render_template, request, url_for, jsonify
 import threading
@@ -22,6 +25,10 @@ app.debug = False
 
 trainset = None
 algo = None
+
+TTL_DNS_CACHE=300  # Time-to-live of DNS cache
+MAX_TCP_CONN=50  # Throttle at max these many simultaneous connections
+TIMEOUT_TOTAL=10  # Each request times out after these many seconds
 
 def gettwitterhandle(url):
     try:
@@ -71,85 +78,86 @@ def integrate_NG_iffy(ng_fn,iffyfile):
 
     return ng_domains
 
-# by default cache results in memory
-_CACHE = {}
-
-def _newcache(fn=None):
-    if fn is None:
-        return dict()
+async def unshortenone(url, session, pattern=None, maxlen=None, 
+                       cache=None, timeout=None):
+    # If user specified list of domains, check netloc is in it, otherwise set
+    # to False (equivalent of saying there is always a match against the empty list)
+    if pattern is not None:
+        domain = urlsplit(url).netloc
+        match = re.search(pattern, domain)
+        no_match = (match is None)
+    else:
+        no_match = False
+    # If user specified max URL length, check length, otherwise set to False
+    # (equivalent to setting max length to infinity -- any length is OK)
+    too_long = (maxlen is not None and len(url) > maxlen)
+    # Ignore if either of the two exclusion criteria applies.
+    if too_long or no_match:
+        return url
+    if cache is not None and url in cache:
+        return str(cache[url])
     else:
         try:
-            import dbhash
-            return dbhash.open(fn, 'w')
-        except ImportError:
-            import sys
-            print("warning: cannot import BerkeleyDB (dbhash), "
-                  "storing cache in memory.",
-                  file=sys.stderr)
-            return dict()
+            # await asyncio.sleep(0.01)
+            resp = await session.head(url, timeout=timeout, 
+                                      ssl=False, allow_redirects=True)
+            expanded_url = str(resp.url)
+            if url != expanded_url:
+                if cache is not None and url not in cache:
+                    # update cache if needed
+                    cache[url] = expanded_url
+            return expanded_url
+        except (aiohttp.ClientError, asyncio.TimeoutError, UnicodeError):
+            return url
 
-def _setcache(fn=None):
-    global _CACHE
-    _CACHE = _newcache(fn)
 
-def init(queue):
-    global idx
-    idx = queue.get()
+# Thanks: https://blog.jonlu.ca/posts/async-python-http
+async def gather_with_concurrency(n, *tasks):
+    semaphore = asyncio.Semaphore(n)
+    async def sem_task(task):
+        async with semaphore:
+            return await task
+    return await asyncio.gather(*(sem_task(task) for task in tasks))
 
-def unshortenone(urlidx):
-    global idx
-    u = urlidx[1]
-    uk = u.encode('utf-8')
-    if uk in _CACHE:
-        return _CACHE[uk]
+
+async def _unshorten(*urls, cache=None, domains=None, maxlen=None):
+    if domains is not None:
+        pattern = re.compile(f"({'|'.join(domains)})", re.I)
+    else:
+        pattern = None
+    conn = aiohttp.TCPConnector(ttl_dns_cache=TTL_DNS_CACHE, limit=None)
+    u1 = unshortenone
+    timeout = aiohttp.ClientTimeout(total=TIMEOUT_TOTAL)
+    async with aiohttp.ClientSession(connector=conn) as session:
+        return await gather_with_concurrency(MAX_TCP_CONN, 
+                                             *(u1(u, session, cache=cache,
+                                                  maxlen=maxlen,
+                                                  pattern=pattern, 
+                                                  timeout=timeout) for u in urls))
+
+
+def unshorten(*args, **kwargs):
     try:
-        r = requests.head(u, allow_redirects=True,timeout=10)
-        _CACHE[uk] = r.url
-        return r.url
-    except requests.exceptions.RequestException:
-        return u
-
-def unshorten(urls, threads=None, cachepath=None):
-    """
-    Iterator over unshortened versions of input URLs. Follows redirects using
-    HEAD commands. Operates in parallel using multiple threads of execution.
-
-    Parameters
-    ==========
-
-    urls : iterator
-        a sequence of short URLs.
-
-    threads : int
-        optional; number of threads to use.
-
-    cachepath : str
-        optional; path to file with cache (for reuse). By default will use
-        in-memory cache.
-    """
-    _setcache(cachepath)
-
-    d = threading.local()
-    def set_num(counter):
-        d.id = next(counter) + 1
-
-    ids = list(range(threads))
-    manager = Manager()
-    idQueue = manager.Queue()
-
-    for i in ids:
-        idQueue.put(i)
-
-    pool = Pool(threads,init,(idQueue,))
-    urlswithidx = [list(uidx) for uidx in zip(range(len(urls)),urls)]
-    for url in pool.imap(unshortenone, urlswithidx):
-        yield url
+        loop = asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop = asyncio.get_event_loop()
+    return loop.run_until_complete(_unshorten(*args, **kwargs))
 
 def unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains):
     ng_domain_values = ng_domains['domain'].unique()
     ng_twitter_values = ng_domains['twitter'].unique()
     urls_unshorted = []
-    outputs = unshorten(all_urls, threads=20, cachepath='/home/saumya/')
+    cache = {}
+    shortening_domains = []
+    with open('../data/shorturl-services-list.csv') as f:
+        f.readline()
+        shortening_domains = [line.strip(',\n') for line in f]
+    maxlen = 30
+    all_urls_star = (url for url in all_urls)
+    outputs = unshorten(*all_urls_star, cache=cache, domains=shortening_domains, maxlen=maxlen)
     for url in outputs:
         urls_unshorted.append(url)
     
