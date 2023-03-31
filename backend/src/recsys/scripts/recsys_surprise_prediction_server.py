@@ -416,7 +416,7 @@ if __name__ == "__main__":
 	#training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
 
 	print("Preparing Training set")
-	hoaxy_training_file = '../data/hoaxy_dataset_training.csv'
+	hoaxy_training_file = '../data/hoaxy_dataset_training_tfidf.csv'
 	pd_hoaxy_training_dataset = pd.read_csv(hoaxy_training_file)
 	pd_hoaxy_training_dataset = pd_hoaxy_training_dataset.drop(columns=['Unnamed: 0'])
 	reader = surprise.reader.Reader(rating_scale=(0, 1))
@@ -424,7 +424,7 @@ if __name__ == "__main__":
 	trainset = training_data.build_full_trainset()
 
 	print("Preparing model")
-	model_file = '../model/hoaxy_recsys_model.sav'
+	model_file = '../model/hoaxy_recsys_model_tfidf.sav'
 	algo = joblib.load(model_file)
 
 	app.run(host = "0.0.0.0", port = 5053)
