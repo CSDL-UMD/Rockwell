@@ -184,6 +184,20 @@ def unshorten_and_tag_NG(all_urls,ng_domains):
             urls_tagged.append("NA")
     return urls_tagged
 
+def idf(values,tot_users=0):
+    num_users = len(set(values))
+    return math.log10(tot_users/num_users)
+
+def tfidf(values,idf_dict={}):
+    domain_counter = Counter(values)
+    domain_rating = {}
+    for dd in domain_counter.keys():
+        tf = domain_counter[dd]/len(values)
+        idf = idf_dict[dd]
+        domain_rating[dd] = tf/idf
+    domain_rating_json = json.dumps(domain_rating, indent = 4)
+    return domain_rating_json
+
 def rating_calculate(values):
     domain_rating = {}
     total = len(values)
@@ -290,25 +304,31 @@ recsys_engagement = pd.read_csv('../data/hoaxy_dataset.csv')
 if 'Unnamed: 0' in recsys_engagement.columns:
     recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
 recsys_engagement = recsys_engagement.reset_index(drop=True)
-data_dir = '/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/'
-pd_new_users = get_data_from_new_users(data_dir, ng_domains)
-pd_new_users = pd_new_users.reset_index(drop=True)
-pd_new_users.columns = ['user','NG_domain']
-recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
-domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
+tot_users = len(recsys_engagement['user'].unique())
+domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
+domain_idf_dict = {}
+for kk in domain_idf.keys():
+    domain_idf_dict[kk] = domain_idf[kk]
+domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
+#data_dir = '/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/'
+#pd_new_users = get_data_from_new_users(data_dir, ng_domains)
+#pd_new_users = pd_new_users.reset_index(drop=True)
+#pd_new_users.columns = ['user','NG_domain']
+#recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
+#domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
 
-all_users = []
-for uu in domain_rating_json_column.index:
-    rating_json = json.loads(domain_rating_json_column[uu])
-    if 'domain' not in rating_json.keys():
-        all_users.append(uu)
+#all_users = []
+#for uu in domain_rating_json_column.index:
+#    rating_json = json.loads(domain_rating_json_column[uu])
+#    if 'domain' not in rating_json.keys():
+#        all_users.append(uu)
 
 users_training = []
 domains_training = []
 ratings_training = []
 
 #Full training set
-for (i,uu) in enumerate(all_users):
+for (i,uu) in enumerate(domain_rating_json_column.keys()):
     if i % 10000 == 0:
         print(i)
     rating_json = json.loads(domain_rating_json_column[uu])
@@ -319,10 +339,13 @@ for (i,uu) in enumerate(all_users):
 
 pd_training = pd.concat([pd.DataFrame(users_training),pd.DataFrame(domains_training),pd.DataFrame(ratings_training)],axis=1)
 pd_training.columns = ['Users','Domains','Ratings']
-pd_training_domains = pd.DataFrame(pd_training['Domains'].unique().tolist(),columns=['Domains'])
+#pd_training_domains = pd.DataFrame(pd_training['Domains'].unique().tolist(),columns=['Domains'])
 
-pd_training.to_csv('../data/hoaxy_dataset_training_2.csv')
-pd_training_domains.to_csv('../data/hoaxy_dataset_training_domains_2.csv')
+pd_training.to_csv('../data/hoaxy_dataset_training_tfidf.csv')
+#pd_training_domains.to_csv('../data/hoaxy_dataset_training_domains_2.csv')
+
+with open('../data/domain_idf.json','w') as fp:
+    json.dump(domain_idf_dict,fp)
 
 reader = surprise.reader.Reader(rating_scale=(0, 1))
 data = surprise.dataset.Dataset.load_from_df(pd_training, reader)
@@ -331,5 +354,5 @@ algo = surprise.SVD()
 trainset = data.build_full_trainset()
 algo.fit(trainset)
 
-model_filename = '../model/hoaxy_recsys_model_2.sav'
+model_filename = '../model/hoaxy_recsys_model_tfidf.sav'
 joblib.dump(algo,model_filename)

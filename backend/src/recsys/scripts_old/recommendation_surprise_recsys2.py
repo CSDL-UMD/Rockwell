@@ -17,6 +17,20 @@ from scipy import stats
 from scipy.spatial.distance import cosine
 from collections import Counter
 
+def idf(values,tot_users=0):
+    num_users = len(set(values))
+    return math.log10(tot_users/num_users)
+
+def tfidf(values,idf_dict={}):
+    domain_counter = Counter(values)
+    domain_rating = {}
+    for dd in domain_counter.keys():
+        tf = domain_counter[dd]/len(values)
+        idf = idf_dict[dd]
+        domain_rating[dd] = tf/idf
+    domain_rating_json = json.dumps(domain_rating, indent = 4)
+    return domain_rating_json
+
 def rating_calculate(values):
     domain_rating = {}
     total = len(values)
@@ -93,6 +107,17 @@ def rmse_at_k(pd_prediction):
         else:
             rmse_array.append(sum(rmse_at_k)/len(rmse_at_k))
             rmse_array_err.append(stats.sem(rmse_at_k))
+
+recsys_engagement = pd.read_csv('../data/hoaxy_dataset.csv')
+if 'Unnamed: 0' in recsys_engagement.columns:
+    recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
+recsys_engagement = recsys_engagement.reset_index(drop=True)
+tot_users = len(recsys_engagement['user'].unique())
+domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
+domain_idf_dict = {}
+for kk in domain_idf.keys():
+    domain_idf_dict[kk] = domain_idf[kk]
+domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
 
 recsys_engagement = pd.read_csv('/home/saumya/Documents/USF/Project/ASD/recommendation_surprise/user_domain_reaction.csv',sep='\t')
 domain_rating_json_column = recsys_engagement.groupby('Users').Domains.agg(rating_calculate)

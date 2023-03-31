@@ -330,7 +330,14 @@ def recsys_rerank():
 	domains = []
 	ratings = []
 	engaged_urls_tagged = [url for url in engaged_urls_tagged if url != 'NA']
-	total = len(engaged_urls_tagged)
+	domain_counter = Counter(engaged_urls_tagged)
+	for dd in domain_counter.keys():
+	    tf = domain_counter[dd]/len(engaged_urls_tagged)
+	    idf = domain_idf_dict[dd]
+	    domains.append(dd)
+	    ratings.append(tf/idf)
+	"""
+    total = len(engaged_urls_tagged)
 	if total == 0:
 		for dd in training_ng_domains:
 			domains.append(dd)
@@ -351,6 +358,7 @@ def recsys_rerank():
 	        else:
 	            domains.append(dd)
 	            ratings.append(0.005)
+    """
 
 	item_latent = algo.qi
 	item_latent_transpose = np.matrix.transpose(item_latent)
@@ -399,9 +407,13 @@ if __name__ == "__main__":
 	print("Reading NewsGuard, Iffy and training domains")
 	ng_fn = "../NewsGuardIffy/label-2022101916.json"
 	iffyfile = "../NewsGuardIffy/iffy.csv"
-	training_ng_domains_file = '../data/hoaxy_dataset_training_domains.csv'
 	ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
-	training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
+	training_ng_domains_file = '../data/domain_idf.json'
+	with open(training_ng_domains_file) as fn:
+		domain_idf_dict = json.load(fn)
+	training_ng_domains = domain_idf_dict.keys()
+	#training_ng_domains_file = '../data/hoaxy_dataset_training_domains.csv'
+	#training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
 
 	print("Preparing Training set")
 	hoaxy_training_file = '../data/hoaxy_dataset_training.csv'

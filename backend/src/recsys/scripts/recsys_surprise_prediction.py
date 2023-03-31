@@ -7,7 +7,6 @@ Created on Mon Feb 27 13:50:17 2023
 """
 
 import re
-import math
 import glob
 import gzip
 import json
@@ -194,14 +193,18 @@ def unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains):
 
 ng_fn = "../NewsGuardIffy/label-2022101916.json"
 iffyfile = "../NewsGuardIffy/iffy.csv"
-training_ng_domains_file = '../data/hoaxy_dataset_training_domains.csv'
+#training_ng_domains_file = '../data/hoaxy_dataset_training_domains.csv'
+training_ng_domains_file = '../data/domain_idf.json'
 ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
-training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
+#training_ng_domains = pd.read_csv(training_ng_domains_file)['Domains'].values.tolist()
+with open(training_ng_domains_file) as fn:
+    domain_idf_dict = json.load(fn)
+training_ng_domains = domain_idf_dict.keys()
 
 hometimeline_urls = []
 hometimeline_tweets = {}
 
-home_timeline_files = sorted(glob.glob("/home/saumya/Documents/USF/Project/ASD/MTurk_pilot_data/pilot2_testing/187521608_home_*.json.gz"))
+home_timeline_files = sorted(glob.glob("/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/84653850_home_*.json.gz"))
 files_by_user = groupby(home_timeline_files, key=lambda k: k.split("_")[0])
 for user, user_files in files_by_user:
     user_files_sorted = sorted(user_files, key=lambda fn: fn.split("_")[2])
@@ -233,7 +236,7 @@ pd_hometimeline_urls = pd.DataFrame(hometimeline_urls)
 
 engaged_urls = []
 
-with gzip.open('/home/saumya/Documents/USF/Project/ASD/MTurk_pilot_data/pilot2_testing/187521608-user.json.gz', 'r') as fin:
+with gzip.open('/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/84653850-user.json.gz', 'r') as fin:
     data = json.loads(fin.read().decode('utf-8'))
     if data['userTweets']:
         user_id = data["userObject"]["id"]
@@ -256,7 +259,7 @@ with gzip.open('/home/saumya/Documents/USF/Project/ASD/MTurk_pilot_data/pilot2_t
                 for url in urls_extracted:
                     engaged_urls.append(url)
 
-with gzip.open('/home/saumya/Documents/USF/Project/ASD/MTurk_pilot_data/pilot2_testing/187521608-fave.json.gz', 'r') as fin:
+with gzip.open('/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/84653850-fave.json.gz', 'r') as fin:
     data = json.loads(fin.read().decode('utf-8'))
     if data['likedTweets']:
         user_id = data["userObject"]["id"]
@@ -294,7 +297,14 @@ pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline
 domains = []
 ratings = []
 engaged_urls_tagged = [url for url in engaged_urls_tagged if url != 'NA']
-total = len(engaged_urls_tagged)
+domain_counter = Counter(engaged_urls_tagged)
+for dd in domain_counter.keys():
+    tf = domain_counter[dd]/len(engaged_urls_tagged)
+    idf = domain_idf_dict[dd]
+    domains.append(dd)
+    ratings.append(tf/idf)
+    
+"""
 if total == 1:
     domains.append(engaged_urls_tagged[0])
     ratings.append(1.0)
@@ -311,15 +321,16 @@ else:
         else:
             domains.append(dd)
             ratings.append(0.005)
+"""
 
-hoaxy_training_file = '../data/hoaxy_dataset_training.csv'
+hoaxy_training_file = '../data/hoaxy_dataset_training_tfidf.csv'
 pd_hoaxy_training_dataset = pd.read_csv(hoaxy_training_file)
 pd_hoaxy_training_dataset = pd_hoaxy_training_dataset.drop(columns=['Unnamed: 0'])
 reader = surprise.reader.Reader(rating_scale=(0, 1))
 training_data = surprise.dataset.Dataset.load_from_df(pd_hoaxy_training_dataset, reader) 
 trainset = training_data.build_full_trainset()
 
-model_file = '../model/hoaxy_recsys_model.sav'
+model_file = '../model/hoaxy_recsys_model_tfidf.sav'
 algo = joblib.load(model_file)
 
 item_latent = algo.qi
@@ -345,5 +356,7 @@ for index,row in pd_hometimeline_urls.iterrows():
     else:
         predicted_rating.append(-1000)
 
-pd_hometimeline_urls_predicted = pd.concat([pd_hometimeline_urls,pd.DataFrame(predicted_rating,columns=['Predicted_ratings'])],axis=1)
-pd_hometimeline_urls_predicted.to_csv('../data/predicted_ratings_brendan.csv')
+pd_hometimeline_urls_predicted_brendan = pd.concat([pd_hometimeline_urls,pd.DataFrame(predicted_rating,columns=['Predicted_ratings'])],axis=1)
+pd_hometimeline_urls_predicted_brendan = pd_hometimeline_urls_predicted_brendan.sort_values('Predicted_ratings',ascending=False)
+pd_hometimeline_urls_predicted_brendan.to_csv('../data/predicted_ratings_brendan_tfidf.csv')
+
