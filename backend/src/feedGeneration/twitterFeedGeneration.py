@@ -77,14 +77,14 @@ def get_feed():
 			params_user = {"count": "200","tweet_mode": "extended"}
 			#params_fav = {"count": "200", "user_id":user_id, "tweet_mode": "extended"}
 			response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
-			#response_fav = oauth.get("https://api.twitter.com/1.1/statuses/favorites/list.json", params = params_user)
+			response_fav = oauth.get("https://api.twitter.com/1.1/statuses/favorites/list.json", params = params_user)
 			#response_fav = oauth.get("https://api.twitter.com/2/users/"+str(user_id)+"/liked_tweets")
-			#print("FAVORITES!!!!")
-			#print(response_fav.text)
+			print("FAVORITES!!!!")
+			print(response_fav.text)
 			public_tweets_user = json.loads(response_user.text)
 			#public_tweets_fav = json.loads(response_fav.text)
 			#timeline_json = [public_tweets,public_tweets_user,public_tweets_fav]
-			timeline_json = [public_tweets,public_tweets_user]
+			timeline_json = [public_tweets,public_tweets_user,screen_name]
 			recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
 			public_tweets = recsys_response.json()['data']
 		tot_tweets = len(public_tweets)

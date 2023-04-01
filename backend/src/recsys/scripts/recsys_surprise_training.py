@@ -304,17 +304,20 @@ recsys_engagement = pd.read_csv('../data/hoaxy_dataset.csv')
 if 'Unnamed: 0' in recsys_engagement.columns:
     recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
 recsys_engagement = recsys_engagement.reset_index(drop=True)
+data_dir = '/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/'
+pd_new_users = get_data_from_new_users(data_dir, ng_domains)
+pd_new_users = pd_new_users.reset_index(drop=True)
+pd_new_users.columns = ['user','NG_domain']
+recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
+
 tot_users = len(recsys_engagement['user'].unique())
 domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
 domain_idf_dict = {}
 for kk in domain_idf.keys():
     domain_idf_dict[kk] = domain_idf[kk]
+
 domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
-#data_dir = '/home/saumya/Documents/Infodiversity/pilot_data/pilot2_testing_engagement/'
-#pd_new_users = get_data_from_new_users(data_dir, ng_domains)
-#pd_new_users = pd_new_users.reset_index(drop=True)
-#pd_new_users.columns = ['user','NG_domain']
-#recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
+
 #domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
 
 #all_users = []

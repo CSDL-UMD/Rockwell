@@ -129,6 +129,9 @@ for uu in domain_rating_json_column.index:
         all_users.append(uu)
 
 test_users =  random.sample(all_users,int(0.3*(len(all_users))))
+#training_users = [uu for uu in all_users if uu not in test_users]
+training_users = set(all_users) - set(test_users)
+training_users = list(training_users)
 
 users_training = []
 domains_training = []
@@ -148,23 +151,32 @@ for (i,uu) in enumerate(all_users):
         domains_training.append(dd)
         ratings_training.append(rating_json[dd])
 
-for (i,uu) in enumerate(all_users):
-    if i % 100 == 0:
+#Partial training set
+for (i,uu) in enumerate(training_users):
+    if i % 1000 == 0:
         print(i)
     rating_json = json.loads(domain_rating_json_column[uu])
-    test_domains = []
-    if uu in test_users:
-        all_domains = list(rating_json.keys())
-        test_domains = random.sample(all_domains,int(0.3*len(all_domains)))
     for dd in rating_json.keys():
-        if dd in test_domains:
-            users_testing.append(uu)
-            domains_testing.append(dd)
-            ratings_testing.append(rating_json[dd])
-        else:
-            users_training.append(uu)
-            domains_training.append(dd)
-            ratings_training.append(rating_json[dd])
+        users_training.append(uu)
+        domains_training.append(dd)
+        ratings_training.append(rating_json[dd])
+        
+#Partial testing set
+for (i,uu) in enumerate(test_users):
+    if i % 1000 == 0:
+        print(i)
+    rating_json = json.loads(domain_rating_json_column[uu])
+    all_domains = list(rating_json.keys())
+    test_domains = random.sample(all_domains,int(0.3*len(all_domains)))
+    training_domains = [dd for dd in all_domains if dd not in test_domains]
+    for dd in test_domains:
+        users_testing.append(uu)
+        domains_testing.append(dd)
+        ratings_testing.append(rating_json[dd])
+    for dd in training_domains:
+        users_training.append(uu)
+        domains_training.append(dd)
+        ratings_training.append(rating_json[dd])
 
 pd_training = pd.concat([pd.DataFrame(users_training),pd.DataFrame(domains_training),pd.DataFrame(ratings_training)],axis=1)
 pd_training.columns = ['Users','Domains','Ratings']
@@ -210,7 +222,7 @@ for index,row in pd_testing.iterrows():
 
 pd_surprise_results = pd.concat([pd_testing,pd.DataFrame(prediction_surprise)],axis=1)
 pd_surprise_results.columns = ['Users','Domains','Ratings','Predicted']
-pd_surprise_results.to_csv('/home/saumya/Documents/USF/Project/ASD/recommendation_surprise/results_surprise.csv',encoding='utf-8',index=False)
+pd_surprise_results.to_csv('results_surprise_tfidf.csv',encoding='utf-8',index=False)
 
 users_in_testing = pd_testing['Users'].unique()
 
