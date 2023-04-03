@@ -280,6 +280,11 @@ def screenname():
 def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500
 
+@app.after_request
+def add_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    return response
   
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
