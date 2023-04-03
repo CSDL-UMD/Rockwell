@@ -27,6 +27,8 @@ account_settings_url = str(webInformation['account_settings_url'])
 
 oauth_store = {}
 screenname_store = {}
+userid_store = {}
+worker_id_store = {}
 access_token_store = {}
 access_token_secret_store = {}
 
@@ -139,8 +141,13 @@ def callback():
     response = oauth_account_settings.get(account_settings_url)
     account_settings_user = json.dumps(json.loads(response.text))
 
+    insert_user_payload = {'twitter_id': str(user_id), 'account_settings': account_settings_user}
+    resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user',params=insert_user_payload)
+    worker_id = resp_worker_id.json()["data"]
     
     screenname_store[oauth_token] = screen_name
+    userid_store[oauth_token] = user_id
+    worker_id_store[oauth_token] = str(worker_id)
     access_token_store[oauth_token] = real_oauth_token
     access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
@@ -171,9 +178,11 @@ def screenname():
     screen_name_return = screenname_store[oauth_token_qualtrics]
     if screen_name_return == "####":
         return screen_name_return
+    userid_return = userid_store[oauth_token_qualtrics]
+    worker_id_return = worker_id_store[oauth_token_qualtrics]
     access_token_return = access_token_store[oauth_token_qualtrics]
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
-    return screen_name_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
+    return screen_name_return+"$$$"+userid_return+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
 
 @app.errorhandler(500)
 def internal_server_error(e):
