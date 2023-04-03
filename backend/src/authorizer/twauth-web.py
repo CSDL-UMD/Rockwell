@@ -35,6 +35,7 @@ def config(filename='database.ini', section='postgresql'):
 webInformation = config('../configuration/config.ini','webconfiguration')
 
 app_callback_url = str(webInformation['callback'])
+app_callback_url_qual = str(webInformation['qualcallback'])
 request_token_url = str(webInformation['request_token_url'])
 access_token_url = str(webInformation['access_token_url'])
 authorize_url = str(webInformation['authorize_url'])
@@ -80,13 +81,11 @@ def start():
 
 @app.route('/qualauth/')
 def qualstart():
-    app_callback_url = url_for('callback', _external=True)
-    print(app_callback_url)
     cred = config('../configuration/config.ini','twitterapp')
 
     try:
         request_token = OAuth1Session(client_key=cred['key'],client_secret=cred['key_secret'])
-        content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url})
+        content = request_token.post(request_token_url, data = {"oauth_callback":app_callback_url_qual})
         logging.info('Twitter access successfull')
     except Exception as error:
         print('Twitter access failed with error : '+str(error))
