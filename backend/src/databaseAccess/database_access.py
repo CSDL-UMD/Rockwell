@@ -20,6 +20,8 @@ app = Flask(__name__)
 
 app.debug = False
 
+worker_id_store = {}
+
 # Is full Universal to check when function calls, if is full is true our buffer is being used (push package immediately), if not continue as normal
 # WINNER:::I should make it normal where we can call them all but on overflow it is pushed to queue here and then the loop function is called, now on empty terminate. (if it keeps being added to it keeps going)
 #def queueLoop() -> None: # async so it doesnt interfere with the rest of the execution.
@@ -39,6 +41,13 @@ app.debug = False
 #                    except FullQueue:
 #                        time.sleep(1) # wait one second when the queue has data but connections are full.
 #            time.sleep(5)
+
+@app.route('/set_credentials', methods=['POST'])
+def set_credentials():
+    worker_id = request.args.get('worker_id')
+    random_indentifier = request.args.get('random_indentifier')
+    worker_id_store[random_indentifier] = worker_id
+    return "Done!"
 
 # Send me JSON with 2 arrays of arrays/objects. 0: tweets, 1: tweet_session. (I will get ID's for the other relation from 0) AND append the worker id as the 3rd "array/object"
 # Essentially I want an array of "arrays" where the outer array has 3 elements and inside they have arrays of objects etc.
@@ -274,7 +283,10 @@ def save_all_engagements_new():
     worker_id = 0
     page = 0
     try:
-        worker_id = int(request.args.get('worker_id'))
+        random_indentifier = request.args.get('random_indentifier')
+        worker_id = worker_id_store[random_indentifier]
+        del worker_id_store[random_indentifier]
+        #worker_id = int(request.args.get('worker_id'))
         page = int(request.args.get('page'))
         tweetRetweets = request.args.get('tweetRetweets')
         tweetLikes = request.args.get('tweetLikes')
@@ -338,7 +350,10 @@ def save_all_attention_new():
     tries = 5
     connection = None
     try:
-        worker_id = int(request.args.get('worker_id'))
+        random_indentifier = request.args.get('random_indentifier')
+        worker_id = worker_id_store[random_indentifier]
+        del worker_id_store[random_indentifier]
+        #worker_id = int(request.args.get('worker_id'))
         page = int(request.args.get('page'))
         attnanswers = request.args.get('attnanswers')
         print(attnanswers)

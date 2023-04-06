@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response
 import requests
+import random, string
 import datetime
 from requests_oauthlib import OAuth1Session
 #from src.databaseAccess.database_config import config
@@ -170,11 +171,20 @@ def callback():
     page = 0
     pre_attn_check = 1
 
-    rockwell_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&user_id=' + str(user_id) + '&screen_name=' + str(screen_name) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) 
+    random_identifier_len = random.randint(15, 26)    
+    random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(random_identifier_len))
+    set_user_credentials_payload_db = {'worker_id': str(worker_id), 'random_indentifier': random_identifier}
+    set_user_credentials_payload = {'access_token': str(real_oauth_token), 'access_token_secret': str(real_oauth_token_secret), 'screen_name': str(screen_name), 'user_id': str(user_id), 'worker_id': str(worker_id), 'random_indentifier': random_identifier}
+    requests.post('http://' + webInformation['localhost'] + ':5052/set_credentials',params=set_user_credentials_payload_db)
+    requests.post('http://' + webInformation['localhost'] + ':5051/set_credentials',params=set_user_credentials_payload)
+
+
+    #rockwell_url_agg = str(webInformation['app_route']) + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&user_id=' + str(user_id) + '&screen_name=' + str(screen_name) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page)
+    rockwell_url_agg = str(webInformation['app_route']) + '?randomtokenszzzz=' + random_identifier + '&attn=' + str(attn) + '&page=' + str(page) 
     #rockwell_url_agg = 'http://127.0.0.1:3000' + '?access_token=' + str(real_oauth_token) + '&access_token_secret=' + str(real_oauth_token_secret) + '&worker_id=' + str(worker_id) + '&attn=' + str(attn) + '&page=' + str(page) + '&pre_attn_check=' + str(pre_attn_check)
 
     del oauth_store[oauth_token]
-    redirect(rockwell_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
+    #redirect(rockwell_url + '?access_token=' + real_oauth_token + '&access_token_secret=' + real_oauth_token_secret)
 
 
     #return render_template('placeholder.html', worker_id=worker_id, access_token=real_oauth_token, access_token_secret=real_oauth_token_secret)
@@ -270,11 +280,15 @@ def screenname():
     screen_name_return = screenname_store[oauth_token_qualtrics]
     if screen_name_return == "####":
         return screen_name_return
+    random_identifier_len = random.randint(15, 26)    
+    random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(random_identifier_len))
     userid_return = userid_store[oauth_token_qualtrics]
     worker_id_return = worker_id_store[oauth_token_qualtrics]
     access_token_return = access_token_store[oauth_token_qualtrics]
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
-    return screen_name_return+"$$$"+userid_return+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return
+    set_user_credentials_payload = {'access_token': access_token_return, 'access_token_secret': access_token_secret_return, 'screen_name': screen_name_return, 'user_id': userid_return, 'worker_id': worker_id_return, 'random_indentifier': random_identifier}
+    requests.post('http://' + webInformation['localhost'] + ':5051/set_credentials',params=set_user_credentials_payload)
+    return screen_name_return+"$$$"+userid_return+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return+"$$$"+random_identifier
 
 @app.errorhandler(500)
 def internal_server_error(e):

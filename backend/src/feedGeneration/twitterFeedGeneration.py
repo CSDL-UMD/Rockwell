@@ -4,6 +4,7 @@ import re
 import numpy as np
 import datetime
 import json
+import random, string
 import CardInfo as Cardinfo
 import requests
 from flask import Flask, render_template, request, url_for, jsonify
@@ -36,17 +37,42 @@ def config(filename,section):
 
     return db
 
+screenname_store = {}
+userid_store = {}
+worker_id_store = {}
+access_token_store = {}
+access_token_secret_store = {}
+
+@app.route('/set_credentials', methods=['POST'])
+def set_credentials():
+	access_token = request.args.get('access_token')
+	access_token_secret = request.args.get('access_token_secret')
+	screen_name = request.args.get('screen_name')
+	user_id = request.args.get('user_id')
+	worker_id = request.args.get('worker_id')
+	random_indentifier = request.args.get('random_indentifier')
+	screenname_store[random_indentifier] = screen_name
+	userid_store[random_indentifier] = user_id
+	worker_id_store[random_indentifier] = worker_id
+	access_token_store[random_indentifier] = access_token
+	access_token_secret_store[random_indentifier] = access_token_secret
+	return "Done!"
+
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
 	#Experimental code, need to make this so I can get the package back from the request, also need to add cookie checking here eventually.
-	print("Reached Here???")
-	access_token = request.args.get('access_token')
-	access_token_secret = request.args.get('access_token_secret')
+	random_indentifier = request.args.get('random_indentifier')
+	access_token = access_token_store[random_indentifier]
+	access_token_secret = access_token_secret_store[random_indentifier]
+	#access_token = request.args.get('access_token')
+	#access_token_secret = request.args.get('access_token_secret')
 	attn = int(request.args.get('attn'))
 	page = int(request.args.get('page'))
 	feedtype = str(request.args.get('feedtype')).strip()
-	screen_name = request.args.get('screen_name')
-	user_id = request.args.get('user_id')
+	screen_name = screenname_store[random_indentifier]
+	user_id = userid_store[random_indentifier]
+	#screen_name = request.args.get('screen_name')
+	#user_id = request.args.get('user_id')
 	cred = config('../configuration/config.ini','twitterapp')
 	cred['token'] = access_token.strip()
 	cred['token_secret'] = access_token_secret.strip()
@@ -55,7 +81,8 @@ def get_feed():
 						resource_owner_key=cred['token'],
 						resource_owner_secret=cred['token_secret'])
 	public_tweets = None
-	worker_id = request.args.get('worker_id')
+	worker_id = worker_id_store[random_indentifier]
+	#worker_id = request.args.get('worker_id')
 	print("Worker Id in Twitter feed generation : "+str(worker_id))
 	print("Attention : "+str(attn)+" Page : "+str(page))
 	refresh = 0
@@ -434,6 +461,22 @@ def get_feed():
 		}
 		feed_json.append(feed)
 		rankk = rankk + 1
+	new_random_identifier_len = random.randint(15, 26)
+	new_random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(new_random_identifier_len))
+	screenname_store[new_random_identifier] = screen_name
+	userid_store[new_random_identifier] = user_id
+	worker_id_store[new_random_identifier] = worker_id
+	access_token_store[new_random_identifier] = access_token
+	access_token_secret_store[new_random_identifier] = access_token_secret
+	del screenname_store[random_indentifier]
+	del userid_store[random_indentifier]
+	del worker_id_store[random_indentifier]
+	del access_token_store[random_indentifier]
+	del access_token_secret_store[random_indentifier]
+	set_user_credentials_payload_db = {'worker_id': str(worker_id), 'random_indentifier': new_random_identifier}
+	requests.post('http://127.0.0.1:5052/set_credentials',params=set_user_credentials_payload_db)
+	last_feed_value = {'new_random_identifier' : new_random_identifier}
+	feed_json.append(last_feed_value)
 	return jsonify(feed_json)
 
 @app.after_request

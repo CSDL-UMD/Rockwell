@@ -12,6 +12,7 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
+  const [nextRandomIdentifier, setNextRandomIdentifier] = useState('0');
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
   const [starTimeInformation, setStarTimeInformation] = useState(0);
@@ -46,12 +47,15 @@ function MainFeed(props) {
 
     const fetchTweets = (argumentObject) => {
       console.log("In Fetch Tweets!!!")
-      fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      fetch(configuration.get_feed + '?random_indentifier=' + argumentObject.randomtokenszzzz + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
         return resp.json();
       }).then(value => {
         if (JSON.stringify(value) === '{}') {
           window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
         }
+        setNextRandomIdentifier(value[value.length - 1]['new_random_identifier']);
+        let feed_value = value.pop();
         setFeedInformation(value);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
@@ -220,10 +224,12 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
-    fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+    //fetch(configuration.database_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+    fetch(configuration.database_url + '?random_indentifier='+ givenArguments.randomtokenszzzz + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
         return resp.json();
       })
-    window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
+    //window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
+    window.location.href = '/attention?randomtokenszzzz=' + nextRandomIdentifier + '&attn=1&page=' + givenArguments.page
   };
 
   return (
