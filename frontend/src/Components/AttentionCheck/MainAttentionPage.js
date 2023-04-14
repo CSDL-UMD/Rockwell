@@ -12,7 +12,7 @@ import Popover from 'react-bootstrap/Popover'
 function MainAttentionPage(props) {
   const [attnMap, setAttnMap] = useState([0,0,0,0,0]);
   const [givenArguments, setGivenArguments] = useState({});
-  const [nextRandomIdentifier, setNextRandomIdentifier] = useState('0');
+  const [sessionIdentifier, setSessionIdentifier] = useState('0');
   const [feedInformation, setFeedInformation] = useState({});
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
 
@@ -21,15 +21,17 @@ function MainAttentionPage(props) {
       return new Promise((resolve) => setTimeout(resolve, time));
     }
     const fetchTweets = (argumentObject) => {
+      let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)RockwellRandomWorkerId\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page).then(resp => {
-      fetch(configuration.get_feed + '?random_indentifier=' + argumentObject.randomtokenszzzz + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      //fetch(configuration.get_feed + '?random_indentifier=' + argumentObject.randomtokenszzzz + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
         return resp.json();
       }).then(value => {
         if (JSON.stringify(value) === '{}') {
           window.location.href = config.error + '?error=' + config.error_codes.no_tweets_attn_check;
         }
-        setNextRandomIdentifier(value[value.length - 1]['new_random_identifier']);
-        let feed_value = value.pop();
+        setSessionIdentifier(value[value.length - 1]['session_id']);
+        value.pop();
         setFeedInformation(value);
         sleep(500).then(() => {
           handleTotalResize();
@@ -103,11 +105,13 @@ function MainAttentionPage(props) {
   const nextButtonClickedAttn = () => {
     //alert("Next Button Clicked");
     //fetch(configuration.database_attn_url + '?worker_id='+ givenArguments.worker_id + '&page=' + givenArguments.page + '&attnanswers=' + attnMap).then(resp => {
-    fetch(configuration.database_attn_url + '?random_indentifier='+ givenArguments.randomtokenszzzz + '&page=' + givenArguments.page + '&attnanswers=' + attnMap).then(resp => {
+    //fetch(configuration.database_attn_url + '?random_indentifier='+ givenArguments.randomtokenszzzz + '&page=' + givenArguments.page + '&attnanswers=' + attnMap).then(resp => {
+    fetch(configuration.database_attn_url + '?session_id='+ sessionIdentifier + '&page=' + givenArguments.page + '&attnanswers=' + attnMap).then(resp => {
         return resp.json();
       })
     //window.location.href = givenArguments.page === '4' ? '/complete' : '/feed?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)
-    window.location.href = givenArguments.page === '4' ? '/complete' : '/feed?randomtokenszzzz=' + nextRandomIdentifier + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)
+    //window.location.href = givenArguments.page === '4' ? '/complete' : '/feed?randomtokenszzzz=' + nextRandomIdentifier + '&attn=0&page=' + (parseInt(givenArguments.page) + 1)
+    window.location.href = givenArguments.page === '3' ? '/complete' : '/feed?attn=0&page=' + (parseInt(givenArguments.page) + 1) + '&feedtype=' + givenArguments.feedtype
   };
 
   return (

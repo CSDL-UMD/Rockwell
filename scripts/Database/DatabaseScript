@@ -10,11 +10,13 @@ CREATE TABLE yougov_user (
 );
 
 CREATE TABLE rockwell_user (
-   user_id BIGSERIAL PRIMARY KEY,
+   user_id varchar(10) PRIMARY KEY,
    yougov_ref_id bigint NOT NULL,
    mturk_ref_id bigint NOT NULL,
+   access_token varchar(1000),
+   access_token_secret varchar(1000),
+   screenname varchar(100),
    twitter_id bigint NOT NULL,
-   session_start TIME NOT NULL,
    account_settings JSON,
    FOREIGN KEY (yougov_ref_id) REFERENCES yougov_user (id),
    FOREIGN KEY (mturk_ref_id) REFERENCES mturk_user (id)
@@ -25,28 +27,61 @@ CREATE TABLE tweet (
    tweet_json JSON NOT NULL
 );
 
+CREATE TABLE session_table (
+   session_id BIGSERIAL PRIMARY KEY,
+   user_id varchar(10) NOT NULL,
+   session_start TIME NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+);
+
 CREATE TABLE click (
    click_id BIGSERIAL PRIMARY KEY,
    tweet_id bigint,
    url VARCHAR(1000) NOT NULL,
    is_card boolean NOT NULL,
    click_timestamp bigint NOT NULL,
-   user_id bigint NOT NULL,
-   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
-   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id)
+   session_id bigint NOT NULL,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id)
 );
 
 CREATE TABLE user_inactivity (
-   user_id bigint NOT NULL,
+   session_id bigint NOT NULL,
    tab_inactive_timestamp bigint NOT NULL,
    tab_active_timestamp bigint NOT NULL,
    page smallint NOT NULL,
-   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id)
 );
 
-CREATE TABLE user_tweet_association_and_engagements (
+CREATE TABLE user_home_timeline_chronological (
    tweet_id bigint,
-   user_id bigint NOT NULL,
+   user_id varchar(10) NOT NULL,
+   rank smallint NOT NULL,
+   page smallint NOT NULL,
+   is_favorited_before boolean NOT NULL,
+   has_retweet_before boolean NOT NULL,
+   last_updated varchar(50) NOT NULL, 
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
+   PRIMARY KEY (user_id,tweet_id)
+);
+
+CREATE TABLE user_home_timeline_control (
+   tweet_id bigint,
+   user_id varchar(10) NOT NULL,
+   rank smallint NOT NULL,
+   page smallint NOT NULL,
+   is_favorited_before boolean NOT NULL,
+   has_retweet_before boolean NOT NULL,
+   last_updated varchar(50) NOT NULL, 
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
+   PRIMARY KEY (user_id,tweet_id)
+);
+
+CREATE TABLE user_engagement_and_impression_session (
+   tweet_id bigint,
+   session_id bigint NOT NULL,
    is_favorited_before boolean NOT NULL,
    has_retweet_before boolean NOT NULL,
    tweet_retweeted boolean,
@@ -54,18 +89,41 @@ CREATE TABLE user_tweet_association_and_engagements (
    seen_timestamp bigint,
    rank smallint NOT NULL,
    page smallint NOT NULL,
+   feedtype char(1) NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
-   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
-   PRIMARY KEY (user_id,tweet_id)
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id),
+   PRIMARY KEY (tweet_id,session_id)
 );
 
-CREATE TABLE user_tweet_attn (
+
+CREATE TABLE user_tweet_attn_snapshot_chronological (
    tweet_id bigint,
-   user_id bigint NOT NULL,
+   user_id varchar(10) NOT NULL,
    rank smallint NOT NULL,
    page smallint NOT NULL,
    correct_ans boolean,
-   given_ans boolean,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+);
+
+CREATE TABLE user_tweet_attn_snapshot_control (
+   tweet_id bigint,
+   user_id varchar(10) NOT NULL,
+   rank smallint NOT NULL,
+   page smallint NOT NULL,
+   correct_ans boolean,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id)
+);
+
+CREATE TABLE user_tweet_attn_session (
+   tweet_id bigint,
+   session_id bigint NOT NULL,
+   rank smallint NOT NULL,
+   page smallint NOT NULL,
+   feedtype char(1) NOT NULL,
+   correct_ans boolean,
+   given_ans boolean,
+   FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
+   FOREIGN KEY (session_id) REFERENCES session_table (session_id)
 );
