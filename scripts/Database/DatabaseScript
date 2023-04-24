@@ -1,7 +1,8 @@
 CREATE TABLE mturk_user (
    id BIGSERIAL PRIMARY KEY,
-   worker_id bigint NOT NULL,
-   assignment_id bigint NOT NULL
+   participant_id varchar(100) NOT NULL,
+   assignment_id varchar(100) NOT NULL,
+   project_id varchar(100) NOT NULL
 );
 
 CREATE TABLE yougov_user (
@@ -11,8 +12,8 @@ CREATE TABLE yougov_user (
 
 CREATE TABLE rockwell_user (
    user_id varchar(10) PRIMARY KEY,
-   yougov_ref_id bigint NOT NULL,
-   mturk_ref_id bigint NOT NULL,
+   yougov_ref_id bigint,
+   mturk_ref_id bigint,
    access_token varchar(1000),
    access_token_secret varchar(1000),
    screenname varchar(100),
@@ -60,7 +61,8 @@ CREATE TABLE user_home_timeline_chronological (
    page smallint NOT NULL,
    is_favorited_before boolean NOT NULL,
    has_retweet_before boolean NOT NULL,
-   last_updated varchar(50) NOT NULL, 
+   last_updated varchar(50) NOT NULL,
+   predicted_score real NOT NULL, 
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
    PRIMARY KEY (user_id,tweet_id)
@@ -73,7 +75,8 @@ CREATE TABLE user_home_timeline_control (
    page smallint NOT NULL,
    is_favorited_before boolean NOT NULL,
    has_retweet_before boolean NOT NULL,
-   last_updated varchar(50) NOT NULL, 
+   last_updated varchar(50) NOT NULL,
+   predicted_score real NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (user_id) REFERENCES rockwell_user (user_id),
    PRIMARY KEY (user_id,tweet_id)
@@ -89,6 +92,7 @@ CREATE TABLE user_engagement_and_impression_session (
    seen_timestamp bigint,
    rank smallint NOT NULL,
    page smallint NOT NULL,
+   predicted_score real NOT NULL,
    feedtype char(1) NOT NULL,
    FOREIGN KEY (tweet_id) REFERENCES tweet (tweet_id),
    FOREIGN KEY (session_id) REFERENCES session_table (session_id),

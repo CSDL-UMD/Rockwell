@@ -6,7 +6,6 @@ import json
 import requests
 import joblib
 import random
-import aiohttp
 import asyncio
 import numpy as np
 import pandas as pd
@@ -135,7 +134,6 @@ async def _unshorten(*urls, cache=None, domains=None, maxlen=None):
                                                   pattern=pattern, 
                                                   timeout=timeout) for u in urls))
 
-
 def unshorten(*args, **kwargs):
     try:
         loop = asyncio.get_event_loop()
@@ -146,7 +144,128 @@ def unshorten(*args, **kwargs):
             loop = asyncio.get_event_loop()
     return loop.run_until_complete(_unshorten(*args, **kwargs))
 
+# by default cache results in memory
+_CACHE = {}
+
+def _newcache(fn=None):
+    if fn is None:
+        return dict()
+    else:
+        try:
+            import dbhash
+            return dbhash.open(fn, 'w')
+        except ImportError:
+            import sys
+            print("warning: cannot import BerkeleyDB (dbhash), "
+                  "storing cache in memory.",
+                  file=sys.stderr)
+            return dict()
+
+def _setcache(fn=None):
+    global _CACHE
+    _CACHE = _newcache(fn)
+
+def init(queue):
+    global idx
+    idx = queue.get()
+
+def unshortenone(urlidx):
+    global idx
+    if urlidx[0] % 100 == 0:
+        print(urlidx[0])
+    u = urlidx[1]
+    uk = u.encode('utf-8')
+    if uk in _CACHE:
+        return _CACHE[uk]
+    try:
+        r = requests.head(u, allow_redirects=True,timeout=10)
+        _CACHE[uk] = r.url
+        return r.url
+    except requests.exceptions.RequestException:
+        return u
+
+def unshorten(urls, threads=None, cachepath=None):
+    """
+    Iterator over unshortened versions of input URLs. Follows redirects using
+    HEAD commands. Operates in parallel using multiple threads of execution.
+
+    Parameters
+    ==========
+
+    urls : iterator
+        a sequence of short URLs.
+
+    threads : int
+        optional; number of threads to use.
+
+    cachepath : str
+        optional; path to file with cache (for reuse). By default will use
+        in-memory cache.
+    """
+    _setcache(cachepath)
+
+    d = threading.local()
+    def set_num(counter):
+        d.id = next(counter) + 1
+
+    ids = list(range(threads))
+    manager = Manager()
+    idQueue = manager.Queue()
+
+    for i in ids:
+        idQueue.put(i)
+
+    pool = Pool(threads,init,(idQueue,))
+    urlswithidx = [list(uidx) for uidx in zip(range(len(urls)),urls)]
+    for url in pool.imap(unshortenone, urlswithidx):
+        yield url
+
 def unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains):
+    ng_domain_values = ng_domains['domain'].unique()
+    ng_twitter_values = ng_domains['twitter'].unique()
+    urls_unshorted = []
+    outputs = unshorten(all_urls, threads=20, cachepath='/home/saumya/')
+    for url in outputs:
+        urls_unshorted.append(url)
+    
+    urls_domains = []
+    urls_twitter = []
+    for url in urls_unshorted:
+        domain = ".".join(url.split("/")[2].split(".")[-2:])
+        urls_domains.append(domain)
+        if domain == "twitter.com":
+            try:
+                urls_twitter.append(url.split("/")[3])
+            except:
+                urls_twitter.append("NA")
+        else:
+            urls_twitter.append("NA")
+    
+    urls_tagged = []
+    for idx in range(len(urls_domains)):
+        if urls_domains[idx] in ng_domain_values:
+            if urls_domains[idx] in training_ng_domains:
+                urls_tagged.append(urls_domains[idx])
+            else:
+                urls_tagged.append("NA")
+        elif urls_twitter[idx] != "NA":
+            if urls_twitter[idx] in ng_twitter_values: 
+                try:
+                    twitter_domain = ng_domains.loc[(ng_domains['twitter'] == urls_twitter[idx])]['domain'][0]
+                    if twitter_domain in training_ng_domains:
+                        urls_tagged.append(twitter_domain)
+                    else:
+                        urls_tagged.append("NA")
+                except KeyError:
+                    urls_tagged.append("NA")
+                    continue
+            else:
+                urls_tagged.append("NA")
+        else:
+            urls_tagged.append("NA")
+    return urls_tagged
+
+def unshorten_and_tag_NG_async(all_urls,ng_domains,training_ng_domains):
     ng_domain_values = ng_domains['domain'].unique()
     ng_twitter_values = ng_domains['twitter'].unique()
     urls_unshorted = []
@@ -241,6 +360,59 @@ def pageArrangement(ng_tweets, ng_tweets_ratings, non_ng_tweets):
     #print("Res Feed Len: " + str(len(final_resultant_feed)))
     return final_resultant_feed
 
+def pageArrangementendless(ng_tweets, ng_tweets_ratings, non_ng_tweets):
+    ranked_ng_tweets = []
+    final_resultant_feed = []
+    final_resultant_feed_score = []
+    final_feed_length = len(ng_tweets) + len(non_ng_tweets)
+    resultant_feed = [None] * final_feed_length
+    resultant_score = [0.0] * final_feed_length
+
+    #Rank the NG tweets
+    for i in range(len(ng_tweets)):
+        ranked_ng_tweets.append((ng_tweets[i], ng_tweets_ratings[i]))
+    
+    #Top 50 tweets from NewsGuard
+    ranked_ng_tweets.sort(key=lambda a: a[1], reverse=True)
+    top_50 = ranked_ng_tweets
+
+    #50 other tweets
+    other_tweets = non_ng_tweets
+
+    pt = 0.5
+
+    #Assign positions in feed to the NG and non NG tweets
+    for i in range(len(resultant_feed)):
+    	if len(top_50) == 0:
+    		break
+    	if len(other_tweets) == 0:
+    		break
+    	chance = random.randint(1, 100)
+    	if chance < (pt * 100):
+    		resultant_feed[i] = top_50[0][0]
+    		resultant_score[i] = top_50[0][1]
+    		top_50.pop(0)
+    	else:
+    		resultant_feed[i] = other_tweets[0]
+    		resultant_score[i] = -100
+    		other_tweets.pop(0)
+    
+    if len(top_50) == 0:
+    	resultant_feed.extend(other_tweets)
+    	resultant_score.extend([-100]*(len(other_tweets)))
+    if len(other_tweets) == 0:
+    	for tt in top_50:
+    		resultant_feed.append(tt[0])
+    		resultant_score.append(tt[1])
+
+    for i in range(len(resultant_feed)):
+        if resultant_feed[i] != None:
+            final_resultant_feed.append(resultant_feed[i])
+            final_resultant_feed_score.append(resultant_score[i])
+
+    #print("Res Feed Len: " + str(len(final_resultant_feed)))
+    return final_resultant_feed,final_resultant_feed_score
+
 @app.route('/recsys_rerank', methods=['GET'])
 def recsys_rerank():
 	payload = request.json
@@ -282,6 +454,7 @@ def recsys_rerank():
 		userintrain = False
 
 	if userintrain:
+		print("YES PRESENT!!!!")
 		all_urls = pd_hometimeline_urls['url'].values.tolist()
 		hometimeline_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
 		pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline_urls_tagged,columns=['tagged_urls'])],axis=1)
@@ -306,9 +479,9 @@ def recsys_rerank():
 			else:
 				non_NG_tweets.append(hometimeline_tweets[tweet_id])
 
-		final_resultant_feed = pageArrangement(NG_tweets,NG_tweets_ratings,non_NG_tweets)
+		resultant_feed,resultant_score = pageArrangementendless(NG_tweets,NG_tweets_ratings,non_NG_tweets)
 
-		return jsonify(data=final_resultant_feed)
+		return jsonify(data=[resultant_feed,resultant_score])
 
 	else:
 		engaged_urls = []
@@ -430,9 +603,9 @@ def recsys_rerank():
 			else:
 				non_NG_tweets.append(hometimeline_tweets[tweet_id])
 
-		final_resultant_feed = pageArrangement(NG_tweets,NG_tweets_ratings,non_NG_tweets)
+		resultant_feed,resultant_score = pageArrangementendless(NG_tweets,NG_tweets_ratings,non_NG_tweets)
 
-		return jsonify(data=final_resultant_feed)
+		return jsonify(data=[resultant_feed,resultant_score])
 
 @app.after_request
 def add_headers(response):

@@ -24,35 +24,43 @@
     }
 
     if ('{{start}}' == "Yes"){
-        var rockwellcookie = getCookie("RockwellRandomWorkerId")
-        if (rockwellcookie == "NA"){
+        if ('{{mode}}' == "ELIGIBILITY"){
             window.location.href = '{{start_url}}';
         }
-        else {
-            oauth_token_tt = '{{oauth_token}}'
+        else{
+            var rockwellcookie = getCookie("{{secretidentifier}}")
+            if (rockwellcookie == "NA"){
+                window.location.href = '{{start_url}}';
+            }
+            else {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                        statuss = xmlHttp.responseText;
+                        if (statuss == 'Invalid Token')
+                            window.location.href = '{{start_url}}';
+                    }
+                }
+                xmlHttp.open("GET", '{{insertfeedurl}}?worker_id='+rockwellcookie+"&oauth_token={{oauth_token}}", true);
+                xmlHttp.send(null);
+            }
+        }
+    }
+
+    else{
+        if ('{{mode}}' == "ELIGIBILITY")
+            setCookie("{{secretidentifier}}",'{{worker_id}}',100);
+        else{
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
                     statuss = xmlHttp.responseText;
-                    if (statuss == 'Invalid Token')
-                        window.location.href = '{{start_url}}';
+                    setCookie("{{secretidentifier}}",'{{worker_id}}',100);
                 }
             }
-            xmlHttp.open("GET", '{{insertfeedurl}}?worker_id='+rockwellcookie+"&oauth_token="+oauth_token_tt, true);
+            xmlHttp.open("GET", '{{insertfeedurl}}?worker_id={{worker_id}}&oauth_token={{oauth_token}}', true);
             xmlHttp.send(null);
         }
-    }
-    else{
-        setCookie("RockwellRandomWorkerId",'{{worker_id}}',100);
-        oauth_token_tt = '{{oauth_token}}'
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function() {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
-                statuss = xmlHttp.responseText;
-            }
-        }
-        xmlHttp.open("GET", '{{insertfeedurl}}?worker_id={{worker_id}}&oauth_token={{oauth_token}}', true);
-        xmlHttp.send(null);
     }
     //window.location.href = "https://colon.umd.edu/auth/";
 </script>

@@ -13,6 +13,7 @@ function MainFeed(props) {
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
   const [sessionIdentifier, setSessionIdentifier] = useState('0');
+  const [maxPageIdentifier, setMaxPageIdentifier] = useState('0');
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
   const [starTimeInformation, setStarTimeInformation] = useState(0);
@@ -22,7 +23,7 @@ function MainFeed(props) {
   const [tweetLinkClicks, setTweetLinkClicks] = useState([]);
 
   async function beginTimer() {
-    await new Promise(r => setTimeout(r, 30000));
+    await new Promise(r => setTimeout(r, 10000));
     setMinimumFeedTimeCondition(true)
   }
 
@@ -46,7 +47,7 @@ function MainFeed(props) {
     };
 
     const fetchTweets = (argumentObject) => {
-      let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)RockwellRandomWorkerId\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)_rockwellidentifierv2_\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
       fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
         return resp.json();
@@ -54,6 +55,7 @@ function MainFeed(props) {
         if (JSON.stringify(value) === '{}') {
           window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
         }
+        setMaxPageIdentifier(value[value.length - 1]['max_pages']);
         setSessionIdentifier(value[value.length - 1]['session_id']);
         value.pop();
         //let cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)worker_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");

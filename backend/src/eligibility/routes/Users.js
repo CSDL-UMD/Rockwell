@@ -31,13 +31,14 @@ const resolveURL = (hostname) => {
 */
 
 
-router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:since_id&:collection_started', async (request, response) => {  
+router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:worker_id&:since_id&:collection_started', async (request, response) => {  
   console.log("IN HOMETIMELINE");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
+  const worker_id = request.params.worker_id;
   const since_id = request.params.since_id;
   const collection_started = request.params.collection_started;
   const date_str = new Date().toISOString().replace(/\..+/, '');
@@ -152,6 +153,7 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     accessToken: token,
     accessTokenSecret: token_secret,
     latestTweetId: latestTweetId,
+    worker_id: worker_id,
     userObject: v1User,
     homeTweets: userHomeTimelineTweets,
     ResponseObject: json_response
@@ -162,13 +164,17 @@ router.get('/api/hometimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   response.send();
 });
 
-router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:worker_id&:since_id&:collection_started', async (request, response) => {
   console.log("IN USERTIMELINE");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
+  const worker_id = request.params.worker_id;
+  const since_id = request.params.since_id;
+  const collection_started = request.params.collection_started;
+  const date_str = new Date().toISOString().replace(/\..+/, '');
   let errorMessage = "";
   let client;
   let user;
@@ -264,7 +270,11 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    collectionStarted: collectionStartedStr,
     source: "pilot2",
+    accessToken: token,
+    accessTokenSecret: token_secret,
+    latestTweetId: latestTweetId,
     userObject: v1User,
     userTweets: userTimelineTweets,
     ResponseObject: json_response
@@ -275,13 +285,17 @@ router.get('/api/usertimeline/:access_token&:access_token_secret&:mturk_id&:mtur
   response.send();
 });
 
-router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id', async (request, response) => {
+router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_hit_id&:mturk_assignment_id&:worker_id&:since_id&:collection_started', async (request, response) => {
   console.log("IN FAVORITES");
   const token = request.params.access_token;
   const token_secret = request.params.access_token_secret;
   const mturk_id = request.params.mturk_id;
   const mturk_hit_id = request.params.mturk_hit_id;
   const mturk_assignment_id = request.params.mturk_assignment_id;
+  const worker_id = request.params.worker_id;
+  const since_id = request.params.since_id;
+  const collection_started = request.params.collection_started;
+  const date_str = new Date().toISOString().replace(/\..+/, '');
   let errorMessage = "";
   let client;
   let user;
@@ -370,7 +384,11 @@ router.get('/api/favorites/:access_token&:access_token_secret&:mturk_id&:mturk_h
     MTurkId: mturk_id,
     MTurkHitId: mturk_hit_id,
     MTurkAssignmentId: mturk_assignment_id,
+    collectionStarted: collectionStartedStr,
     source: "pilot2",
+    accessToken: token,
+    accessTokenSecret: token_secret,
+    latestTweetId: latestTweetId,
     userObject: v1User,
     likedTweets: userLikedTweets,
     ResponseObject: json_response

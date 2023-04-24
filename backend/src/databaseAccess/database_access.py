@@ -81,12 +81,13 @@ def insert_timelines_attention():
                 rtbefore = obj['rtbefore']
                 page = obj['page']
                 rank = str(obj['rank'])
-                sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated)
-                VALUES(%s,%s,%s,%s,%s,%s,%s);"""
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
-                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,))
+                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,predicted_score,))
             connection.commit()
 
             for obj in payload[3]: # Take care of tweet in session here.
@@ -95,13 +96,21 @@ def insert_timelines_attention():
                 rtbefore = obj['rtbefore']
                 page = obj['page']
                 rank = str(obj['rank'])
-                sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated)
-                VALUES(%s,%s,%s,%s,%s,%s,%s);"""
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
-                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,))
+                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,predicted_score,))
             connection.commit()
+
+            #DELETE ATTENTION TABLES
+            sql = """DELETE FROM user_tweet_attn_snapshot_chronological where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_tweet_attn_snapshot_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()           
 
             for obj in payload[2]: # Take care of tweet in attention here.
                 tweet_id = obj['tweet_id']
@@ -159,9 +168,10 @@ def insert_timelines_attention_in_session():
                 rtbefore = obj['rtbefore']
                 page = obj['page']
                 rank = str(obj['rank'])
-                sql = """INSERT INTO user_engagement_and_impression_session(tweet_id,session_id,is_favorited_before,has_retweet_before,rank,page,feedtype)
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_engagement_and_impression_session(tweet_id,session_id,is_favorited_before,has_retweet_before,rank,page,feedtype,predicted_score)
                 VALUES(%s,%s,%s,%s,%s,%s,%s);"""
-                conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,))
+                conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,predicted_score))
             connection.commit()
 
             for obj in payload[3]: # Take care of tweet in attention here.
@@ -322,6 +332,38 @@ async def tweet_session(tweets, conn_cur) -> None:
         VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
         conn_cur.execute(sql,(fav_before,sid,tid,rtbefore,tweet_seen,retweet_now,favorite_now,rank,))
 
+
+@app.route('/get_existing_mturk_user', methods=['GET','POST']) # Should the method be GET?
+def get_existing_mturk_user():
+    tries = 5
+    connection = None
+    worker_id = ''
+    worker_id = request.args.get('worker_id').strip()
+    try:
+        #Getting connection from pool
+        worker_id = request.args.get('worker_id').strip()
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        sql = """SELECT U.access_token,U.access_token_secret,U.screenname,U.twitter_id,M.participant_id,M.assignment_id,M.project_id FROM rockwell_user U, mturk_user M 
+        WHERE M.id = U.mturk_ref_id and U.user_id = %s"""
+        conn_cur.execute(sql, (worker_id,))     
+        ret = conn_cur.fetchall()
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data=ret)
+    except Exception as error:
+        print(error)
+    return "Done!"
 
 @app.route('/get_existing_user', methods=['GET','POST']) # Should the method be GET?
 def get_worker_credentials():
@@ -847,6 +889,28 @@ def insert_session():
         print("ERROR!!!!",error)
     return retVal123
 
+@app.route('/insert_mturk_user', methods=['GET'])
+def insert_mturk_user():
+    """ insert a new vendor into the vendors table """
+    retVal123 = -1
+    sql = """INSERT INTO mturk_user(participant_id,assignment_id,project_id) VALUES(%s,%s,%s) RETURNING id;"""
+    try:
+        connection = accessPool.getconn()
+        if connection is not False: 
+            participant_id = request.args.get('participant_id')
+            assignment_id = request.args.get('assignment_id')
+            project_id = request.args.get('project_id')
+            cursor = connection.cursor()
+            cursor.execute(sql, (participant_id,assignment_id,project_id,))
+            retVal123 = cursor.fetchall()[0][0]
+            cursor.close()
+            connection.commit()
+            accessPool.putconn(connection)
+            return jsonify(data=retVal123)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("ERROR!!!!",error)
+    return retVal123
+
 @app.route('/insert_user', methods=['GET'])
 def insert_user():
     """ insert a new vendor into the vendors table """
@@ -854,10 +918,11 @@ def insert_user():
     #sql = """INSERT INTO rockwell_user(user_id,yougov_ref_id,mturk_ref_id,twitter_id,access_token,access_token_secret,screenname,session_start,account_settings)
     #     VALUES(%s,1,1,%s,%s,%s,%s,%s,%s) RETURNING user_id;"""
     sql = """INSERT INTO rockwell_user(user_id,yougov_ref_id,mturk_ref_id,twitter_id,access_token,access_token_secret,screenname,account_settings)
-          VALUES(%s,1,1,%s,%s,%s,%s,%s);"""
+          VALUES(%s,1,%s,%s,%s,%s,%s,%s);"""
     try:
         connection = accessPool.getconn()
-        if connection is not False: 
+        if connection is not False:
+            mturk_ref_id = request.args.get('mturk_ref_id')
             twitter_id = request.args.get('twitter_id')
             access_token = request.args.get('access_token')
             access_token_secret = request.args.get('access_token_secret')
@@ -869,7 +934,7 @@ def insert_user():
             print(session_start)
             random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
             cursor = connection.cursor()
-            cursor.execute(sql, (random_identifier,twitter_id,access_token,access_token_secret,screenname,account_settings_json,))
+            cursor.execute(sql, (random_identifier,mturk_ref_id,twitter_id,access_token,access_token_secret,screenname,account_settings_json,))
             #retVal123 = cursor.fetchall()[0][0]
             cursor.close()
             connection.commit()
