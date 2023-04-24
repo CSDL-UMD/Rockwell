@@ -387,7 +387,7 @@ def qualrender():
     assignment_id_store[oauth_token_qualtrics] = assignment_id
     project_id_store[oauth_token_qualtrics] = project_id
     start_url = start_url_store[oauth_token_qualtrics]
-    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl="http://127.0.0.1:5000/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
     return res
 
 @app.route('/callback')
@@ -543,7 +543,7 @@ def qualcallback():
     access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
-    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl="http://127.0.0.1:5000/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
     return res
 
     #return "<script>window.onload = window.close();</script>"
