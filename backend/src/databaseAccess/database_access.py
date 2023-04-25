@@ -75,6 +75,17 @@ def insert_timelines_attention():
 
             worker_id = payload[5]
 
+            #DELETE ATTENTION TABLES
+            sql = """DELETE FROM user_home_timeline_chronological where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_home_timeline_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_tweet_attn_snapshot_chronological where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_tweet_attn_snapshot_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
             for obj in payload[1]: # Take care of tweet in session here.
                 fav_before = obj['fav_before']
                 tid = obj['tid']
@@ -103,13 +114,6 @@ def insert_timelines_attention():
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
                 conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,predicted_score,))
-            connection.commit()
-
-            #DELETE ATTENTION TABLES
-            sql = """DELETE FROM user_tweet_attn_snapshot_chronological where user_id = %s"""
-            conn_cur.execute(sql,(worker_id,))
-            sql = """DELETE FROM user_tweet_attn_snapshot_control where user_id = %s"""
-            conn_cur.execute(sql,(worker_id,))
             connection.commit()           
 
             for obj in payload[2]: # Take care of tweet in attention here.
