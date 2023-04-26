@@ -90,6 +90,7 @@ def main(data_dir, collection_days, host=HOST_DEFAULT, port=PORT_DEFAULT, log_pa
             inital_time_datetime = datetime.strptime(initial_time, '%Y-%m-%dT%H:%M:%S')
             time_diff = (time_now - inital_time_datetime).total_seconds()
             time_diff_days = time_diff/86400
+            new_file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
         except KeyError as e:
             logger.error(f"Problem getting fields for {user=}", exc_info=e)
             continue
@@ -110,7 +111,8 @@ def main(data_dir, collection_days, host=HOST_DEFAULT, port=PORT_DEFAULT, log_pa
         try:
             url_path = f"/hometimeline?worker_id={worker_id}"\
                 f"&max_id={since_id}"\
-                f"&collection_started={initial_time}"
+                f"&collection_started={initial_time}"\
+                f"&file_number={new_file_number}"
             res = rq.get(f"http://{host}:{port}{url_path}")
             if res.ok:
                 out = res.json()

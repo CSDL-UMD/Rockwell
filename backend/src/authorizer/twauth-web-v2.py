@@ -14,6 +14,7 @@ from collections import defaultdict
 import CardInfo as Cardinfo
 import logging
 import json
+import glob
 import xml
 import xml.sax.saxutils
 
@@ -594,7 +595,7 @@ def insert_feed_qualtrics():
             need_to_fetch_screenname = True
     if need_to_fetch_screenname:
         db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?worker_id='+str(screenname)+"&page="+str(0)+"&feedtype=S")
-        if db_response_screenname.json()['data'] = "NEW":
+        if db_response_screenname.json()['data'] == "NEW":
             need_to_fetch_tweets = True
         else:
             last_updated_date_str = db_response_screenname.json()['data'][0][1]
@@ -771,9 +772,24 @@ def screenname():
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
     return screen_name_return+"$$$"+str(userid_return)+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return+"$$$"+random_identifier
 
+@app.route('/hometimeline_max_file', methods=['GET'])
+def get_hometimeline():
+    worker_id = request.args.get('worker_id').strip()
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
+    db_response = db_response.json()['data']
+    userid = db_response[0][3]
+    existing_home_timeline_files = sorted(glob.glob("UserData/{}_home_*.json.gz".format(userid)))
+    if existing_home_timeline_files:
+        latest_user_file = max(existing_home_timeline_files, key=lambda fn: int(fn.split(".")[0].split("_")[2]))
+        file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
+    else:
+        file_number = 1
+    return jsonify({"file_number" : str(file_number)})    
+
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
     worker_id = request.args.get('worker_id').strip()
+    file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
@@ -854,13 +870,6 @@ def get_hometimeline():
         "homeTweets" : v1tweetobj,
         "errorMessage" : errormessage
     }
-
-    existing_home_timeline_files = sorted(glob.glob("UserData/{}_home_*.json.gz".format(user_id)))
-    if existing_home_timeline_files:
-        latest_user_file = max(existing_home_timeline_files, key=lambda fn: int(fn.split(".")[0].split("_")[2]))
-        file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
-    else:
-        file_number = 1
 
     with gzip.open("UserData/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
