@@ -96,14 +96,14 @@ def filter_tweets(feedtweets):
             filtered_feedtweets.append(tweet)
     return filtered_feedtweets
 
-def break_timeline_attention(public_tweets,absent_tweets,max_pages):
+def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max_pages):
     db_tweet_payload = []
     db_tweet_attn_payload = []
     absent_tweets_ids = []
     rankk = 0
     tweetids_by_page = defaultdict(list)
     all_tweet_ids = [tweet['id'] for tweet in public_tweets]
-    for tweet in public_tweets:
+    for (i,tweet) in enumerate(public_tweets):
         page = int(rankk/10)
         rank_in_page = (rankk%10) + 1
         db_tweet = {
@@ -111,7 +111,8 @@ def break_timeline_attention(public_tweets,absent_tweets,max_pages):
             'tid':str(tweet["id"]),
             'rtbefore':str(tweet['retweeted']),
             'page':page,
-            'rank':rank_in_page
+            'rank':rank_in_page,
+            'predicted_score':public_tweets_score[i]
         }
         db_tweet_payload.append(db_tweet)
         tweetids_by_page[page].append(tweet["id"])
@@ -578,9 +579,10 @@ def insert_feed_qualtrics():
     screenname = db_response[0][2]
     userid = db_response[0][3]
     db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page="+str(0)+"&feedtype=S")
+    need_to_fetch_screenname = False
     need_to_fetch_tweets = False
     if db_response.json()['data'] == "NEW":
-        need_to_fetch_tweets = True
+        need_to_fetch_screenname = True
     else:
         last_updated_date_str = db_response.json()['data'][0][1]
         last_updated_date = datetime.datetime.strptime(last_updated_date_str,'%Y-%m-%d %H:%M:%S')
@@ -589,7 +591,22 @@ def insert_feed_qualtrics():
         days, seconds = diff.days, diff.seconds
         hours = days * 24 + seconds // 3600
         if hours > 24:
+            need_to_fetch_screenname = True
+    if need_to_fetch_screenname:
+        db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?worker_id='+str(screenname)+"&page="+str(0)+"&feedtype=S")
+        if db_response_screenname.json()['data'] = "NEW":
             need_to_fetch_tweets = True
+        else:
+            last_updated_date_str = db_response_screenname.json()['data'][0][1]
+            last_updated_date = datetime.datetime.strptime(last_updated_date_str,'%Y-%m-%d %H:%M:%S')
+            datetime_now = datetime.datetime.now()
+            diff = datetime_now - last_updated_date
+            days, seconds = diff.days, diff.seconds
+            hours = days * 24 + seconds // 3600
+            if hours > 24:
+                need_to_fetch_tweets = True
+            else:
+                worker_id = db_response_screenname.json()['data'][0][-1].strip()
     if need_to_fetch_tweets:
         cred = config('../configuration/config.ini','twitterapp')
         cred['token'] = access_token.strip()
@@ -628,6 +645,7 @@ def insert_feed_qualtrics():
                 }
                 db_tweet_payload.append(db_tweet)
             public_tweets = public_tweets[0:len(public_tweets)-10]
+            public_tweets_score = [-100]*len(public_tweets)
             absent_tweets = public_tweets[-10:]
             max_pages = int(len(public_tweets)/10)
             params_user = {"count": "200","tweet_mode": "extended"}
@@ -642,9 +660,10 @@ def insert_feed_qualtrics():
             #timeline_json = [public_tweets,public_tweets_user,public_tweets_fav]
             timeline_json = [public_tweets,public_tweets_user,screenname]
             recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
-            public_tweets_control = recsys_response.json()['data']
-            db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(public_tweets,absent_tweets,max_pages)
-            db_tweet_control_payload,db_tweet_control_attn_payload = break_timeline_attention(public_tweets_control,absent_tweets,max_pages)
+            public_tweets_control = recsys_response.json()['data'][0]
+            public_tweets_control_score = recsys_response.json()['data'][1]
+            db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max_pages)
+            db_tweet_control_payload,db_tweet_control_attn_payload = break_timeline_attention(public_tweets_control,public_tweets_control_score,absent_tweets,max_pages)
             finalJson = []
             finalJson.append(db_tweet_payload)
             finalJson.append(db_tweet_chronological_payload)
@@ -652,6 +671,7 @@ def insert_feed_qualtrics():
             finalJson.append(db_tweet_control_payload)
             finalJson.append(db_tweet_control_attn_payload)
             finalJson.append(worker_id)
+            finalJson.append(screenname)
             requests.post('http://127.0.0.1:5052/insert_timelines_attention',json=finalJson)
     screenname_store[oauth_token] = screenname
     userid_store[oauth_token] = userid
@@ -732,7 +752,7 @@ def insert_feed_qualtrics():
     finalJson.append(worker_id)
     requests.post('http://127.0.0.1:5052/insert_tweet',json=finalJson)
     """
-    return "Done!"
+    return worker_id
 
 @app.route('/auth/getscreenname')
 def screenname():

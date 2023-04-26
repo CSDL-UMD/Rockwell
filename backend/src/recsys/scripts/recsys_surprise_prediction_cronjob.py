@@ -143,6 +143,7 @@ def main():
             	finalJson.append(db_tweet_control_payload)
             	finalJson.append(db_tweet_control_attn_payload)
             	finalJson.append(worker_id)
+            	finalJson.append(screenname)
             	requests.post('http://127.0.0.1:5052/insert_timelines_attention',json=finalJson)
 
     processed_json["hometimeline"] = unprocessed_home_files

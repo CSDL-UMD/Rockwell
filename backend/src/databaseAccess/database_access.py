@@ -74,6 +74,7 @@ def insert_timelines_attention():
             connection.commit()
 
             worker_id = payload[5]
+            screenname = payload[6]
 
             #DELETE ATTENTION TABLES
             sql = """DELETE FROM user_home_timeline_chronological where user_id = %s"""
@@ -93,12 +94,12 @@ def insert_timelines_attention():
                 page = obj['page']
                 rank = str(obj['rank'])
                 predicted_score = obj['predicted_score']
-                sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
-                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
             connection.commit()
 
             for obj in payload[3]: # Take care of tweet in session here.
@@ -108,12 +109,12 @@ def insert_timelines_attention():
                 page = obj['page']
                 rank = str(obj['rank'])
                 predicted_score = obj['predicted_score']
-                sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
-                conn_cur.execute(sql,(tid,worker_id,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
             connection.commit()           
 
             for obj in payload[2]: # Take care of tweet in attention here.
@@ -444,6 +445,62 @@ def get_worker_tweet_chronological():
                 sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
                 conn_cur.execute(sql, (worker_id,page))     
+        if conn_cur.rowcount > 0:
+            ret = conn_cur.fetchall()
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data=ret)
+        else:
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data="NEW") #Meaning we need to fetch new tweets.
+    except Exception as error:
+        print(error)
+    return "Done!"
+
+@app.route('/get_existing_tweets_new_screenname', methods=['GET','POST'])
+def get_existing_tweets_new_screenname():
+    tries = 5
+    connection = None
+    screenname = ''
+    page = ''
+    feedtype = ''
+    screenname = request.args.get('screenname').strip()
+    try:
+        #Getting connection from pool
+        screenname = request.args.get('screenname').strip()
+        page = request.args.get('page').strip()
+        feedtype = request.args.get('feedtype').strip()
+    except:
+        print("Failed to recieve the screenname.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        if feedtype == 'S':
+            if page == 'NA':
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id FROM user_home_timeline_chronological UA,tweet T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s"""
+                conn_cur.execute(sql, (screenname,))
+            else:
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id FROM user_home_timeline_chronological UA,tweet T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s AND UA.page = %s"""
+                conn_cur.execute(sql, (screenname,page))
+        elif feedtype == 'M':
+            if page == 'NA':
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id FROM user_home_timeline_control UA,tweet T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s"""
+                conn_cur.execute(sql, (screenname,))
+            else:
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id FROM user_home_timeline_control UA,tweet T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s AND UA.page = %s"""
+                conn_cur.execute(sql, (screenname,page))     
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()

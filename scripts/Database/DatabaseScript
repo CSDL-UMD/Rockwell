@@ -57,6 +57,7 @@ CREATE TABLE user_inactivity (
 CREATE TABLE user_home_timeline_chronological (
    tweet_id bigint,
    user_id varchar(10) NOT NULL,
+   screenname varchar(100) NOT NULL,
    rank smallint NOT NULL,
    page smallint NOT NULL,
    is_favorited_before boolean NOT NULL,
@@ -71,6 +72,7 @@ CREATE TABLE user_home_timeline_chronological (
 CREATE TABLE user_home_timeline_control (
    tweet_id bigint,
    user_id varchar(10) NOT NULL,
+   screenname varchar(100) NOT NULL,
    rank smallint NOT NULL,
    page smallint NOT NULL,
    is_favorited_before boolean NOT NULL,
