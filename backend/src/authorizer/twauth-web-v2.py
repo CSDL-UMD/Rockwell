@@ -770,21 +770,12 @@ def screenname():
     worker_id_return = worker_id_store[oauth_token_qualtrics]
     access_token_return = access_token_store[oauth_token_qualtrics]
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
-    return screen_name_return+"$$$"+str(userid_return)+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return+"$$$"+random_identifier
-
-@app.route('/hometimeline_max_file', methods=['GET'])
-def get_hometimeline():
-    worker_id = request.args.get('worker_id').strip()
-    db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
-    db_response = db_response.json()['data']
-    userid = db_response[0][3]
+    file_number = 1
     existing_home_timeline_files = sorted(glob.glob("UserData/{}_home_*.json.gz".format(userid)))
     if existing_home_timeline_files:
         latest_user_file = max(existing_home_timeline_files, key=lambda fn: int(fn.split(".")[0].split("_")[2]))
         file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
-    else:
-        file_number = 1
-    return jsonify({"file_number" : str(file_number)})    
+    return screen_name_return+"$$$"+str(userid_return)+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return+"$$$"+random_identifier+"$$$"+str(file_number)  
 
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
