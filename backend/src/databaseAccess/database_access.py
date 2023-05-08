@@ -95,7 +95,7 @@ def insert_timelines_attention():
                 rank = str(obj['rank'])
                 predicted_score = obj['predicted_score']
                 sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
@@ -110,7 +110,7 @@ def insert_timelines_attention():
                 rank = str(obj['rank'])
                 predicted_score = obj['predicted_score']
                 sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
-                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
                 now_session_start = datetime.datetime.now()
                 session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
                 #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)

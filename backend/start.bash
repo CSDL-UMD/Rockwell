@@ -11,7 +11,7 @@ function usage () {
 function startbackend () {
     echo -e "Starting backend..."
     #tmux new-session -s NodeApp -d 'node ./app.js'
-    tmux new-session -s Authorizer -d 'cd ./src/authorizer/ && python3 ./twauth-web.py' || echo "Could not start Authorizer!"
+    #tmux new-session -s Authorizer -d 'cd ./src/authorizer/ && python3 ./twauth-web.py' || echo "Could not start Authorizer!"
     tmux new-session -s Authorizer_Version2 -d 'cd ./src/authorizer/ && python3 ./twauth-web-v2.py' || echo "Could not start Version 2 Authorizer!"
     #tmux new-session -s FeedRendering -d 'cd ./src/feedGeneration/ && python3 ./twitterFeedGeneration.py' || echo "Could not start FeedRendering!"
     tmux new-session -s DatabaseAccess -d 'cd ./src/databaseAccess/ && python3 ./database_access.py' || echo "Could not start DatabaseAccess!"
@@ -22,7 +22,7 @@ function startbackend () {
 function stopbackend () {
     echo -e "Stopping backend..."
     #tmux kill-session -t NodeApp || echo "Could not kill NodeApp; check it is running."
-    tmux kill-session -t Authorizer || echo "Could not kill Authorizer; check it is running."
+    #tmux kill-session -t Authorizer || echo "Could not kill Authorizer; check it is running."
     tmux kill-session -t Authorizer_Version2 || echo "Could not kill Version 2 Authorizer; check it is running."
     #tmux kill-session -t FeedRendering || echo "Could not kill FeedRendering; check it is running."
     tmux kill-session -t DatabaseAccess || echo "Could not kill DatabaseAccess; check it is running."

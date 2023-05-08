@@ -389,7 +389,7 @@ def qualrender():
     assignment_id_store[oauth_token_qualtrics] = assignment_id
     project_id_store[oauth_token_qualtrics] = project_id
     start_url = start_url_store[oauth_token_qualtrics]
-    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+":5000/insertfeedqualtrics"))
     return res
 
 @app.route('/callback')
@@ -545,7 +545,7 @@ def qualcallback():
     access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
-    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+":5000/insertfeedqualtrics"))
     return res
 
     #return "<script>window.onload = window.close();</script>"
@@ -594,7 +594,7 @@ def insert_feed_qualtrics():
         if hours > 24:
             need_to_fetch_screenname = True
     if need_to_fetch_screenname:
-        db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?worker_id='+str(screenname)+"&page="+str(0)+"&feedtype=S")
+        db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?screenname='+str(screenname)+"&page="+str(0)+"&feedtype=S")
         if db_response_screenname.json()['data'] == "NEW":
             need_to_fetch_tweets = True
         else:
@@ -771,7 +771,7 @@ def screenname():
     access_token_return = access_token_store[oauth_token_qualtrics]
     access_token_secret_return = access_token_secret_store[oauth_token_qualtrics]
     file_number = 1
-    existing_home_timeline_files = sorted(glob.glob("UserData/{}_home_*.json.gz".format(userid)))
+    existing_home_timeline_files = sorted(glob.glob("UserData/{}_home_*.json.gz".format(userid_return)))
     if existing_home_timeline_files:
         latest_user_file = max(existing_home_timeline_files, key=lambda fn: int(fn.split(".")[0].split("_")[2]))
         file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
@@ -1046,6 +1046,7 @@ def get_favorites():
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
     worker_id = str(request.args.get('worker_id')).strip()
+    print(worker_id)
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
     feedtype = str(request.args.get('feedtype')).strip()
@@ -1209,23 +1210,27 @@ def get_feed():
         # Decision making for the block to retrieve article cards AND embedded images
 
         if isQuote and isRetweet: # Check for the case of a quote within a retweet.
-            entities_keys = tweet["retweeted_status"]["quoted_status"]["entities"].keys()
-            mediaArr = tweet["retweeted_status"]["quoted_status"]['entities'].get('media',[])
+            if "entities" in tweet["retweeted_status"]["quoted_status"].keys(): 
+                entities_keys = tweet["retweeted_status"]["quoted_status"]["entities"].keys()
+                mediaArr = tweet["retweeted_status"]["quoted_status"]['entities'].get('media',[])
             if "urls" in entities_keys:
                 all_urls = tweet["retweeted_status"]["quoted_status"]["entities"]["urls"]
         elif isQuote: #  quote only case
-            entities_keys = tweet["quoted_status"]["entities"].keys()
-            mediaArr = tweet["quoted_status"]['entities'].get('media',[])
+            if "entities" in tweet["quoted_status"].keys():
+                entities_keys = tweet["quoted_status"]["entities"].keys()
+                mediaArr = tweet["quoted_status"]['entities'].get('media',[])
             if "urls" in entities_keys:
                 all_urls = tweet["quoted_status"]["entities"]["urls"]
         elif isRetweet:
-            entities_keys = tweet["retweeted_status"]["entities"].keys()
-            mediaArr = tweet["retweeted_status"]['entities'].get('media',[])
+            if "entities" in tweet["retweeted_status"].keys():
+                entities_keys = tweet["retweeted_status"]["entities"].keys()
+                mediaArr = tweet["retweeted_status"]['entities'].get('media',[])
             if "urls" in entities_keys:
                 all_urls = tweet["retweeted_status"]["entities"]["urls"]
         else:
-            entities_keys = tweet["entities"].keys()
-            mediaArr = tweet['entities'].get('media',[])
+            if "entities" in tweet.keys():
+                entities_keys = tweet["entities"].keys()
+                mediaArr = tweet['entities'].get('media',[])
             if "urls" in entities_keys:
                 all_urls = tweet["entities"]["urls"]
 

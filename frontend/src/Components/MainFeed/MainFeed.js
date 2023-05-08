@@ -11,7 +11,7 @@ import './MainFeed.css';
 function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
-  const [feedInformation, setFeedInformation] = useState({});
+  const [feedInformation, setFeedInformation] = useState([]);
   const [sessionIdentifier, setSessionIdentifier] = useState('0');
   const [maxPageIdentifier, setMaxPageIdentifier] = useState('0');
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
@@ -32,10 +32,12 @@ function MainFeed(props) {
     let feedSize = [];
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false;
-    let tweetViewTimeStamps_local = []
+    let tweetViewTimeStamps_local = [];
+    let feedslocal = [];
 
     const handleFirstRender = (argumentObject) => {
       let result = handleTotalResize();
+      console.log(feedInformation);
       feedSize = (calculateFeedSize(result, window.innerHeight));
       tweetViewTimeStamps_local.push([1,0]);
       window.scrollTo(0, 0);
@@ -60,7 +62,10 @@ function MainFeed(props) {
         value.pop();
         //let cookieValue = document.cookie.replace(/(?:(?:^|.*;\s*)worker_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
         //console.log(cookieValue);
-        setFeedInformation(value);
+        for (let i = 0; i < value.length; i++) {
+          feedslocal.push(value[i]);
+        }
+        setFeedInformation(feedslocal);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
         }
@@ -71,6 +76,21 @@ function MainFeed(props) {
         window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
       })
     }
+
+    const fetchTweetsagain = () => {
+      let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)_rockwellidentifierv2_\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=0&page=1&feedtype=S').then(resp => {
+        return resp.json();
+      }).then(value => {
+        value.pop();
+        for (let i = 0; i < value.length; i++) {
+          feedslocal.push(value[i]);
+        }
+        setFeedInformation(feedslocal);
+        //setTweetViewTimeStamps(tempObject);
+      })      
+    }  
 
     const getUrlArgs = () => {
       let originalArgs = props.location.search.substring(1).split('&');
@@ -162,9 +182,10 @@ function MainFeed(props) {
         currentTweet = res;
         console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
       if (res[0] === 10 && !hasReachedEndOfFeed) {
-        hasReachedEndOfFeed = true;
-        setEndOfFeedCondition(true);
-        console.log(tweetViewTimeStamps_local);
+        fetchTweetsagain();
+        //hasReachedEndOfFeed = true;
+        //setEndOfFeedCondition(true);
+        //console.log(tweetViewTimeStamps_local);
       }
       }
       
@@ -258,9 +279,7 @@ function MainFeed(props) {
                 <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike} handleLinkClicked={handleLinkClicked}/>
               ))
             }
-            <div className="TopInstructions">
-              <h4 style={{ margin: '0' }}>Once you are done, click on the button below</h4>
-            </div>
+            <div class="loader"></div>
           </div>
 
           <div className="BottomNavBar">

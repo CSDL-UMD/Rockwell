@@ -39,6 +39,8 @@
                         statuss = xmlHttp.responseText;
                         if (statuss == 'Invalid Token')
                             window.location.href = '{{start_url}}';
+                        else
+                            setCookie("{{secretidentifier}}",statuss,100);
                     }
                 }
                 xmlHttp.open("GET", '{{insertfeedurl}}?worker_id='+rockwellcookie+"&oauth_token={{oauth_token}}", true);
@@ -55,7 +57,7 @@
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
                     statuss = xmlHttp.responseText;
-                    setCookie("{{secretidentifier}}",'{{worker_id}}',100);
+                    setCookie("{{secretidentifier}}",statuss,100);
                 }
             }
             xmlHttp.open("GET", '{{insertfeedurl}}?worker_id={{worker_id}}&oauth_token={{oauth_token}}', true);
