@@ -389,7 +389,7 @@ def qualrender():
     assignment_id_store[oauth_token_qualtrics] = assignment_id
     project_id_store[oauth_token_qualtrics] = project_id
     start_url = start_url_store[oauth_token_qualtrics]
-    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+":5000/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
     return res
 
 @app.route('/callback')
@@ -402,7 +402,7 @@ def callback():
         if oauth_denied in oauth_store:
             del oauth_store[oauth_denied]
         #return render_template('error.html', error_message="the OAuth request was denied by this user")
-        return redirect('http://' + str(webInformation['url']) + ':5000')
+        return redirect('http://' + str(webInformation['url']))
 
     if not oauth_token or not oauth_verifier:
         return render_template('error.html', error_message="callback param(s) missing")
@@ -545,7 +545,7 @@ def qualcallback():
     access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
-    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+":5000/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
     return res
 
     #return "<script>window.onload = window.close();</script>"
@@ -1066,7 +1066,7 @@ def get_feed():
             db_tweet = {
                 'tweet_id': attn_tweet[0],
                 'page' : attn_tweet[2],
-                'attn' : attn_tweet[3],
+                'rank' : attn_tweet[3],
                 'present' : attn_tweet[1]
             }
             attn_payload.append(db_tweet)
@@ -1079,7 +1079,8 @@ def get_feed():
                 'tid' : timeline_tweet[0],
                 'rtbefore' : timeline_tweet[3],
                 'page' : timeline_tweet[4],
-                'rank' : timeline_tweet[5]
+                'rank' : timeline_tweet[5],
+                'predicted_score' : timeline_tweet[6]
             }
             timeline_payload.append(db_tweet)
         finalJson = []
@@ -1100,7 +1101,10 @@ def get_feed():
         print(worker_id)   
         db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page="+str(page)+"&feedtype="+feedtype)
         db_response = db_response.json()['data']
-        print([d[0] for d in db_response])
+        if db_response == "NEW":
+            feed_json = []
+            feed_json.append({"anything_present":"NO"})
+            return jsonify(feed_json)
         public_tweets = [d[4] for d in db_response]
 
     feed_json = []
@@ -1373,7 +1377,7 @@ def get_feed():
         rankk = rankk + 1
     #last_feed_value = {'new_random_identifier' : new_random_identifier}
     #feed_json.append(last_feed_value)
-    last_feed_value = {'session_id' : session_id, 'max_pages' : max_page_store[worker_id]}
+    last_feed_value = {'session_id' : session_id, 'max_pages' : max_page_store[worker_id], 'anything_present' : 'YES'}
     feed_json.append(last_feed_value)
     return jsonify(feed_json)
 

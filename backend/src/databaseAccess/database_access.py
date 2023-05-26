@@ -175,8 +175,8 @@ def insert_timelines_attention_in_session():
                 rank = str(obj['rank'])
                 predicted_score = obj['predicted_score']
                 sql = """INSERT INTO user_engagement_and_impression_session(tweet_id,session_id,is_favorited_before,has_retweet_before,rank,page,feedtype,predicted_score)
-                VALUES(%s,%s,%s,%s,%s,%s,%s);"""
-                conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,predicted_score))
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,predicted_score,))
             connection.commit()
 
             for obj in payload[3]: # Take care of tweet in attention here.
@@ -429,7 +429,7 @@ def get_worker_tweet_chronological():
         conn_cur = connection.cursor()
         if feedtype == 'S':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json FROM user_home_timeline_chronological UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json FROM user_home_timeline_chronological UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
                 conn_cur.execute(sql, (worker_id,))
             else:
@@ -438,7 +438,7 @@ def get_worker_tweet_chronological():
                 conn_cur.execute(sql, (worker_id,page))
         elif feedtype == 'M':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json FROM user_home_timeline_control UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
                 conn_cur.execute(sql, (worker_id,))
             else:
@@ -657,6 +657,79 @@ def get_worker_attention_tweet():
     #    print(error)
     return "Done!"    
 
+@app.route('/engagements_save_endless', methods=['GET','POST']) # Should the method be GET?
+def save_all_engagements_new_endless():
+    tries = 5
+    connection = None
+    worker_id = 0
+    page = 0
+    try:
+        session_id = request.args.get('session_id')
+        #worker_id = int(request.args.get('worker_id'))
+        page = int(request.args.get('page'))
+        tweetRetweets = request.args.get('tweetRetweets')
+        tweetLikes = request.args.get('tweetLikes')
+        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+        tweetLinkClicks = request.args.get('tweetLinkClicks')
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    try:
+        while(tries > 0):
+            connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+            if connection is None:
+                time.sleep(0.2)
+                tries = tries - 1
+                continue
+            tries = -1
+        conn_cur = connection.cursor()
+        sql_retweet = """UPDATE user_engagement_and_impression_session 
+        SET tweet_retweeted = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_like = """UPDATE user_engagement_and_impression_session 
+        SET tweet_favorited = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_telemetry = """UPDATE user_engagement_and_impression_session 
+        SET seen_timestamp = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_inactivity = """INSERT INTO user_inactivity(session_id,tab_inactive_timestamp,tab_active_timestamp,page) values(%s,%s,%s,%s);"""
+        sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id) values(%s,%s,%s,%s,%s);"""
+        if len(tweetRetweets) > 0:
+            for tweet_rank in tweetRetweets.split(','):
+                page_local = int(int(tweet_rank)/10)
+                rankk_local = int(int(tweet_rank)%10)
+                conn_cur.execute(sql_retweet,(True,session_id,page_local,rankk_local))
+        if len(tweetLikes) > 0:
+            for tweet_rank in tweetLikes.split(','):
+                page_local = int(int(tweet_rank)/10)
+                rankk_local = int(int(tweet_rank)%10)
+                conn_cur.execute(sql_like,(True,session_id,page_local,rankk_local))
+        if len(tweetViewTimeStamps) > 0:
+            timeStampsMap = tweetViewTimeStamps.split(',')
+            tab_inactive = []
+            tab_active = []
+            for i in range(0,len(timeStampsMap),2):
+                if timeStampsMap[i] == '-1':
+                    tab_inactive.append(int(timeStampsMap[i+1]))
+                if timeStampsMap[i] == '-2':
+                    tab_active.append(int(timeStampsMap[i+1]))
+                conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
+            print("TAB ACTIVE : ")
+            print(tab_inactive)
+            print(tab_active)
+            if len(tab_inactive) > 0:
+                for i in range(len(tab_inactive)):
+                    conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
+        if len(tweetLinkClicks) > 0:
+            tweetLinkClickMap = tweetLinkClicks.split(',')
+            print(tweetLinkClickMap)
+            for i in range(0,len(tweetLinkClickMap),4):
+                conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],session_id))
+        connection.commit()
+        conn_cur.close()
+        accessPool.putconn(connection) #closing the connection
+    except Exception as error:
+        print(str(error) + " Something inside of the insertion failed.") # Log this.
+        return "Failed"
+    return "Done!"
+
 @app.route('/engagements_save', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new():
     tries = 5
@@ -708,12 +781,14 @@ def save_all_engagements_new():
                     tab_active.append(int(timeStampsMap[i+1]))
                 conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
             print("TAB ACTIVE : ")
+            print(tab_inactive)
             print(tab_active)
             if len(tab_inactive) > 0:
                 for i in range(len(tab_inactive)):
                     conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
         if len(tweetLinkClicks) > 0:
             tweetLinkClickMap = tweetLinkClicks.split(',')
+            print(tweetLinkClickMap)
             for i in range(0,len(tweetLinkClickMap),4):
                 conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],session_id))
         connection.commit()

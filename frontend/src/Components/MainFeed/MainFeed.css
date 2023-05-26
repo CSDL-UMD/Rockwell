@@ -41,6 +41,15 @@
   margin-bottom: 1%;
 }
 
+.TopInstructionsHidden {
+  border-style: solid;
+  border-radius: 1%;
+  border-color: black;
+  text-align: center;
+  margin-bottom: 1%;
+  display: none;
+}
+
 .BottomNavBar {
   min-height: 7.5vh;
   max-height: 7.5vh;
@@ -79,6 +88,18 @@
   width: 40px;
   height: 40px;
   margin: 0 auto;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.loaderHidden {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: none;
   -webkit-animation: spin 2s linear infinite; /* Safari */
   animation: spin 2s linear infinite;
 }

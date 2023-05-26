@@ -11,9 +11,10 @@ import './MainFeed.css';
 function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
-  const [feedInformation, setFeedInformation] = useState([]);
+  const [feedInformation, setFeedInformation] = useState({});
   const [sessionIdentifier, setSessionIdentifier] = useState('0');
   const [maxPageIdentifier, setMaxPageIdentifier] = useState('0');
+  const [currentPageIdentifier, setCurrentPageIdentifier] = useState(0);
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
   const [starTimeInformation, setStarTimeInformation] = useState(0);
@@ -34,28 +35,36 @@ function MainFeed(props) {
     let hasReachedEndOfFeed = false;
     let tweetViewTimeStamps_local = [];
     let feedslocal = [];
+    let page_set = 0;
+    let page_current = 0;
+    let totalFeedLength = 0;
+    let feedtype_set = '';
+    let max_page = 0;
+    let canFetchNewFeed = true;
 
-    const handleFirstRender = (argumentObject) => {
+    const handleFirstRender = () => {
       let result = handleTotalResize();
-      console.log(feedInformation);
       feedSize = (calculateFeedSize(result, window.innerHeight));
+      totalFeedLength = result.length;
       tweetViewTimeStamps_local.push([1,0]);
-      window.scrollTo(0, 0);
+      //window.scrollTo(0, 0);
       startTime = Date.now();
       setStarTimeInformation(startTime);
-      if (parseInt(argumentObject.page) !== 0) {
+      if (page_set !== 0) {
         beginTimer();
       }
     };
 
-    const fetchTweets = (argumentObject) => {
+    const fetchTweets = () => {
       let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)_rockwellidentifierv2_\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
-      fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
+      fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=0&page=' + page_set + '&feedtype=' + feedtype_set).then(resp => {
         return resp.json();
       }).then(value => {
-        if (JSON.stringify(value) === '{}') {
-          window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
+        if (value[value.length - 1]['anything_present'] == 'NO') {
+          //window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
+          console.log("Here???");
+          setEndOfFeedCondition(true);
         }
         setMaxPageIdentifier(value[value.length - 1]['max_pages']);
         setSessionIdentifier(value[value.length - 1]['session_id']);
@@ -65,12 +74,19 @@ function MainFeed(props) {
         for (let i = 0; i < value.length; i++) {
           feedslocal.push(value[i]);
         }
+        console.log(feedslocal);
         setFeedInformation(feedslocal);
         const sleep = (time) => {
           return new Promise((resolve) => setTimeout(resolve, time));
         }
         sleep(500).then(() => {
-          handleFirstRender(argumentObject); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
+          handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
+        });
+        sleep(500).then(() => {
+          handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
+        });
+        sleep(500).then(() => {
+          handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       }).catch(err => {
         window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
@@ -87,6 +103,7 @@ function MainFeed(props) {
         for (let i = 0; i < value.length; i++) {
           feedslocal.push(value[i]);
         }
+        console.log(feedslocal)
         setFeedInformation(feedslocal);
         //setTweetViewTimeStamps(tempObject);
       })      
@@ -151,8 +168,9 @@ function MainFeed(props) {
       const position = window.pageYOffset + clientHeight * 0.75; // Need to account for the bottom bar height
       let feedPosition = feedSize[0];
       let feedIndex = 1;
-
-      while (position > feedPosition && feedIndex < 11) {
+      //console.log(position);
+      //console.log(feedPosition);
+      while (position > feedPosition) {
         feedPosition += feedSize[feedIndex];
         feedIndex++;
       }
@@ -167,7 +185,7 @@ function MainFeed(props) {
       //console.log(tweetViewTimeStamps);
       tweetViewTimeStamps_local.push([feedIndex, time - startTime]);
       setTweetViewTimeStamps(tweetViewTimeStamps_local);
-      console.log(tweetViewTimeStamps);
+      //console.log(tweetViewTimeStamps);
       return [feedIndex, time - startTime];
     };
 
@@ -178,22 +196,42 @@ function MainFeed(props) {
 
     const debouncedHandleScroll = debounce(function handleScroll() {
       const res = handleTweetViewTracking(window.innerHeight);
+      //console.log(res);
       if (res !== null) {
         currentTweet = res;
-        console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
-      if (res[0] === 10 && !hasReachedEndOfFeed) {
-        fetchTweetsagain();
-        //hasReachedEndOfFeed = true;
-        //setEndOfFeedCondition(true);
-        //console.log(tweetViewTimeStamps_local);
-      }
+        //console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
+        console.log(page_set);
+        console.log(res[0]);
+        console.log(totalFeedLength);
+        if (res[0] === (page_set*10 + 2) && res[0] > page_set*10) {
+          page_set = page_set + 1;
+          fetchTweets();
+          //hasReachedEndOfFeed = true;
+          //setEndOfFeedCondition(true);
+          //console.log(tweetViewTimeStamps_local);
+        }
+        if ((res[0] % 10) == 0){
+          page_current = page_current + 1;
+          setCurrentPageIdentifier(page_current);
+        } 
+        //if ((totalFeedLength - res[0]) < 8 && canFetchNewFeed){
+        //  canFetchNewFeed = false;
+        //  page_set = page_set + 1;
+        //  const getnewfeedtimer = setTimeout(() => {
+        //    canFetchNewFeed = true;
+        //  }, 5000);
+        //  fetchTweets();
+        //}
       }
       
     }, 1);
 
     const urlArgs = getUrlArgs();
     setGivenArguments(urlArgs);
-    fetchTweets(urlArgs);
+    page_set = parseInt(urlArgs.page);
+    setCurrentPageIdentifier(page_set);
+    feedtype_set = urlArgs.feedtype;
+    fetchTweets();
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);
     window.addEventListener('scroll', debouncedHandleScroll);
@@ -229,14 +267,15 @@ function MainFeed(props) {
   };
 
   const handleRetweet = (feedIndex) => {
+    console.log(currentPageIdentifier);
     let tempObject = Object.assign([], tweetRetweets);
-    tempObject.push(feedIndex);
+    tempObject.push(parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10));
     setTweetRetweets(tempObject);
   };
 
   const handleLike = (feedIndex) => {
     let tempObject = Object.assign([], tweetLikes);
-    tempObject.push(feedIndex);
+    tempObject.push(parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10));
     setTweetLikes(tempObject);
   };
 
@@ -256,7 +295,7 @@ function MainFeed(props) {
       })
     //window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
     //window.location.href = '/attention?randomtokenszzzz=' + nextRandomIdentifier + '&attn=1&page=' + givenArguments.page
-    window.location.href = '/attention?attn=1&page=' + givenArguments.page + '&feedtype=' + givenArguments.feedtype
+    window.location.href = '/complete'
   };
 
   return (
@@ -271,19 +310,22 @@ function MainFeed(props) {
         <React.Fragment>
           <div className="Feed">
             <div className="TopInstructions">
-              <h5 style={{ margin: '0.3em' }}>Feed {parseInt(givenArguments.page) + 1} of 5</h5> 
-              <p style={{ margin: '0.1em' }}><i>Please interact with the content below as if you were on Twitter. To complete this page, make sure to scroll through the entire feed.</i></p>
+              <p style={{ margin: '0.1em' }}><i>Please scroll through the content below and interact with it as if you were on Twitter --- for example, by reading as well as clicking on links, liking, and/or retweeting content of interest.</i></p>
+              <p style={{ margin: '0.1em' }}><i>Be sure to spend several minutes reading and interacting with content as you normally would. We will ask you questions about your actions later.</i></p>   
             </div>
             {
               feedInformation.map(tweet => (
                 <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike} handleLinkClicked={handleLinkClicked}/>
               ))
             }
-            <div class="loader"></div>
+            <div class={!endOfFeedCondition ? 'loader' : 'loaderHidden'}></div>
+            <div className={!endOfFeedCondition ? 'TopInstructionsHidden' : 'TopInstructions'}>
+              <h4 style={{ margin: '0' }}>End of feed reached. Once you are done click on the button below.</h4>
+            </div>
           </div>
 
           <div className="BottomNavBar">
-            <input type="image" alt="right arrow, next page button" disabled={(!minimumFeedTimeCondition || !endOfFeedCondition) ? 'disabled' : ''} src={(!minimumFeedTimeCondition || !endOfFeedCondition) ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
+            <input type="image" alt="right arrow, next page button" disabled={!minimumFeedTimeCondition ? 'disabled' : ''} src={!minimumFeedTimeCondition ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
           </div>
 
         </React.Fragment>
