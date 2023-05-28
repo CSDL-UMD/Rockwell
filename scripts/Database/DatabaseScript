@@ -91,7 +91,7 @@ CREATE TABLE user_engagement_and_impression_session (
    has_retweet_before boolean NOT NULL,
    tweet_retweeted boolean,
    tweet_favorited boolean,
-   seen_timestamp bigint,
+   seen_timestamp varchar(1000),
    rank smallint NOT NULL,
    page smallint NOT NULL,
    predicted_score real NOT NULL,

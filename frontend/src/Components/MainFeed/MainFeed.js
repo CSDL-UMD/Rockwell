@@ -30,10 +30,12 @@ function MainFeed(props) {
 
   useEffect(() => {
     let startTime = Date.now();
+    let startTimeGlobal = Date.now();
     let feedSize = [];
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false;
     let tweetViewTimeStamps_local = [];
+    let tweetViewTimeStamps_global = [];
     let feedslocal = [];
     let page_set = 0;
     let page_current = 0;
@@ -63,7 +65,6 @@ function MainFeed(props) {
       }).then(value => {
         if (value[value.length - 1]['anything_present'] == 'NO') {
           //window.location.href = config.error + '?error=' + config.error_codes.no_tweets_main_feed;
-          console.log("Here???");
           setEndOfFeedCondition(true);
         }
         setMaxPageIdentifier(value[value.length - 1]['max_pages']);
@@ -123,15 +124,15 @@ function MainFeed(props) {
       const time = Date.now()
       if (document.visibilityState === "visible") {
         //handleTweetViewTracking(-2,feedSize,currentTweet,startTime);
-        tweetViewTimeStamps_local.push([-2, time - startTime]);
-        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        tweetViewTimeStamps_global.push([-2, time - startTime]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_global);
         //let tempObject = Object.assign([], tweetViewTimeStamps);
         //tempObject.push([-2, time - startTime]);
         //setTweetViewTimeStamps(tempObject);
       } else {
         //handleTweetViewTracking(-1,feedSize,currentTweet,startTime);
-        tweetViewTimeStamps_local.push([-1, time - startTime]);
-        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        tweetViewTimeStamps_global.push([-1, time - startTime]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_global);
         //let tempObject = Object.assign([], tweetViewTimeStamps);
         //tempObject.push([-1, time - startTime]);
         //setTweetViewTimeStamps(tempObject);
@@ -154,7 +155,8 @@ function MainFeed(props) {
 
       if (clientHeight < 0) {
         tweetViewTimeStamps_local.push([clientHeight, time - startTime]);
-        setTweetViewTimeStamps(tweetViewTimeStamps_local);
+        tweetViewTimeStamps_global.push([clientHeight, time - startTimeGlobal]);
+        setTweetViewTimeStamps(tweetViewTimeStamps_global);
         //let tempObject = Object.assign([], tweetViewTimeStamps);
         //tempObject.push([clientHeight, time - startTime]);
         //setTweetViewTimeStamps(tempObject);
@@ -184,8 +186,11 @@ function MainFeed(props) {
       //setTweetViewTimeStamps(tempObject);
       //console.log(tweetViewTimeStamps);
       tweetViewTimeStamps_local.push([feedIndex, time - startTime]);
-      setTweetViewTimeStamps(tweetViewTimeStamps_local);
+      tweetViewTimeStamps_global.push([feedIndex, time - startTimeGlobal]);
+      setTweetViewTimeStamps(tweetViewTimeStamps_global);
       //console.log(tweetViewTimeStamps);
+      console.log(feedIndex);
+      console.log(time - startTimeGlobal);
       return [feedIndex, time - startTime];
     };
 
@@ -200,9 +205,6 @@ function MainFeed(props) {
       if (res !== null) {
         currentTweet = res;
         //console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
-        console.log(page_set);
-        console.log(res[0]);
-        console.log(totalFeedLength);
         if (res[0] === (page_set*10 + 2) && res[0] > page_set*10) {
           page_set = page_set + 1;
           fetchTweets();
@@ -231,6 +233,7 @@ function MainFeed(props) {
     page_set = parseInt(urlArgs.page);
     setCurrentPageIdentifier(page_set);
     feedtype_set = urlArgs.feedtype;
+    //startTime = Date.now();
     fetchTweets();
     urlArgs.page === '0' ? handleShowInstructionCarousel() : setShowInstructionCarousel(false);
     window.addEventListener('resize', debouncedHandleResize);

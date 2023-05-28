@@ -7,6 +7,7 @@ from psycopg2 import pool
 import datetime
 import time
 import asyncio
+from collections import defaultdict
 
 #Global pool variable:
 pool_is_full = False
@@ -671,6 +672,8 @@ def save_all_engagements_new_endless():
         tweetLikes = request.args.get('tweetLikes')
         tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
         tweetLinkClicks = request.args.get('tweetLinkClicks')
+        print("Tweet View Timestamps : ")
+        print(tweetViewTimeStamps)
     except:
         print("Failed to recieve the worker id.") # Log this
         return "Failed"
@@ -703,6 +706,7 @@ def save_all_engagements_new_endless():
                 conn_cur.execute(sql_like,(True,session_id,page_local,rankk_local))
         if len(tweetViewTimeStamps) > 0:
             timeStampsMap = tweetViewTimeStamps.split(',')
+            timeStampsDict = defaultdict(list)
             tab_inactive = []
             tab_active = []
             for i in range(0,len(timeStampsMap),2):
@@ -710,10 +714,14 @@ def save_all_engagements_new_endless():
                     tab_inactive.append(int(timeStampsMap[i+1]))
                 if timeStampsMap[i] == '-2':
                     tab_active.append(int(timeStampsMap[i+1]))
-                conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
-            print("TAB ACTIVE : ")
-            print(tab_inactive)
-            print(tab_active)
+                rankk_glob = int(timeStampsMap[i])
+                timeStampsDict[rankk_glob].append(timeStampsMap[i+1])
+            for rr in timeStampsDict.keys():
+                timestamp_str = ','.join(timeStampsDict[rr])
+                page_local = int(rr/10)
+                rankk_local = int(rr%10)
+                conn_cur.execute(sql_telemetry,(timestamp_str,session_id,page_local,rankk_local))
+                #conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
             if len(tab_inactive) > 0:
                 for i in range(len(tab_inactive)):
                     conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
