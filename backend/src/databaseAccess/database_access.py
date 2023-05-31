@@ -1020,6 +1020,8 @@ def insert_session():
         connection = accessPool.getconn()
         if connection is not False: 
             worker_id = request.args.get('worker_id')
+            print("WORKER ID in Session")
+            print(worker_id)
             now_session_start = datetime.datetime.now()
             session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
             cursor = connection.cursor()

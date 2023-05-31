@@ -21,7 +21,8 @@ function Tweet(props) {
 
   const handleRetweet = (tweet) => {
     if (retweetEnabled) {
-      fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      //fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      fetch(configuration.retweet_tweet + '?worker_id='+ props.workerid + '&tweet_id=' + tweet.tweet_id, { method: 'POST' });
       if (localTweet.retweet_count.includes('k')) {
         setRetweetEnabled(false);
       } else {
@@ -41,7 +42,8 @@ function Tweet(props) {
 
   const handleLike = (tweet) => {
     if (likeEnabled) {
-      fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      //fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      fetch(configuration.like_tweet + '?worker_id='+ props.workerid + '&tweet_id=' + tweet.tweet_id, { method: 'POST' });
       if (localTweet.likes.includes('k')) {
         setLikeEnabled(false);
       } else {

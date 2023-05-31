@@ -569,11 +569,40 @@ def qualcallback():
 
 @app.route('/insertfeedqualtrics', methods=['GET','POST'])
 def insert_feed_qualtrics():
+    worker_id = request.args.get('worker_id').strip()
+    oauth_token = request.args.get('oauth_token')
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_user?worker_id='+str(worker_id))
+    #print(db_response.json())
+    db_response = db_response.json()['data']
+    access_token = db_response[0][0]
+    access_token_secret = db_response[0][1]
+    screenname = db_response[0][2]
+    userid = db_response[0][3]
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page="+str(0)+"&feedtype=S")
+    need_to_fetch_screenname = False
+    need_to_fetch_tweets = False
+    if db_response.json()['data'] == "NEW":
+        need_to_fetch_screenname = True
+    if need_to_fetch_screenname:
+        db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?screenname='+str(screenname)+"&page="+str(0)+"&feedtype=S")
+        if db_response_screenname.json()['data'] == "NEW":
+            need_to_fetch_tweets = True
+        else:
+            worker_id = db_response_screenname.json()['data'][0][-1].strip()
+    screenname_store[oauth_token] = screenname
+    userid_store[oauth_token] = userid
+    worker_id_store[oauth_token] = str(worker_id)
+    access_token_store[oauth_token] = access_token
+    access_token_secret_store[oauth_token] = access_token_secret
+    return worker_id
+
+@app.route('/insertfeedqualtrics_prev', methods=['GET','POST'])
+def insert_feed_qualtrics_prev():
     print("Called!!!")
     worker_id = request.args.get('worker_id').strip()
     oauth_token = request.args.get('oauth_token')
     db_response = requests.get('http://127.0.0.1:5052/get_existing_user?worker_id='+str(worker_id))
-    print(db_response.json())
+    #print(db_response.json())
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
     access_token_secret = db_response[0][1]
@@ -607,7 +636,9 @@ def insert_feed_qualtrics():
             if hours > 24:
                 need_to_fetch_tweets = True
             else:
+                print("Yahan aaya????")
                 worker_id = db_response_screenname.json()['data'][0][-1].strip()
+                print(worker_id)
     if need_to_fetch_tweets:
         cred = config('../configuration/config.ini','twitterapp')
         cred['token'] = access_token.strip()
@@ -627,8 +658,8 @@ def insert_feed_qualtrics():
         if response.text == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
             print("Rate limit exceeded.")
         public_tweets = json.loads(response.text)
-        response_user = oauth.get("https://api.twitter.com/2/users/{}/tweets".format(userid), params = timeline_params)
-        response_fav = oauth.get("https://api.twitter.com/2/users/{}/liked_tweets".format(userid), params = timeline_params)
+        #response_user = oauth.get("https://api.twitter.com/2/users/{}/tweets".format(userid), params = timeline_params)
+        #response_fav = oauth.get("https://api.twitter.com/2/users/{}/liked_tweets".format(userid), params = timeline_params)
         public_tweets_user = json.loads(response_user.text)
         public_tweets_fav = json.loads(response_fav.text)
         public_tweets = convertv2tov1(public_tweets,cred,v2tweetobj_user=public_tweets_user,v2tweetobj_fav=public_tweets_fav)
@@ -654,8 +685,8 @@ def insert_feed_qualtrics():
             #response_user = oauth.get("https://api.twitter.com/1.1/statuses/user_timeline.json", params = params_user)
             #response_fav = oauth.get("https://api.twitter.com/1.1/statuses/favorites/list.json", params = params_user)
             #response_fav = oauth.get("https://api.twitter.com/2/users/"+str(user_id)+"/liked_tweets")
-            print("FAVORITES!!!!")
-            print(response_fav.text)
+            #print("FAVORITES!!!!")
+            #print(response_fav.text)
             public_tweets_user = convertv2tov1(public_tweets_user,cred)
             public_tweets_fav = convertv2tov1(public_tweets_fav,cred)
             #timeline_json = [public_tweets,public_tweets_user,public_tweets_fav]
@@ -776,6 +807,58 @@ def screenname():
         latest_user_file = max(existing_home_timeline_files, key=lambda fn: int(fn.split(".")[0].split("_")[2]))
         file_number = int(latest_user_file.split(".")[0].split("_")[2]) + 1
     return screen_name_return+"$$$"+str(userid_return)+"$$$"+worker_id_return+"$$$"+access_token_return+"$$$"+access_token_secret_return+"$$$"+random_identifier+"$$$"+str(file_number)  
+
+@app.route('/retweet_post', methods=['GET','POST'])
+def retweet_post():
+    worker_id = request.args.get('worker_id').strip()
+    tweet_id = request.args.get('tweet_id').strip()
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
+    db_response = db_response.json()['data']
+    access_token = db_response[0][0]
+    access_token_secret = db_response[0][1]
+    userid = db_response[0][3]
+
+    cred = config('../configuration/config.ini','twitterapp')
+    cred['token'] = access_token.strip()
+    cred['token_secret'] = access_token_secret.strip()
+    oauth = OAuth1Session(cred['key'],
+                        client_secret=cred['key_secret'],
+                        resource_owner_key=cred['token'],
+                        resource_owner_secret=cred['token_secret'])
+
+    try:
+        response_retweet = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(tweet_id))
+        print(response_retweet)
+        return jsonify({"success":1}) # Retweet successful
+    except Exception as e:
+        print(e)
+        return jsonify({"success":0}) # Retweet failed
+
+@app.route('/like_post', methods=['GET','POST'])
+def like_post():
+    worker_id = request.args.get('worker_id').strip()  
+    tweet_id = request.args.get('tweet_id').strip()  
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
+    db_response = db_response.json()['data']
+    access_token = db_response[0][0]
+    access_token_secret = db_response[0][1]
+    userid = db_response[0][3]
+
+    cred = config('../configuration/config.ini','twitterapp')
+    cred['token'] = access_token.strip()
+    cred['token_secret'] = access_token_secret.strip()
+    oauth = OAuth1Session(cred['key'],
+                        client_secret=cred['key_secret'],
+                        resource_owner_key=cred['token'],
+                        resource_owner_secret=cred['token_secret'])
+
+    try:
+        response_retweet = oauth.post("https://api.twitter.com/2/users/{}/likes".format(tweet_id))
+        return jsonify({"success":1}) # Retweet successful
+    except Exception as e:
+        print(e)
+        return jsonify({"success":0}) # Retweet failed
+
 
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
@@ -1046,6 +1129,7 @@ def get_favorites():
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
     worker_id = str(request.args.get('worker_id')).strip()
+    print("WORKER ID in get feed")
     print(worker_id)
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
@@ -1062,6 +1146,7 @@ def get_feed():
         db_response_timeline = db_response_timeline.json()['data']
         attn_payload = []
         attn_pages = []
+        print(db_response_attn)
         for attn_tweet in db_response_attn:
             db_tweet = {
                 'tweet_id': attn_tweet[0],

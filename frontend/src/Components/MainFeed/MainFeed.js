@@ -12,6 +12,7 @@ function MainFeed(props) {
   const [showInstructionCarousel, setShowInstructionCarousel] = useState(false);
   const [givenArguments, setGivenArguments] = useState({});
   const [feedInformation, setFeedInformation] = useState({});
+  const [workeridIdentifier, setWorkeridIdentifier] = useState('0');
   const [sessionIdentifier, setSessionIdentifier] = useState('0');
   const [maxPageIdentifier, setMaxPageIdentifier] = useState('0');
   const [currentPageIdentifier, setCurrentPageIdentifier] = useState(0);
@@ -59,6 +60,7 @@ function MainFeed(props) {
 
     const fetchTweets = () => {
       let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)_rockwellidentifierv2_\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      setWorkeridIdentifier(worker_id_cookie);
       //fetch(configuration.get_feed + '?access_token=' + argumentObject.access_token + '&access_token_secret=' + argumentObject.access_token_secret + '&user_id=' + argumentObject.user_id +  '&screen_name=' + argumentObject.screen_name + '&worker_id=' + argumentObject.worker_id + '&attn=' + argumentObject.attn + '&page=' + argumentObject.page + '&feedtype=' + argumentObject.feedtype).then(resp => {
       fetch(configuration.get_feed + '?worker_id=' + worker_id_cookie + '&attn=0&page=' + page_set + '&feedtype=' + feedtype_set).then(resp => {
         return resp.json();
@@ -270,7 +272,6 @@ function MainFeed(props) {
   };
 
   const handleRetweet = (feedIndex) => {
-    console.log(currentPageIdentifier);
     let tempObject = Object.assign([], tweetRetweets);
     tempObject.push(parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10));
     setTweetRetweets(tempObject);
@@ -318,7 +319,7 @@ function MainFeed(props) {
             </div>
             {
               feedInformation.map(tweet => (
-                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} handleRetweet={handleRetweet} handleLike={handleLike} handleLinkClicked={handleLinkClicked}/>
+                <Tweet key={JSON.stringify(tweet)} tweet={tweet} givenArguments={givenArguments} workerid={workeridIdentifier} handleRetweet={handleRetweet} handleLike={handleLike} handleLinkClicked={handleLinkClicked}/>
               ))
             }
             <div class={!endOfFeedCondition ? 'loader' : 'loaderHidden'}></div>
