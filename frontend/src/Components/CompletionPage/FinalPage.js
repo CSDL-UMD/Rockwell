@@ -1,7 +1,10 @@
+import configuration from '../../Configuration/config';
 import config from '../../Configuration/config';
 import './FinalPage.css';
 
 function FinalPage() {
+    let worker_id_cookie = document.cookie.replace(/(?:(?:^|.*;\s*)_rockwellidentifierv2_\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    fetch(configuration.completed_change + '?worker_id='+ worker_id_cookie, { method: 'POST' });
     return (
         <div className="TextBody">
             Thank you for answering these questions. This research is not intended to support or oppose any political candidate or

@@ -74,6 +74,7 @@ mode_store = {}
 participant_id_store = {}
 assignment_id_store = {}
 project_id_store = {}
+completed_survey = {}
 
 def filter_tweets(feedtweets):
     level_1_tweets = []
@@ -827,8 +828,8 @@ def retweet_post():
                         resource_owner_secret=cred['token_secret'])
 
     try:
-        response_retweet = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(tweet_id))
-        print(response_retweet)
+        payload = {"tweet_id" : tweet_id}
+        response_retweet = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(userid), json=payload)
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
@@ -853,7 +854,8 @@ def like_post():
                         resource_owner_secret=cred['token_secret'])
 
     try:
-        response_retweet = oauth.post("https://api.twitter.com/2/users/{}/likes".format(tweet_id))
+        payload = {"tweet_id" : tweet_id}
+        response_likes = oauth.post("https://api.twitter.com/2/users/{}/likes".format(userid), json=payload)
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
@@ -1129,8 +1131,7 @@ def get_favorites():
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
     worker_id = str(request.args.get('worker_id')).strip()
-    print("WORKER ID in get feed")
-    print(worker_id)
+    completed_survey[worker_id] = False
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
     feedtype = str(request.args.get('feedtype')).strip()
@@ -1465,6 +1466,18 @@ def get_feed():
     last_feed_value = {'session_id' : session_id, 'max_pages' : max_page_store[worker_id], 'anything_present' : 'YES'}
     feed_json.append(last_feed_value)
     return jsonify(feed_json)
+
+@app.route('/completedstatuschange', methods=['GET'])
+def completed_status_change():
+    worker_id = str(request.args.get('worker_id')).strip()
+    completed_survey[worker_id] = True
+
+@app.route('/completedcheck', methods=['GET'])
+def completed_check():
+    worker_id = str(request.args.get('worker_id')).strip()
+    if not completed_survey[worker_id]:
+        return "NO"
+    return "YES"
 
 @app.errorhandler(500)
 def internal_server_error(e):
