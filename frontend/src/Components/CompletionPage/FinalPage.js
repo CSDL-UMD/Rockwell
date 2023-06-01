@@ -12,7 +12,9 @@ function FinalPage() {
             nyhan@dartmouth.edu.
 
             We will not access your Twitter account again in the future. You can revoke access to your profile at any time by following
-            the instructions <a rel="noopener noreferrer" target="_blank" href="https://help.twitter.com/en/managing-your-account/connect-or-revoke-access-to-third-party-apps">here.</a> Please click the next button below to finish the survey and receive credit for completion from YouGov.
+            the instructions <a rel="noopener noreferrer" target="_blank" href="https://help.twitter.com/en/managing-your-account/connect-or-revoke-access-to-third-party-apps">here.</a> 
+
+            Please close this window aand return to the survey.
             Thank you again for participating!
             <br />
             <button onClick={() => window.location.href = config.youGovCompleteRedirect}>Next</button>

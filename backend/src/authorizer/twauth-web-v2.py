@@ -539,11 +539,11 @@ def qualcallback():
     resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user',params=insert_user_payload)
     worker_id = resp_worker_id.json()["data"]
     
-    screenname_store[oauth_token] = screen_name
-    userid_store[oauth_token] = user_id
-    worker_id_store[oauth_token] = str(worker_id)
-    access_token_store[oauth_token] = real_oauth_token
-    access_token_secret_store[oauth_token] = real_oauth_token_secret
+    #screenname_store[oauth_token] = screen_name
+    #userid_store[oauth_token] = user_id
+    #worker_id_store[oauth_token] = str(worker_id)
+    #access_token_store[oauth_token] = real_oauth_token
+    #access_token_secret_store[oauth_token] = real_oauth_token_secret
     del oauth_store[oauth_token]
 
     res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
@@ -595,6 +595,9 @@ def insert_feed_qualtrics():
     worker_id_store[oauth_token] = str(worker_id)
     access_token_store[oauth_token] = access_token
     access_token_secret_store[oauth_token] = access_token_secret
+    print("WORKER ID IN INSERT FEED QUALTRICS")
+    print(worker_id)
+    completed_survey[worker_id] = False
     return worker_id
 
 @app.route('/insertfeedqualtrics_prev', methods=['GET','POST'])
@@ -1131,7 +1134,6 @@ def get_favorites():
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
     worker_id = str(request.args.get('worker_id')).strip()
-    completed_survey[worker_id] = False
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
     feedtype = str(request.args.get('feedtype')).strip()
@@ -1467,14 +1469,16 @@ def get_feed():
     feed_json.append(last_feed_value)
     return jsonify(feed_json)
 
-@app.route('/completedstatuschange', methods=['GET'])
+@app.route('/completedstatuschange', methods=['GET','POST'])
 def completed_status_change():
     worker_id = str(request.args.get('worker_id')).strip()
     completed_survey[worker_id] = True
+    return "Done!"
 
-@app.route('/completedcheck', methods=['GET'])
+@app.route('/completedcheck', methods=['GET','POST'])
 def completed_check():
     worker_id = str(request.args.get('worker_id')).strip()
+    print(completed_survey[worker_id])
     if not completed_survey[worker_id]:
         return "NO"
     return "YES"
