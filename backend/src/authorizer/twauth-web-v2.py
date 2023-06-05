@@ -30,7 +30,7 @@ def config(filename='database.ini', section='postgresql'):
     parser = ConfigParser()
     # read config file
     parser.read(filename)
-
+yo yo honey singh
     # get section, default to postgresql
     db = {}
     if parser.has_section(section):
@@ -104,8 +104,11 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
     absent_tweets_ids = []
     rankk = 0
     tweetids_by_page = defaultdict(list)
-    all_tweet_ids = [tweet['id'] for tweet in public_tweets]
+    print(absent_tweets)
+    all_tweet_ids = [tweet['id'] for tweet in public_tweets if type(tweet) != float]
     for (i,tweet) in enumerate(public_tweets):
+        if type(tweet) == float:
+                continue
         page = int(rankk/10)
         rank_in_page = (rankk%10) + 1
         db_tweet = {
@@ -121,6 +124,8 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
         rankk = rankk + 1
 
     for tweet in absent_tweets:
+        if type(tweet) == float:
+                continue
         absent_tweets_ids.append(tweet["id_str"])
 
     for attn_page in range(max_pages):
@@ -535,15 +540,23 @@ def qualcallback():
         resp_mturk_ref_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_mturk_user',params=insert_mturk_user_payload)
         mturk_ref_id = resp_mturk_ref_id.json()["data"]
 
-    insert_user_payload = {'mturk_ref_id' : mturk_ref_id, 'twitter_id': str(user_id),'access_token': real_oauth_token, 'access_token_secret': real_oauth_token_secret, 'screenname': screen_name, 'account_settings': account_settings_user}
+    worker_id = ''
+    db_response_screenname = requests.get('http://127.0.0.1:5052/get_existing_tweets_new_screenname?screenname='+str(screenname)+"&page="+str(0)+"&feedtype=S")
+    if db_response_screenname.json()['data'] == "NEW":
+        worker_id = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
+    else:
+        worker_id = db_response_screenname.json()['data'][0][-1].strip()
+
+    insert_user_payload = {'worker_id' : worker_id, 'mturk_ref_id' : mturk_ref_id, 'twitter_id': str(user_id),'access_token': real_oauth_token, 'access_token_secret': real_oauth_token_secret, 'screenname': screen_name, 'account_settings': account_settings_user}
     resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user',params=insert_user_payload)
-    worker_id = resp_worker_id.json()["data"]
+    #worker_id = resp_worker_id.json()["data"]
     
-    #screenname_store[oauth_token] = screen_name
-    #userid_store[oauth_token] = user_id
-    #worker_id_store[oauth_token] = str(worker_id)
-    #access_token_store[oauth_token] = real_oauth_token
-    #access_token_secret_store[oauth_token] = real_oauth_token_secret
+    screenname_store[oauth_token] = screen_name
+    userid_store[oauth_token] = user_id
+    worker_id_store[oauth_token] = str(worker_id)
+    access_token_store[oauth_token] = real_oauth_token
+    access_token_secret_store[oauth_token] = real_oauth_token_secret
+    completed_survey[worker_id] = False
     del oauth_store[oauth_token]
 
     res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
@@ -595,8 +608,6 @@ def insert_feed_qualtrics():
     worker_id_store[oauth_token] = str(worker_id)
     access_token_store[oauth_token] = access_token
     access_token_secret_store[oauth_token] = access_token_secret
-    print("WORKER ID IN INSERT FEED QUALTRICS")
-    print(worker_id)
     completed_survey[worker_id] = False
     return worker_id
 
@@ -954,17 +965,43 @@ def get_hometimeline():
         outfile.write(json.dumps(writeObj).encode('utf-8'))
 
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
-        outfile.write(json.dumps(v2tweetobj).encode('utf-8'))    
+        outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
-    unprocessed_json = {}
-    with open("../configuration/unprocessed.json") as fin:
-        unprocessed_json = json.loads(fin.read())
-    unprocessed_files = unprocessed_json["hometimeline"]
-    unprocessed_files.append(os.getcwd()+"/UserData/{}_home_{}.json.gz".format(userid,file_number))
-    unprocessed_files = list(set(unprocessed_files)) 
-    unprocessed_json["hometimeline"] = unprocessed_files
-    with open("../configuration/unprocessed.json","w") as outfile:
-        outfile.write(json.dumps(unprocessed_json))
+    feed_tweets = filter_tweets(v1tweetobj)
+    db_tweet_payload = []
+    for tweet in feed_tweets:
+        db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet}
+        db_tweet_payload.append(db_tweet)
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page=NA&feedtype=S")
+    if db_response.json()['data'] != "NEW":
+        existing_tweets = [response[6] for response in db_response.json()['data']]
+        feed_tweets.extend(existing_tweets)
+    feed_tweets = feed_tweets[0:len(feed_tweets)-10]
+    absent_tweets = feed_tweets[-10:]
+    feed_tweets_chronological = []
+    feed_tweets_chronological_score = []
+    for tweet in feed_tweets:
+        feed_tweets_chronological.append(tweet)
+        feed_tweets_chronological_score.append(-100)
+    max_pages = min([len(feed_tweets),5])
+    db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(feed_tweets_chronological,feed_tweets_chronological_score,absent_tweets,max_pages)
+    finalJson = []
+    finalJson.append(db_tweet_payload)
+    finalJson.append(db_tweet_chronological_payload)
+    finalJson.append(db_tweet_chronological_attn_payload)
+    finalJson.append(worker_id)
+    finalJson.append(screenname)
+    requests.post('http://127.0.0.1:5052/insert_timelines_attention_chronological',json=finalJson)
+
+    #unprocessed_json = {}
+    #with open("../configuration/unprocessed.json") as fin:
+    #    unprocessed_json = json.loads(fin.read())
+    #unprocessed_files = unprocessed_json["hometimeline"]
+    #unprocessed_files.append(os.getcwd()+"/UserData/{}_home_{}.json.gz".format(userid,file_number))
+    #unprocessed_files = list(set(unprocessed_files)) 
+    #unprocessed_json["hometimeline"] = unprocessed_files
+    #with open("../configuration/unprocessed.json","w") as outfile:
+    #    outfile.write(json.dumps(unprocessed_json))
 
     return jsonify({"errorMessage" : errormessage})
 
@@ -1037,16 +1074,6 @@ def get_usertimeline():
     with gzip.open("UserDatav2/{}_user.json.gz".format(userid),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
-    unprocessed_json = {}
-    with open("../configuration/unprocessed.json") as fin:
-        unprocessed_json = json.loads(fin.read())
-    unprocessed_files = unprocessed_json["usertimeline"]
-    unprocessed_files.append(os.getcwd()+"/UserData/{}_user.json.gz".format(userid))
-    unprocessed_files = list(set(unprocessed_files)) 
-    unprocessed_json["usertimeline"] = unprocessed_files
-    with open("../configuration/unprocessed.json","w") as outfile:
-        outfile.write(json.dumps(unprocessed_json))
-
     return jsonify({"errorMessage" : errormessage})
 
 
@@ -1118,22 +1145,14 @@ def get_favorites():
     with gzip.open("UserDatav2/{}_fav.json.gz".format(userid),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
-    unprocessed_json = {}
-    with open("../configuration/unprocessed.json") as fin:
-        unprocessed_json = json.loads(fin.read())
-    unprocessed_files = unprocessed_json["favorites"]
-    unprocessed_files.append(os.getcwd()+"/UserData/{}_fav.json.gz".format(userid))
-    unprocessed_files = list(set(unprocessed_files)) 
-    unprocessed_json["favorites"] = unprocessed_files
-    with open("../configuration/unprocessed.json","w") as outfile:
-        outfile.write(json.dumps(unprocessed_json))
-
     return jsonify({"errorMessage" : errormessage})
 
 
 @app.route('/getfeed', methods=['GET'])
 def get_feed():
     worker_id = str(request.args.get('worker_id')).strip()
+    print("WORKER ID IN GET FEED!!!")
+    print(worker_id)
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
     feedtype = str(request.args.get('feedtype')).strip()

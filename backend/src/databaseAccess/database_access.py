@@ -44,6 +44,138 @@ worker_id_store = {}
 #                        time.sleep(1) # wait one second when the queue has data but connections are full.
 #            time.sleep(5)
 
+@app.route('/insert_timelines_attention_chronological', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_attention_chronological():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+            # We can also async all 3 of these 
+            for obj in payload[0]:
+                tweet_id = obj['tweet_id']
+                tweet_json = json.dumps(obj['tweet_json'])
+                sql = """INSERT INTO tweet VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json))
+            connection.commit()
+
+            worker_id = payload[3]
+            screenname = payload[4]
+
+            #DELETE ATTENTION TABLES
+            sql = """DELETE FROM user_home_timeline_chronological where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_tweet_attn_snapshot_chronological where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
+            for obj in payload[1]: # Take care of tweet in session here.
+                fav_before = obj['fav_before']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_home_timeline_chronological(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                now_session_start = datetime.datetime.now()
+                session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
+                #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+            connection.commit()
+
+            for obj in payload[2]: # Take care of tweet in attention here.
+                tweet_id = obj['tweet_id']
+                page = str(obj['page'])
+                rank = str(obj['rank'])
+                present = obj['present']
+                sql = """INSERT INTO user_tweet_attn_snapshot_chronological(tweet_id,user_id,page,rank,correct_ans) VALUES(%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tweet_id,worker_id,page,rank,present,))
+            connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
+@app.route('/insert_timelines_attention_control', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_attention_control():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+            # We can also async all 3 of these 
+            worker_id = payload[2]
+            screenname = payload[3]
+
+            #DELETE ATTENTION TABLES
+            sql = """DELETE FROM user_home_timeline_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            sql = """DELETE FROM user_tweet_attn_snapshot_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
+            for obj in payload[0]: # Take care of tweet in session here.
+                fav_before = obj['fav_before']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_home_timeline_control(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                now_session_start = datetime.datetime.now()
+                session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
+                #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+            connection.commit()
+
+            for obj in payload[1]: # Take care of tweet in attention here.
+                tweet_id = obj['tweet_id']
+                page = str(obj['page'])
+                rank = str(obj['rank'])
+                present = obj['present']
+                sql = """INSERT INTO user_tweet_attn_snapshot_control(tweet_id,user_id,page,rank,correct_ans) VALUES(%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tweet_id,worker_id,page,rank,present,))
+            connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
 
 @app.route('/insert_timelines_attention', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
 def insert_timelines_attention():
@@ -1068,6 +1200,7 @@ def insert_user():
     try:
         connection = accessPool.getconn()
         if connection is not False:
+            worker_id = request.args.get('worker_id')
             mturk_ref_id = request.args.get('mturk_ref_id')
             twitter_id = request.args.get('twitter_id')
             access_token = request.args.get('access_token')
@@ -1078,9 +1211,9 @@ def insert_user():
             session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
             print("INSERTTT USER DATEEEEEE")
             print(session_start)
-            random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
+            #random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
             cursor = connection.cursor()
-            cursor.execute(sql, (random_identifier,mturk_ref_id,twitter_id,access_token,access_token_secret,screenname,account_settings_json,))
+            cursor.execute(sql, (worker_id,mturk_ref_id,twitter_id,access_token,access_token_secret,screenname,account_settings_json,))
             #retVal123 = cursor.fetchall()[0][0]
             cursor.close()
             connection.commit()
