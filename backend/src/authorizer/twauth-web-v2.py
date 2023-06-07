@@ -1,6 +1,7 @@
 import os
 import re
 import gzip
+import html
 import numpy as np
 from dateutil import parser
 from flask import Flask, render_template, request, url_for, redirect, flash, make_response, jsonify
@@ -583,6 +584,8 @@ def qualcallback():
 @app.route('/insertfeedqualtrics', methods=['GET','POST'])
 def insert_feed_qualtrics():
     worker_id = request.args.get('worker_id').strip()
+    print("Worker ID in insertfeedqualtrics")
+    print(worker_id)
     oauth_token = request.args.get('oauth_token')
     db_response = requests.get('http://127.0.0.1:5052/get_existing_user?worker_id='+str(worker_id))
     #print(db_response.json())
@@ -960,7 +963,7 @@ def get_hometimeline():
         "errorMessage" : errormessage
     }
 
-    with gzip.open("UserData/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
+    with gzip.open("hometimeline_data/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
 
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
@@ -1067,7 +1070,7 @@ def get_usertimeline():
         "errorMessage" : errormessage
     }
 
-    with gzip.open("UserData/{}_user.json.gz".format(userid),"w") as outfile:
+    with gzip.open("usertimeline_data/{}_user.json.gz".format(userid),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
 
     with gzip.open("UserDatav2/{}_user.json.gz".format(userid),"w") as outfile:
@@ -1138,7 +1141,7 @@ def get_favorites():
         "errorMessage" : errormessage
     }
 
-    with gzip.open("UserData/{}_fav.json.gz".format(userid),"w") as outfile:
+    with gzip.open("favorites_data/{}_fav.json.gz".format(userid),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
 
     with gzip.open("UserDatav2/{}_fav.json.gz".format(userid),"w") as outfile:
@@ -1405,7 +1408,7 @@ def get_feed():
         #print(full_text)
         full_text = xml.sax.saxutils.unescape(full_text)
 
-        body = full_text
+        body = html.unescape(full_text)
         date_string_temp = tweet['created_at']
         created_date_datetime = parser.parse(date_string_temp)
         td = (datetime.datetime.now(datetime.timezone.utc) - created_date_datetime)
