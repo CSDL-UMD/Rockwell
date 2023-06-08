@@ -12,7 +12,7 @@ from requests_oauthlib import OAuth1Session
 #from src.databaseAccess.database_config import config
 from configparser import ConfigParser
 from collections import defaultdict
-import CardInfo as Cardinfo
+import src.feedGeneration.CardInfo as CardInfo
 import logging
 import json
 import glob
@@ -1385,7 +1385,7 @@ def get_feed():
             eimage[0] = ""
 
 
-            # Redesigned block to retrieve the Cardinfo data.
+            # Redesigned block to retrieve the CardInfo data.
         if "urls" in entities_keys and not hasEmbed:
             for each_url in all_urls:
                 urls_list.append(each_url["url"])
@@ -1394,7 +1394,7 @@ def get_feed():
             expanded_urls = ",".join(expanded_urls_list)
         if len(expanded_urls_list) > 0 and not isQuote and not hasEmbed: # not isQuote is to save time in the case of a quote. no card needed
             card_url = expanded_urls_list[0]
-            card_data = Cardinfo.getCardData(card_url)
+            card_data = CardInfo.getCardData(card_url)
             if card_data:
                 if "image" in card_data.keys():
                     image_raw = card_data['image']
