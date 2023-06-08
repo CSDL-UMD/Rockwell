@@ -1,15 +1,18 @@
-#Function to get the card info from a website for a tweet.
-#Requires full tweet links in order to work as anticipated.
-import html # This may not be needed and can be removed if you take out line 18. Im not sure it actually does anything.
-import requests as rq
-import time
-#import asgiref # pip install asgiref
+# Function to get the card info from a website for a tweet.
+# Requires full tweet links in order to work as anticipated.
+
+import logging
+import requests
 from bs4 import BeautifulSoup
-import asyncio
 from configparser import ConfigParser
-#from src.databaseAccess.database_config import config
+
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/114.0"
+
 
 def config(filename='database.ini', section='postgresql'):
+    """
+    Read configuration file
+    """
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -26,151 +29,114 @@ def config(filename='database.ini', section='postgresql'):
 
     return db
 
-# no longer fetches the actual image this should increase the speed of execution by alot. !!
-#@async_to_sync
-def fetchWebpage(link):
-    try:
-        content = rq.get(link)
-        searchMe = content.text
-        return searchMe
-    except:
-        return None
-    
-def getCardData(link) -> dict: 
-    failCounter = 0
-    searchMe = None
-    while(failCounter < 3):
-        searchMe = fetchWebpage(link) # changed this call to async to make the fetching of webpages asyncronus.
-        if(searchMe == None):
-            time.sleep(0.1) # This can be adjusted and async may be desirable.
-            failCounter = failCounter + 1
-        else:
-            break
 
-    out = {}
-    params = config('../configuration/config.ini','twitterapp')
-    titleMax = int(params['title_max'])
-    descriptionMax = int(params['description_max'])
+def truncate(s, maxlen, ellipsis="..."):
+    """
+    Truncate string to maxlen with optional ellipsis.
+    """
+    if len(s) > (maxlen - len(ellipsis)):
+        s = s[:maxlen] + ellipsis
+    return s
 
-    if(searchMe is not None): # Check if our request passed.
-        soup = ""
-        try: # Create our BeautifulSoup parser "soup"
-            soup = BeautifulSoup(searchMe,"html.parser")
-        except:
-            print("Very unexpected error. Log this")
-            return out
+
+def meta2dict(body):
+    """ 
+    Convert meta tags with a "content" attribute to a dictionary mapping
+    the name of the property (typically the value of either a "name" or
+    "property" attribute) to the value of the "content" attribute.
+
+    Example:
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@UMD" />
+
+    Will return the dictionary
+
+    {
+        "twitter:card": "summary_large_image",
+        "twitter:site: "@UMD"
+    }
+
+    Only tags with a "content" attribute will be included.
+    """
+    tags = body.find_all(name="meta")
+    d = {}
+    for tag in tags:
+        # skip meta tags without two separate attributes (property/name and content)
+        if len(tag.attrs) < 2:
+            continue
+        # since we are going to pop, keep body unchanged by working on a copy
+        attrs = tag.attrs.copy()
+        # get value of "content" attribute; skip tags without it
         try:
-            meta_tag_image = soup.find("meta", {"property": "twitter:image"}) # Could be None even in this tag scope, if below.
-            meta_tag_title = soup.find("meta", {"property": "twitter:title"})
-            meta_tag_description = soup.find("meta", {"property": "twitter:description"})
-
-            if meta_tag_image is None:
-                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
-            
-            imageLink = meta_tag_image.get('content')
-
-            articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered)
-            articleTitleFiltered = titleSoup.get_text()
-
-            if (len(articleTitleFiltered) > titleMax):
-                articleTitleFiltered = articleTitleFiltered[0:titleMax]
-                articleTitleFiltered = articleTitleFiltered + "..."
-
-            articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
-            articleDescriptionFiltered = descriptionSoup.get_text()
-
-            if (len(articleDescriptionFiltered) > descriptionMax):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
-                articleDescriptionFiltered = articleDescriptionFiltered + "..."
-
-            #Creating the return dictonary if all actions worked.
-            out = {
-                "image": imageLink,
-                "title": articleTitleFiltered,
-                "description": articleDescriptionFiltered
-            }
-
-            return out # Returning a dictonary with all neccessary information
-            
-        except:
-            pass # Did not discover, not an error just no twitter tag.
-            
-        try: #try twitter tag under <meta name> if <meta property> didn't work
-            meta_tag_image = soup.find("meta", {"name": "twitter:image"}) # Could be None even in this tag scope, if below.
-            meta_tag_title = soup.find("meta", {"name": "twitter:title"})
-            meta_tag_description = soup.find("meta", {"name": "twitter:description"})
-
-            if meta_tag_image is None:
-                meta_tag_image = soup.find("meta", {"property": "twitter:image:src"}) # some also do "twitter:image:src", this covers it.
-            
-            imageLink = meta_tag_image.get('content')
-
-            articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
-            articleTitleFiltered = titleSoup.get_text()
-
-            if (len(articleTitleFiltered) > titleMax):
-                articleTitleFiltered = articleTitleFiltered[0:titleMax]
-                articleTitleFiltered = articleTitleFiltered + "..."
-
-            articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered)
-            articleDescriptionFiltered = descriptionSoup.get_text()
-
-            if (len(articleDescriptionFiltered) > descriptionMax):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
-                articleDescriptionFiltered = articleDescriptionFiltered + "..."
+            value = attrs.pop("content")
+        except KeyError:
+            continue
+        # the name of the property can be under the "name" or "property" attribute
+        _, key = attrs.popitem()
+        d[key] = value
+    return d
 
 
+def getCardData(url, maxretries=5, timeout=0.1): 
+    """
+    Returns a dictionary with the following information needed to display a card
+    of an external web page:
 
-            #Creating the return dictonary if all actions worked.
-            out = {
-                "image": imageLink,
-                "title": articleTitleFiltered,
-                "description": articleDescriptionFiltered
-            }
+        image - URL to card image
+        title - card title string
+        description - card description
 
-            return out # Returning a dictonary with all neccessary information
-            
-        except:
-            pass # Did not discover, not an error just no twitter tag under meta name.
+    Both the title and description are shortened to a maximum length specified
+    in the configuration file. 
+
+    Parameters
+    ==========
+
+    url : str
+        The URL whose card we are fetching
+
+    maxretries : int
+        Maximum number of retries in case of timeout
+
+    timeout : float
+        The initial timeout with exponential backoff in case of timeout
+    """
+    resp = None
+    try:
+        with requests.Session() as session:
+            for i in range(maxretries):
+                try:
+                    resp = session.get(url, 
+                                       timeout=timeout, 
+                                       headers={"User-Agent": USER_AGENT})
+                except requests.Timeout:
+                    logging.error(f"Error: timed out: {url} after {timeout}s")
+                    timeout *= 2
+    except (requests.RequestException, requests.ConnectionError) as e:
+        logging.error(f"{e.__class__.__name__}: {e}: {url}")
+        return {}
+    if resp is None:
+        logging.error(f"Error: Max retries reached: {url}")
+        return {}
+    if not resp.ok:
+        logging.error(f"Error: {resp.status_code} {resp.reason}: {url}")
         
-        try: # Try the default og: tags if twitter: does not work.
-            meta_tag_image = soup.find("meta", {"property": "og:image"})
-            meta_tag_title = soup.find("meta", {"property": "og:title"})
-            meta_tag_description = soup.find("meta", {"property": "og:description"})
-
-            imageLink = meta_tag_image.get('content')
-            
-            articleTitleFiltered = meta_tag_title.get('content')
-            titleSoup = BeautifulSoup(articleTitleFiltered,features="html.parser")
-            articleTitleFiltered = titleSoup.get_text()
-
-            if (len(articleTitleFiltered) > titleMax):
-                articleTitleFiltered = articleTitleFiltered[0:titleMax]
-                articleTitleFiltered = articleTitleFiltered + "..."
-
-            articleDescriptionFiltered = meta_tag_description.get('content')
-            descriptionSoup = BeautifulSoup(articleDescriptionFiltered,features="html.parser")
-            articleDescriptionFiltered = descriptionSoup.get_text()
-
-            if (len(articleDescriptionFiltered) > descriptionMax):
-                articleDescriptionFiltered = articleDescriptionFiltered[0:descriptionMax]
-                articleDescriptionFiltered = articleDescriptionFiltered + "..."
-
-
-            #Creating the return dictonary if all actions worked.
-            out = {
-                "image": imageLink,
-                "title": articleTitleFiltered,
-                "description": articleDescriptionFiltered
-            }
-            return out
-        except:
-            pass
-        
-
-    else: # REQUEST FAILED.
-        return out
+    params = config('../configuration/config.ini','twitterapp')
+    try: 
+        soup = BeautifulSoup(resp.text, "html.parser")
+        meta = meta2dict(soup)
+        image = \
+            meta.get("twitter:image") or \
+            meta.get("twitter:image:src") or \
+            meta.get("og:image")
+        title = meta.get("twitter:title") or meta.get("og:title")
+        description = meta.get("twitter:description") or meta.get("og:description")
+        return {
+            "image": image,
+            "title": truncate(title, int(params['title_max'])),
+            "description": truncate(description, int(params['description_max']))
+        }
+    except Exception as e:
+        logging.error(f"{e.__class__.__name__}: {e}: {url}")
+        return {}
