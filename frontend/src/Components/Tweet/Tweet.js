@@ -94,14 +94,15 @@ function Tweet(props) {
         <div style={{ marginBottom: '1%' }}>{localTweet.body}</div>
         {localTweet.urls !== ''
           ? <div className="TweetArticleContainer">
-            {localTweet.picture_heading !== '' ?
-              <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
-              : null}
+
             <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={() => handleLinkClicked(localTweet.urls,localTweet.tweet_id,'True')}>
               {localTweet.picture !== '' ?
                 <img className="TweetImage" src={localTweet.picture} alt='Article' />
                 : localTweet.urls}
             </a>
+            {localTweet.picture_heading !== '' ?
+              <div style={{ marginTop: '1%', marginBottom: '1%',fontWeight:'bold' }}>{localTweet.picture_heading}</div>
+              : null}
             <div>{localTweet.picture_description}</div>
           </div>
           :
