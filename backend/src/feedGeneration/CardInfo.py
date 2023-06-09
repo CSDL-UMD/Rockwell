@@ -78,7 +78,7 @@ def meta2dict(body):
     return d
 
 
-def getCardData(url, maxretries=5, timeout=0.1): 
+def getCardData(url, maxretries=3, timeout=0.5): 
     """
     Returns a dictionary with the following information needed to display a card
     of an external web page:
@@ -111,16 +111,16 @@ def getCardData(url, maxretries=5, timeout=0.1):
                                        timeout=timeout, 
                                        headers={"User-Agent": USER_AGENT})
                 except requests.Timeout:
-                    logging.error(f"Error: timed out: {url} after {timeout}s")
+                    logging.error(f"Time out after {timeout}s: {url}")
                     timeout *= 2
     except (requests.RequestException, requests.ConnectionError) as e:
         logging.error(f"{e.__class__.__name__}: {e}: {url}")
         return {}
     if resp is None:
-        logging.error(f"Error: Max retries reached: {url}")
+        logging.error(f"Max retries reached: {url}")
         return {}
     if not resp.ok:
-        logging.error(f"Error: {resp.status_code} {resp.reason}: {url}")
+        logging.error(f"{resp.status_code} {resp.reason}: {url}")
         
     params = config('../configuration/config.ini','twitterapp')
     try: 
@@ -132,6 +132,9 @@ def getCardData(url, maxretries=5, timeout=0.1):
             meta.get("og:image")
         title = meta.get("twitter:title") or meta.get("og:title")
         description = meta.get("twitter:description") or meta.get("og:description")
+        if any([image is None, title is None, description is None]):
+            logging.error(f"No card data: {url}")
+            return {}
         return {
             "image": image,
             "title": truncate(title, int(params['title_max'])),
