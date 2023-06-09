@@ -121,6 +121,7 @@ def getCardData(url, maxretries=3, timeout=0.5):
         return {}
     if not resp.ok:
         logging.error(f"{resp.status_code} {resp.reason}: {url}")
+        return {}
         
     params = config('../configuration/config.ini','twitterapp')
     try: 
