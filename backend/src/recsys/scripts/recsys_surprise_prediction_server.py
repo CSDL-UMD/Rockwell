@@ -415,6 +415,78 @@ def pageArrangementendless(ng_tweets, ng_tweets_ratings, non_ng_tweets):
 
 @app.route('/recsys_rerank', methods=['GET'])
 def recsys_rerank():
+    payload = request.json
+    hometimeline = payload[0]
+    screen_name = payload[1]
+
+    hometimeline_urls = []
+    hometimeline_tweets = {}
+
+    for tweet in hometimeline:
+        tweet_id = tweet["id_str"]
+        hometimeline_tweets[tweet_id] = tweet
+        if 'retweeted_status' in tweet:
+            urls_extracted = extractfromentities(tweet['retweeted_status'])
+            for url in urls_extracted:
+                hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+            if 'quoted_status' in tweet['retweeted_status']:
+                urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
+                for url in urls_extracted:
+                    hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+        else:
+            if 'quoted_status' in tweet:
+                urls_extracted = extractfromentities(tweet['quoted_status'])
+                for url in urls_extracted:
+                    hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+            urls_extracted = extractfromentities(tweet)
+            for url in urls_extracted:
+                hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+
+    pd_hometimeline_urls = pd.DataFrame(hometimeline_urls)
+
+    userintrain = True
+
+    try:
+        inner_uid = trainset.to_inner_uid(screen_name)
+    except:
+        userintrain = False
+
+    if userintrain:
+        print("YES PRESENT!!!!")
+        all_urls = pd_hometimeline_urls['url'].values.tolist()
+        hometimeline_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
+        pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline_urls_tagged,columns=['tagged_urls'])],axis=1)
+
+        predicted_rating = {}
+        for index,row in pd_hometimeline_urls.iterrows():
+            if row['tagged_urls'] != 'NA':
+                try:
+                    predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                except ValueError:
+                    continue
+
+        predicted_rating_tweets = predicted_rating.keys()
+        NG_tweets = []
+        NG_tweets_ratings = []
+        non_NG_tweets = []
+
+        for tweet_id in hometimeline_tweets.keys():
+            if tweet_id in predicted_rating_tweets:
+                NG_tweets.append(hometimeline_tweets[tweet_id])
+                NG_tweets_ratings.append(predicted_rating[tweet_id])
+            else:
+                non_NG_tweets.append(hometimeline_tweets[tweet_id])
+
+        resultant_feed,resultant_score = pageArrangementendless(NG_tweets,NG_tweets_ratings,non_NG_tweets)
+
+        return jsonify(data=[resultant_feed,resultant_score])
+
+    else:
+
+        return jsonify(data="NOTPRESENT")
+
+@app.route('/recsys_rerank_prev', methods=['GET'])
+def recsys_rerank_prev():
 	payload = request.json
 	hometimeline = payload[0]
 	usertimeline = payload[1]

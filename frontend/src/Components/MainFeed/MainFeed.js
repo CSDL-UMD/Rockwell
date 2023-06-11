@@ -25,7 +25,7 @@ function MainFeed(props) {
   const [tweetLinkClicks, setTweetLinkClicks] = useState([]);
 
   async function beginTimer() {
-    await new Promise(r => setTimeout(r, 10000));
+    await new Promise(r => setTimeout(r, 90000));
     setMinimumFeedTimeCondition(true)
   }
 

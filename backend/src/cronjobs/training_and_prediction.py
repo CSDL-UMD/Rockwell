@@ -21,7 +21,7 @@ from multiprocessing.dummy import Pool
 from argparse import ArgumentParser
 
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
-LOG_PATH_DEFAULT="./prediction_cronjob.log"
+LOG_PATH_DEFAULT="/home/rockwell/Rockwell/backend/src/cronjobs/prediction_cronjob.log"
 
 
 def make_logger(path=LOG_PATH_DEFAULT):
@@ -344,8 +344,11 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
     absent_tweets_ids = []
     rankk = 0
     tweetids_by_page = defaultdict(list)
+    print(absent_tweets)
     all_tweet_ids = [tweet['id'] for tweet in public_tweets if type(tweet) != float]
     for (i,tweet) in enumerate(public_tweets):
+        if type(tweet) == float:
+                continue
         page = int(rankk/10)
         rank_in_page = (rankk%10) + 1
         db_tweet = {
@@ -361,6 +364,8 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
         rankk = rankk + 1
 
     for tweet in absent_tweets:
+        if type(tweet) == float:
+                continue
         absent_tweets_ids.append(tweet["id_str"])
 
     for attn_page in range(max_pages):
@@ -386,7 +391,7 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
 
 def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
     logger = make_logger(log_path)
-    logger.info(f"Training Cron job started: {proj_dir=}")
+    logger.info(f"Training Cron job started: {proj_dir=} {data_dir=}")
     try:
         ng_fn = proj_dir + "/recsys/NewsGuardIffy/label-2022101916.json"
         iffyfile = proj_dir + "/recsys/NewsGuardIffy/iffy.csv"
@@ -463,13 +468,55 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
         model_filename = proj_dir + '/recsys/model/hoaxy_recsys_model_tfidf.sav'
         joblib.dump(algo,model_filename)
 
-        processed_json["usertimeline"] = unprocessed_user_files
-        processed_json["favorites"] = unprocessed_fav_files
+        logger.info(f"Training Cron job fininshed: {proj_dir=}")
 
-        with open(proj_dir + "/configuration/processed.json","w") as outfile:
-            outfile.write(json.dumps(processed_json))
     except Exception as e:
         logger.error(f"Error in Training", exc_info=e)
+
+    logger.info(f"Prediction Cron job started")
+
+    try:
+        db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_all_screenname')
+        screen_name_home = []
+        tweets_home = []
+        if db_response.json()['data'] != "NEW":
+            screen_name_home = [response[0] for response in db_response.json()['data']]
+            worker_id_home = [response[1] for response in db_response.json()['data']]
+            tweets_home = [response[2] for response in db_response.json()['data']]
+        else:
+            logger.info(f"Prediction Cron job NO DATA")
+            return
+        all_screenname = list(set(screen_name_home))
+        for screen_name in all_screenname:
+            try:
+                logger.info(f"Prediction Cron job Processing {screen_name=?}")
+                feed_tweets = [tweets_home[i] for i in range(len(screen_name_home)) if screen_name_home[i] == screen_name]
+                worker_id = [worker_id_home[i] for i in range(len(screen_name_home)) if screen_name_home[i] == screen_name][0]
+                feed_tweets = feed_tweets[0:len(feed_tweets)-10]
+                absent_tweets = feed_tweets[-10:]
+                timeline_json = [feed_tweets,screen_name]
+                recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
+                if recsys_response.json()['data'] == "NOTPRESENT":
+                    logger.info(f"Prediction Cron job screen_name not present {screen_name=?}")
+                    continue    
+                feed_tweets_control = recsys_response.json()['data'][0]
+                feed_tweets_control_score = recsys_response.json()['data'][1]
+                max_pages = min([len(feed_tweets),5])
+                db_tweet_control_payload,db_tweet_control_attn_payload = break_timeline_attention(feed_tweets_control,feed_tweets_control_score,absent_tweets,max_pages)
+                finalJson = []
+                finalJson.append(db_tweet_chronological_payload)
+                finalJson.append(db_tweet_chronological_attn_payload)
+                finalJson.append(worker_id)
+                finalJson.append(screen_name)
+                requests.post('http://127.0.0.1:5052/insert_timelines_attention_control',json=finalJson)
+            except Exception as e:
+                logger.error(f"Prediction Cron job Failed for {screen_name=?}",exc_info=e)
+                continue
+
+            logger.info(f"Prediction Cron job Finished for {screen_name=?}")
+
+    except Exception as e:
+        logger.error(f"Error in Prediction", exc_info=e)
 
 if __name__ == '__main__':
     parser = make_parser()
