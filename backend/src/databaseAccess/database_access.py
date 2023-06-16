@@ -648,7 +648,7 @@ def get_existing_tweets_new_screenname():
     return "Done!"
 
 @app.route('/get_existing_tweets_all_screenname', methods=['GET','POST'])
-def get_existing_tweets_new_screenname():
+def get_existing_tweets_all_screenname():
     tries = 5
     connection = None
     while(tries > 0):
@@ -661,7 +661,7 @@ def get_existing_tweets_new_screenname():
     try:
         conn_cur = connection.cursor()
         sql = """SELECT UA.screenname,UA.user_id,T.tweet_json FROM user_home_timeline_chronological UA,tweet T WHERE T.tweet_id = UA.tweet_id"""
-        conn_cur.execute(sql, (screenname,))
+        conn_cur.execute(sql)
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()

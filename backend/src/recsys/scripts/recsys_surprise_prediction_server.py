@@ -6,6 +6,7 @@ import json
 import requests
 import joblib
 import random
+import datetime
 import asyncio
 import numpy as np
 import pandas as pd
@@ -419,28 +420,35 @@ def recsys_rerank():
     hometimeline = payload[0]
     screen_name = payload[1]
 
+    alpha_m = 0.9
+    alpha_t = 0.1
+
     hometimeline_urls = []
     hometimeline_tweets = {}
 
     for tweet in hometimeline:
         tweet_id = tweet["id_str"]
+        date_string_temp = tweet['created_at']
+        created_date_datetime = parser.parse(date_string_temp)
+        td = (datetime.datetime.now(datetime.timezone.utc) - created_date_datetime)
+        age_seconds = td.seconds
         hometimeline_tweets[tweet_id] = tweet
         if 'retweeted_status' in tweet:
             urls_extracted = extractfromentities(tweet['retweeted_status'])
             for url in urls_extracted:
-                hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+                hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
             if 'quoted_status' in tweet['retweeted_status']:
                 urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
                 for url in urls_extracted:
-                    hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+                    hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
         else:
             if 'quoted_status' in tweet:
                 urls_extracted = extractfromentities(tweet['quoted_status'])
                 for url in urls_extracted:
-                    hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+                    hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
             urls_extracted = extractfromentities(tweet)
             for url in urls_extracted:
-                hometimeline_urls.append({"tweet_id": tweet_id,"url":url})
+                hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
 
     pd_hometimeline_urls = pd.DataFrame(hometimeline_urls)
 
@@ -456,12 +464,14 @@ def recsys_rerank():
         all_urls = pd_hometimeline_urls['url'].values.tolist()
         hometimeline_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
         pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline_urls_tagged,columns=['tagged_urls'])],axis=1)
-
+        pd_hometimeline_urls['rating_age'] = np.exp(-1.0*pd_hometimeline_urls['age']/pd_hometimeline_urls['age'].mean())
         predicted_rating = {}
         for index,row in pd_hometimeline_urls.iterrows():
             if row['tagged_urls'] != 'NA':
                 try:
-                    predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                    recsys_rating = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                    predicted_rating[row['tweet_id']] = alpha_m*recsys_rating + alpha_t*row['rating_age']
+                    #predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
                 except ValueError:
                     continue
 
