@@ -76,11 +76,12 @@ assignment_id_store = {}
 project_id_store = {}
 completed_survey = {}
 
-def filter_tweets(feedtweets):
+def filter_tweets(feedtweetsv1,feedtweetsv2):
     level_1_tweets = []
     level_2_retweeted = []
     filtered_feedtweets = []
-    for tweet in feedtweets:
+    filtered_feedtweetsv2 = []
+    for (i,tweet) in enumerate(feedtweetsv1):
         unique = False
         no_reply = True
         if tweet["id_str"] not in level_1_tweets:
@@ -96,7 +97,8 @@ def filter_tweets(feedtweets):
             reply = False
         if unique and no_reply:
             filtered_feedtweets.append(tweet)
-    return filtered_feedtweets
+            filtered_feedtweetsv2.append(feedtweetsv2[i])
+    return filtered_feedtweets,filtered_feedtweetsv2
 
 def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max_pages):
     db_tweet_payload = []
@@ -969,10 +971,10 @@ def get_hometimeline():
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
-    feed_tweets = filter_tweets(v1tweetobj)
+    feed_tweets,feed_tweets_v2 = filter_tweets(v1tweetobj,v2tweetobj)
     db_tweet_payload = []
-    for tweet in feed_tweets:
-        db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet}
+    for (i,tweet) in enumerate(feed_tweets):
+        db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet, 'tweet_json_v2':feed_tweets_v2[i]}
         db_tweet_payload.append(db_tweet)
     db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page=NA&feedtype=S")
     if db_response.json()['data'] != "NEW":
@@ -1041,7 +1043,7 @@ def get_usertimeline():
 
     if errormessage == "NA":
         v2tweetobj = json.loads(response.text)
-        v1tweetobj = convertv2tov1(v2tweetobj,cred)
+        v1tweetobj = convertv2tov1(v2tweetobj,cred)[0]
 
     newest_id = ""
     if "meta" in v2tweetobj.keys():
@@ -1112,7 +1114,7 @@ def get_favorites():
 
     if errormessage == "NA":
         v2tweetobj = json.loads(response.text)
-        v1tweetobj = convertv2tov1(v2tweetobj,cred)
+        v1tweetobj = convertv2tov1(v2tweetobj,cred)[0]
 
     newest_id = ""
     #if "meta" in v2tweetobj.keys():

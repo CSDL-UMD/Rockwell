@@ -69,8 +69,9 @@ def insert_timelines_attention_chronological():
             for obj in payload[0]:
                 tweet_id = obj['tweet_id']
                 tweet_json = json.dumps(obj['tweet_json'])
-                sql = """INSERT INTO tweet VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
-                conn_cur.execute(sql, (tweet_id,tweet_json))
+                tweet_json_v2 = json.dumps(obj['tweet_json'])
+                sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json,tweet_json_v2))
             connection.commit()
 
             worker_id = payload[3]
