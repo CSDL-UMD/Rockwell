@@ -19,6 +19,9 @@ import glob
 import xml
 import xml.sax.saxutils
 
+import psycopg2  #to connect to hoaxy and get the user engagements
+
+
 app = Flask(__name__)
 
 app.debug = True
@@ -1006,6 +1009,57 @@ def get_hometimeline():
     #    outfile.write(json.dumps(unprocessed_json))
 
     return jsonify({"errorMessage" : errormessage})
+
+def get_hoaxy_engagement(user_id):
+    
+    """
+    Returns a list of JSON that represents the tweets of the user inside the Hoaxy database.
+
+    Args:
+        user_id: The user ID of the user whose tweets you want to get.
+
+    Returns:
+        A list of JSON that represents the tweets of the user.
+    """
+
+    res = []
+    hostname  = 'localhost'
+    port_id = 5432
+    db = 'hoaxy_infodiversity'
+    username = 'hoaxy'
+    pwd = 'hoaxy.is.for.rincewind'
+    conn = None
+    cur = None
+
+    try:
+        conn = psycopg2.connect (
+            host = hostname,
+            dbname =db,
+            user = username,
+            password = pwd,
+            port = port_id,
+        )
+        
+        cur =  conn.cursor()
+        script = """ select tweet.json_data from tweet join ass_tweet_url on tweet.id = ass_tweet_url.tweet_id join url on url.id = ass_tweet_url.url_id where user_id = placeholder; """
+
+        script = script.replace("placeholder", str(user_id))
+        cur.execute(script)
+
+
+        for element in cur.fetchall():
+            res.append(element[0])
+
+    except Exception as err:
+        print(err)
+
+    finally:
+        if cur is not None:
+            cur.close()
+
+        if conn is not None:
+            conn.close()
+    return res
 
 
 @app.route('/usertimeline', methods=['GET'])
