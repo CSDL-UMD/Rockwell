@@ -69,8 +69,9 @@ def insert_timelines_attention_chronological():
             for obj in payload[0]:
                 tweet_id = obj['tweet_id']
                 tweet_json = json.dumps(obj['tweet_json'])
-                sql = """INSERT INTO tweet VALUES(%s,%s) ON CONFLICT DO NOTHING;"""
-                conn_cur.execute(sql, (tweet_id,tweet_json))
+                tweet_json_v2 = json.dumps(obj['tweet_json'])
+                sql = """INSERT INTO tweet VALUES(%s,%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json,tweet_json_v2))
             connection.commit()
 
             worker_id = payload[3]
@@ -647,6 +648,34 @@ def get_existing_tweets_new_screenname():
         print(error)
     return "Done!"
 
+@app.route('/get_existing_tweets_all_screenname', methods=['GET','POST'])
+def get_existing_tweets_all_screenname():
+    tries = 5
+    connection = None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        sql = """SELECT UA.screenname,UA.user_id,T.tweet_json FROM user_home_timeline_chronological UA,tweet T WHERE T.tweet_id = UA.tweet_id"""
+        conn_cur.execute(sql)
+        if conn_cur.rowcount > 0:
+            ret = conn_cur.fetchall()
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data=ret)
+        else:
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data="NEW") #Meaning we need to fetch new tweets.
+    except Exception as error:
+        print(error)
+    return "Done!"
+
 @app.route('/get_existing_attn_tweets_new', methods=['GET','POST'])
 def get_existing_tweets_attn_chronological():
     tries = 5
@@ -789,6 +818,8 @@ def get_worker_attention_tweet():
     #    print("Error in get existing tweets!!!")
     #    print(error)
     return "Done!"    
+
+
 
 @app.route('/engagements_save_endless', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new_endless():
