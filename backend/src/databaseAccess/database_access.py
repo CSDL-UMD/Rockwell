@@ -563,20 +563,20 @@ def get_worker_tweet_chronological():
         conn_cur = connection.cursor()
         if feedtype == 'S':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json FROM user_home_timeline_chronological UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_chronological UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
                 conn_cur.execute(sql, (worker_id,))
             else:
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json FROM user_home_timeline_chronological UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_chronological UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
                 conn_cur.execute(sql, (worker_id,page))
         elif feedtype == 'M':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json FROM user_home_timeline_control UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
                 conn_cur.execute(sql, (worker_id,))
             else:
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json FROM user_home_timeline_control UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
                 conn_cur.execute(sql, (worker_id,page))     
         if conn_cur.rowcount > 0:
@@ -619,20 +619,20 @@ def get_existing_tweets_new_screenname():
         conn_cur = connection.cursor()
         if feedtype == 'S':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id FROM user_home_timeline_chronological UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id,T.tweet_json_v2 FROM user_home_timeline_chronological UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s"""
                 conn_cur.execute(sql, (screenname,))
             else:
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id FROM user_home_timeline_chronological UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id,T.tweet_json_v2 FROM user_home_timeline_chronological UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s AND UA.page = %s"""
                 conn_cur.execute(sql, (screenname,page))
         elif feedtype == 'M':
             if page == 'NA':
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id FROM user_home_timeline_control UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,T.tweet_json,UA.user_id,T.tweet_json_v2 FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s"""
                 conn_cur.execute(sql, (screenname,))
             else:
-                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id FROM user_home_timeline_control UA,tweet T 
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,UA.user_id,T.tweet_json_v2 FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.screenname = %s AND UA.page = %s"""
                 conn_cur.execute(sql, (screenname,page))     
         if conn_cur.rowcount > 0:

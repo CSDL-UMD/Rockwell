@@ -1271,13 +1271,15 @@ def get_feed():
             feed_json.append({"anything_present":"NO"})
             return jsonify(feed_json)
         public_tweets = [d[4] for d in db_response]
+        public_tweets_v2 = [d[5] for d in db_response]
 
     feed_json = []
     rankk = 1
 
-    for tweet in public_tweets: # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
+    for (tweet_en,tweet) in enumerate(public_tweets): # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
 
         # Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
+        tweet_v2 = public_tweets_v2[tweet_en]
         actor_name = tweet["user"]["name"]
         full_text = tweet["full_text"]
         url_start = []

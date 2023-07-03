@@ -244,9 +244,10 @@ def rating_calculate(values):
     domain_rating_json = json.dumps(domain_rating, indent = 4)
     return domain_rating_json
 
-def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains):
+def get_data_from_new_users(user_timeline_files,user_hoaxy_timeline_files,fave_timeline_files,ng_domains):
 
     users = []
+    users_tweet_id_covered = defaultdict(list)
     engaged_urls = []
 
     print("IN GET DATA!!!!")
@@ -259,6 +260,35 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains):
             if data['userTweets']:
                 user_id = data["userObject"]["screen_name"]
                 for tweet in data['userTweets']:
+                    users_tweet_id_covered[user_id].append(tweet['id'])
+                    if 'retweeted_status' in tweet:
+                        urls_extracted = extractfromentities(tweet['retweeted_status'])
+                        for url in urls_extracted:
+                            users.append(user_id)
+                            engaged_urls.append(url)
+                        if 'quoted_status' in tweet['retweeted_status']:
+                            urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
+                            for url in urls_extracted:
+                                users.append(user_id)
+                                engaged_urls.append(url)
+                    else:
+                        if 'quoted_status' in tweet:
+                            urls_extracted = extractfromentities(tweet['quoted_status'])
+                            for url in urls_extracted:
+                                users.append(user_id)
+                                engaged_urls.append(url)
+                        urls_extracted = extractfromentities(tweet)
+                        for url in urls_extracted:
+                            users.append(user_id)
+                            engaged_urls.append(url)
+                            
+    for fn in user_hoaxy_timeline_files:
+        with gzip.open(fn, 'r') as fin:
+            data = json.loads(fin.read().decode('utf-8'))
+            if data['userTweets']:
+                user_id = data["userObject"]["screen_name"]
+                for tweet in data['userTweets']:
+                    users_tweet_id_covered[user_id].append(tweet['id'])
                     if 'retweeted_status' in tweet:
                         urls_extracted = extractfromentities(tweet['retweeted_status'])
                         for url in urls_extracted:
@@ -396,7 +426,6 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
 
 def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
     logger = make_logger(log_path)
-    """
     logger.info(f"Training Cron job started: {proj_dir=} {data_dir=}")
     try:
         ng_fn = proj_dir + "/recsys/NewsGuardIffy/label-2022101916.json"
@@ -409,17 +438,22 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
         recsys_engagement = recsys_engagement.reset_index(drop=True)
 
         new_user_timeline_files = []
+        new_user_timeline_hoaxy_files = []
         new_fav_timeline_files = []
 
         for root, dirs, files in os.walk(os.path.abspath(data_dir+"usertimeline_data/")):
             for file in files:
                 new_user_timeline_files.append(os.path.join(root, file))
 
+        for root, dirs, files in os.walk(os.path.abspath(data_dir+"usertimeline_hoaxy_data/")):
+            for file in files:
+                new_user_timeline_hoaxy_files.append(os.path.join(root, file))
+
         for root, dirs, files in os.walk(os.path.abspath(data_dir+"favorites_data/")):
             for file in files:
                 new_fav_timeline_files.append(os.path.join(root, file))
 
-        pd_new_users = get_data_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains)
+        pd_new_users = get_data_from_new_users(new_user_timeline_files, new_user_timeline_hoaxy_files, new_fav_timeline_files, ng_domains)
         pd_new_users = pd_new_users.reset_index(drop=True)
         pd_new_users.columns = ['user','NG_domain']
         recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
@@ -478,7 +512,7 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
 
     except Exception as e:
         logger.error(f"Error in Training", exc_info=e)
-    """
+    
 
     logger.info(f"Prediction Cron job started")
 
