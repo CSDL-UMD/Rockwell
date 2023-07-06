@@ -14,6 +14,7 @@ from configparser import ConfigParser
 from collections import defaultdict
 import src.feedGeneration.CardInfo as CardInfo
 import logging
+import psycopg2
 import json
 import glob
 import xml
@@ -41,6 +42,57 @@ def config(filename='database.ini', section='postgresql'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
+
+def get_hoaxy_engagement(user_id,hoaxy_config):
+
+    """
+    Returns a list of JSON that represents the tweets of the user inside the Hoaxy database.
+    Args:
+        user_id: The user ID of the user whose tweets you want to get.
+    Returns:
+        A list of JSON that represents the tweets of the user.
+    """
+
+    res = []
+    hostname  = str(hoaxy_config['host'])
+    port_id = str(hoaxy_config['port'])
+    db = str(hoaxy_config['database'])
+    username = str(hoaxy_config['user'])
+    pwd = str(hoaxy_config['password'])
+    conn = None
+    cur = None
+
+    err_message = "NA"
+
+    try:
+        conn = psycopg2.connect (
+            host = hostname,
+            dbname =db,
+            user = username,
+            password = pwd,
+            port = port_id,
+        )
+
+        cur =  conn.cursor()
+        script = """ select tweet.json_data from tweet join ass_tweet_url on tweet.id = ass_tweet_url.tweet_id join url on url.id = ass_tweet_url.url_id where user_id = placeholder; """
+
+        script = script.replace("placeholder", str(user_id))
+        cur.execute(script)
+
+
+        for element in cur.fetchall():
+            res.append(element[0])
+
+    except Exception as err:
+        err_message = err
+
+    finally:
+        if cur is not None:
+            cur.close()
+
+        if conn is not None:
+            conn.close()
+    return res,err_message
 
 
 webInformation = config('../configuration/config.ini','webconfiguration')
@@ -1078,6 +1130,31 @@ def get_usertimeline():
     with gzip.open("UserDatav2/{}_user.json.gz".format(userid),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
+    hoaxy_config = config('../configuration/config.ini','hoaxy_database')
+    hoaxy_tweets,err_message = get_hoaxy_engagement(userid,hoaxy_config)
+
+    if err_message != "NA":
+        errormessage = errormessage + " HOAXY ERROR : " + err_message
+
+    if hoaxy_tweets:
+        writeObjHoaxy = {
+            "MTurkId" : participant_id,
+            "MTurkHitId" : assignment_id,
+            "MTurkAssignmentId" : project_id,
+            "timestamp" : session_start,
+            "source": "pilot3",
+            "accessToken": access_token,
+            "accessTokenSecret": access_token_secret,
+            "latestTweetId": newest_id,
+            "worker_id": worker_id,
+            "userObject": userobj,
+            "userTweetsHoaxy" : hoaxy_tweets,
+            "errorMessage" : err_message
+        }
+
+        with gzip.open("usertimeline_hoaxy_data/{}_user_hoaxy.json.gz".format(userid),"w") as outfile:
+            outfile.write(json.dumps(writeObj).encode('utf-8'))
+
     return jsonify({"errorMessage" : errormessage})
 
 
@@ -1466,7 +1543,7 @@ def get_feed():
             'experiment_group':'var1',
             'post_id':rankk,
             'tweet_id':str(tweet["id"]),
-            'worker_id':str(worker_id),
+            'worker_id':str(worker_id), 
             'rank':str(rankk),
             'picture':image_raw.replace("http:", "https:"),
             'picture_heading':picture_heading,

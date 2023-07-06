@@ -285,10 +285,16 @@ def get_data_from_new_users(user_timeline_files,user_hoaxy_timeline_files,fave_t
     for fn in user_hoaxy_timeline_files:
         with gzip.open(fn, 'r') as fin:
             data = json.loads(fin.read().decode('utf-8'))
-            if data['userTweets']:
+            if data['userTweetsHoaxy']:
                 user_id = data["userObject"]["screen_name"]
-                for tweet in data['userTweets']:
-                    users_tweet_id_covered[user_id].append(tweet['id'])
+                for tweet in data['userTweetsHoaxy']:
+                    id_covered = False
+                    for tweet_id in users_tweet_id_covered[user_id]:
+                        if tweet_id == tweet['id']:
+                            id_covered = True
+                            break
+                    if id_covered:
+                        continue
                     if 'retweeted_status' in tweet:
                         urls_extracted = extractfromentities(tweet['retweeted_status'])
                         for url in urls_extracted:
