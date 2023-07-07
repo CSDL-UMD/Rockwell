@@ -17,6 +17,7 @@ import threading
 import surprise
 from collections import Counter
 from collections import defaultdict
+from configparser import ConfigParser
 from multiprocessing import Manager
 from multiprocessing.dummy import Pool
 from argparse import ArgumentParser
@@ -24,6 +25,72 @@ from argparse import ArgumentParser
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
 LOG_PATH_DEFAULT="/home/rockwell/Rockwell/backend/src/cronjobs/prediction_cronjob.log"
 
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
+
+def get_hoaxy_engagement(user_id,hoaxy_config):
+
+    """
+    Returns a list of JSON that represents the tweets of the user inside the Hoaxy database.
+    Args:
+        user_id: The user ID of the user whose tweets you want to get.
+    Returns:
+        A list of JSON that represents the tweets of the user.
+    """
+
+    res = []
+    hostname  = str(hoaxy_config['host'])
+    port_id = str(hoaxy_config['port'])
+    db = str(hoaxy_config['database'])
+    username = str(hoaxy_config['user'])
+    pwd = str(hoaxy_config['password'])
+    conn = None
+    cur = None
+
+    err_message = "NA"
+
+    try:
+        conn = psycopg2.connect (
+            host = hostname,
+            dbname =db,
+            user = username,
+            password = pwd,
+            port = port_id,
+        )
+
+        cur =  conn.cursor()
+        script = """ select tweet.json_data from tweet join ass_tweet_url on tweet.id = ass_tweet_url.tweet_id join url on url.id = ass_tweet_url.url_id where user_id = placeholder; """
+
+        script = script.replace("placeholder", str(user_id))
+        cur.execute(script)
+
+
+        for element in cur.fetchall():
+            res.append(element[0])
+
+    except Exception as err:
+        err_message = err
+
+    finally:
+        if cur is not None:
+            cur.close()
+
+        if conn is not None:
+            conn.close()
+    return res,err_message
 
 def make_logger(path=LOG_PATH_DEFAULT):
     """ 
@@ -244,23 +311,26 @@ def rating_calculate(values):
     domain_rating_json = json.dumps(domain_rating, indent = 4)
     return domain_rating_json
 
-def get_data_from_new_users(user_timeline_files,user_hoaxy_timeline_files,fave_timeline_files,ng_domains):
+def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,logger):
 
     users = []
-    users_tweet_id_covered = defaultdict(list)
     engaged_urls = []
 
     print("IN GET DATA!!!!")
     print(user_timeline_files)
     print(fave_timeline_files)
+
+    hoaxy_config = config('../configuration/config.ini','hoaxy_database')
     
     for fn in user_timeline_files:
         with gzip.open(fn, 'r') as fin:
             data = json.loads(fin.read().decode('utf-8'))
             if data['userTweets']:
                 user_id = data["userObject"]["screen_name"]
+                user_twitter_id = data["userObject"]["twitter_id"]
+                tweets_covered = []
                 for tweet in data['userTweets']:
-                    users_tweet_id_covered[user_id].append(tweet['id'])
+                    tweets_covered.append(tweet['id'])
                     if 'retweeted_status' in tweet:
                         urls_extracted = extractfromentities(tweet['retweeted_status'])
                         for url in urls_extracted:
@@ -281,40 +351,33 @@ def get_data_from_new_users(user_timeline_files,user_hoaxy_timeline_files,fave_t
                         for url in urls_extracted:
                             users.append(user_id)
                             engaged_urls.append(url)
-                            
-    for fn in user_hoaxy_timeline_files:
-        with gzip.open(fn, 'r') as fin:
-            data = json.loads(fin.read().decode('utf-8'))
-            if data['userTweetsHoaxy']:
-                user_id = data["userObject"]["screen_name"]
-                for tweet in data['userTweetsHoaxy']:
-                    id_covered = False
-                    for tweet_id in users_tweet_id_covered[user_id]:
-                        if tweet_id == tweet['id']:
-                            id_covered = True
-                            break
-                    if id_covered:
-                        continue
-                    if 'retweeted_status' in tweet:
-                        urls_extracted = extractfromentities(tweet['retweeted_status'])
-                        for url in urls_extracted:
-                            users.append(user_id)
-                            engaged_urls.append(url)
-                        if 'quoted_status' in tweet['retweeted_status']:
-                            urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
+                hoaxy_tweets,err_message = get_hoaxy_engagement(user_twitter_id,hoaxy_config)
+                if err_message != "NA":
+                    logger.info(f"Error in getting hoaxy tweets for {user_twitter_id=}")
+                else:
+                    for tweet in hoaxy_tweets:
+                        if tweet['id'] in tweets_covered:
+                            continue
+                        if 'retweeted_status' in tweet:
+                            urls_extracted = extractfromentities(tweet['retweeted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
                                 engaged_urls.append(url)
-                    else:
-                        if 'quoted_status' in tweet:
-                            urls_extracted = extractfromentities(tweet['quoted_status'])
+                            if 'quoted_status' in tweet['retweeted_status']:
+                                urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
+                                for url in urls_extracted:
+                                    users.append(user_id)
+                                    engaged_urls.append(url)
+                        else:
+                            if 'quoted_status' in tweet:
+                                urls_extracted = extractfromentities(tweet['quoted_status'])
+                                for url in urls_extracted:
+                                    users.append(user_id)
+                                    engaged_urls.append(url)
+                            urls_extracted = extractfromentities(tweet)
                             for url in urls_extracted:
                                 users.append(user_id)
                                 engaged_urls.append(url)
-                        urls_extracted = extractfromentities(tweet)
-                        for url in urls_extracted:
-                            users.append(user_id)
-                            engaged_urls.append(url)
                             
     for fn in fave_timeline_files:
         with gzip.open(fn, 'r') as fin:
@@ -451,15 +514,11 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
             for file in files:
                 new_user_timeline_files.append(os.path.join(root, file))
 
-        for root, dirs, files in os.walk(os.path.abspath(data_dir+"usertimeline_hoaxy_data/")):
-            for file in files:
-                new_user_timeline_hoaxy_files.append(os.path.join(root, file))
-
         for root, dirs, files in os.walk(os.path.abspath(data_dir+"favorites_data/")):
             for file in files:
                 new_fav_timeline_files.append(os.path.join(root, file))
 
-        pd_new_users = get_data_from_new_users(new_user_timeline_files, new_user_timeline_hoaxy_files, new_fav_timeline_files, ng_domains)
+        pd_new_users = get_data_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains, logger)
         pd_new_users = pd_new_users.reset_index(drop=True)
         pd_new_users.columns = ['user','NG_domain']
         recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)

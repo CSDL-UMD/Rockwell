@@ -1294,7 +1294,9 @@ def get_feed():
             feed_json.append({"anything_present":"NO"})
             return jsonify(feed_json)
         public_tweets = [d[4] for d in db_response]
-        public_tweets_v2 = [d[5] for d in db_response]
+        public_tweets_v2 = [d[4] for d in db_response]
+        if len(db_response[0]) > 5:
+            public_tweets_v2 = [d[5] for d in db_response]
 
     feed_json = []
     rankk = 1
