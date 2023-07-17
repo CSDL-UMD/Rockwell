@@ -948,7 +948,11 @@ def get_hometimeline():
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
-    num_tweets_cap = request.args.get('num_tweets_cap').strip()
+    num_tweets_cap = 100
+    try:
+        num_tweets_cap = request.args.get('num_tweets_cap').strip()
+    except:
+        num_tweets_cap = 100
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
