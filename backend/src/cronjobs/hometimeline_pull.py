@@ -11,7 +11,7 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 HOST_DEFAULT="127.0.0.1"
-PORT_DEFAULT=5054
+PORT_DEFAULT=5000
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
 LOG_PATH_DEFAULT="./cronjob.log"
 

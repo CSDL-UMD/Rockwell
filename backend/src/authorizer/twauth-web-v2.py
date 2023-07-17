@@ -112,6 +112,14 @@ timeline_params = {
     "expansions" : "author_id,referenced_tweets.id,attachments.media_keys"
 }
 
+timeline_params_engagement = {
+    "tweet.fields" : "id,text,edit_history_tweet_ids,attachments,author_id,conversation_id,created_at,entities,in_reply_to_user_id,lang,public_metrics,referenced_tweets,reply_settings",
+    "user.fields" : "id,name,username,created_at,description,entities,location,pinned_tweet_id,profile_image_url,protected,public_metrics,url,verified",
+    "media.fields": "media_key,type,url,duration_ms,height,preview_image_url,public_metrics,width",
+    "expansions" : "author_id,referenced_tweets.id,attachments.media_keys",
+    "max_results" : 50
+}
+
 oauth_store = {}
 start_url_store = {}
 screenname_store = {}
@@ -129,6 +137,8 @@ project_id_store = {}
 completed_survey = {}
 
 def filter_tweets(feedtweetsv1,feedtweetsv2):
+    print(len(feedtweetsv1))
+    print(len(feedtweetsv2))
     level_1_tweets = []
     level_2_retweeted = []
     filtered_feedtweets = []
@@ -938,6 +948,11 @@ def get_hometimeline():
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
+    num_tweets_cap = 100
+    try:
+        num_tweets_cap = request.args.get('num_tweets_cap').strip()
+    except:
+        num_tweets_cap = 100
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
@@ -959,7 +974,11 @@ def get_hometimeline():
                         client_secret=cred['key_secret'],
                         resource_owner_key=cred['token'],
                         resource_owner_secret=cred['token_secret'])
-    response = oauth.get("https://api.twitter.com/2/users/{}/timelines/reverse_chronological".format(userid), params = timeline_params)
+    timeline_params_cap = {}
+    for kk in timeline_params:
+        timeline_params_cap[kk] = timeline_params[kk]
+    timeline_params_cap["max_results"] = num_tweets_cap
+    response = oauth.get("https://api.twitter.com/2/users/{}/timelines/reverse_chronological".format(userid), params = timeline_params_cap)
     if response.text == '{"errors":[{"code":89,"message":"Invalid or expired token."}]}':
         errormessage = "Invalid Token"
 
@@ -1023,41 +1042,44 @@ def get_hometimeline():
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
-    feed_tweets,feed_tweets_v2 = filter_tweets(v1tweetobj,v2tweetobj)
-    db_tweet_payload = []
-    for (i,tweet) in enumerate(feed_tweets):
-        db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet, 'tweet_json_v2':feed_tweets_v2[i]}
-        db_tweet_payload.append(db_tweet)
-    db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page=NA&feedtype=S")
-    if db_response.json()['data'] != "NEW":
-        existing_tweets = [response[6] for response in db_response.json()['data']]
-        feed_tweets.extend(existing_tweets)
-    feed_tweets = feed_tweets[0:len(feed_tweets)-10]
-    absent_tweets = feed_tweets[-10:]
-    feed_tweets_chronological = []
-    feed_tweets_chronological_score = []
-    for tweet in feed_tweets:
-        feed_tweets_chronological.append(tweet)
-        feed_tweets_chronological_score.append(-100)
-    max_pages = min([len(feed_tweets),5])
-    db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(feed_tweets_chronological,feed_tweets_chronological_score,absent_tweets,max_pages)
-    finalJson = []
-    finalJson.append(db_tweet_payload)
-    finalJson.append(db_tweet_chronological_payload)
-    finalJson.append(db_tweet_chronological_attn_payload)
-    finalJson.append(worker_id)
-    finalJson.append(screenname)
-    requests.post('http://127.0.0.1:5052/insert_timelines_attention_chronological',json=finalJson)
+    if "data" in v2tweetobj.keys():
+        feed_tweets,feed_tweets_v2 = filter_tweets(v1tweetobj,v2tweetobj["data"])
+        db_tweet_payload = []
+        for (i,tweet) in enumerate(feed_tweets):
+            db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet, 'tweet_json_v2':feed_tweets_v2[i]}
+            db_tweet_payload.append(db_tweet)
+        db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page=NA&feedtype=S")
+        if db_response.json()['data'] != "NEW":
+            existing_tweets = [response[6] for response in db_response.json()['data']]
+            feed_tweets.extend(existing_tweets)
+        feed_tweets = feed_tweets[0:len(feed_tweets)-10]
+        absent_tweets = feed_tweets[-10:]
+        feed_tweets_chronological = []
+        feed_tweets_chronological_score = []
+        for tweet in feed_tweets:
+            feed_tweets_chronological.append(tweet)
+            feed_tweets_chronological_score.append(-100)
+        max_pages = min([len(feed_tweets),5])
+        db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(feed_tweets_chronological,feed_tweets_chronological_score,absent_tweets,max_pages)
+        finalJson = []
+        finalJson.append(db_tweet_payload)
+        finalJson.append(db_tweet_chronological_payload)
+        finalJson.append(db_tweet_chronological_attn_payload)
+        finalJson.append(worker_id)
+        finalJson.append(screenname)
+        requests.post('http://127.0.0.1:5052/insert_timelines_attention_chronological',json=finalJson)
 
-    #unprocessed_json = {}
-    #with open("../configuration/unprocessed.json") as fin:
-    #    unprocessed_json = json.loads(fin.read())
-    #unprocessed_files = unprocessed_json["hometimeline"]
-    #unprocessed_files.append(os.getcwd()+"/UserData/{}_home_{}.json.gz".format(userid,file_number))
-    #unprocessed_files = list(set(unprocessed_files)) 
-    #unprocessed_json["hometimeline"] = unprocessed_files
-    #with open("../configuration/unprocessed.json","w") as outfile:
-    #    outfile.write(json.dumps(unprocessed_json))
+        #unprocessed_json = {}
+        #with open("../configuration/unprocessed.json") as fin:
+        #    unprocessed_json = json.loads(fin.read())
+        #unprocessed_files = unprocessed_json["hometimeline"]
+        #unprocessed_files.append(os.getcwd()+"/UserData/{}_home_{}.json.gz".format(userid,file_number))
+        #unprocessed_files = list(set(unprocessed_files)) 
+        #unprocessed_json["hometimeline"] = unprocessed_files
+        #with open("../configuration/unprocessed.json","w") as outfile:
+        #    outfile.write(json.dumps(unprocessed_json))
+    else:
+        errormessage = errormessage + " No data in v2 tweet object"
 
     return jsonify({"errorMessage" : errormessage})
 
@@ -1086,7 +1108,7 @@ def get_usertimeline():
                         client_secret=cred['key_secret'],
                         resource_owner_key=cred['token'],
                         resource_owner_secret=cred['token_secret'])
-    response = oauth.get("https://api.twitter.com/2/users/{}/tweets".format(userid), params = timeline_params)
+    response = oauth.get("https://api.twitter.com/2/users/{}/tweets".format(userid), params = timeline_params_engagement)
     if response.text == '{"errors":[{"code":89,"message":"Invalid or expired token."}]}':
         errormessage = "Invalid Token"
 
@@ -1095,7 +1117,7 @@ def get_usertimeline():
 
     if errormessage == "NA":
         v2tweetobj = json.loads(response.text)
-        v1tweetobj = convertv2tov1(v2tweetobj,cred)[0]
+        v1tweetobj = convertv2tov1(v2tweetobj,cred)
 
     newest_id = ""
     if "meta" in v2tweetobj.keys():
@@ -1182,7 +1204,7 @@ def get_favorites():
                         client_secret=cred['key_secret'],
                         resource_owner_key=cred['token'],
                         resource_owner_secret=cred['token_secret'])
-    response = oauth.get("https://api.twitter.com/2/users/{}/liked_tweets".format(userid), params = timeline_params)
+    response = oauth.get("https://api.twitter.com/2/users/{}/liked_tweets".format(userid), params = timeline_params_engagement)
     if response.text == '{"errors":[{"code":89,"message":"Invalid or expired token."}]}':
         errormessage = "Invalid Token"
 
@@ -1191,7 +1213,7 @@ def get_favorites():
 
     if errormessage == "NA":
         v2tweetobj = json.loads(response.text)
-        v1tweetobj = convertv2tov1(v2tweetobj,cred)[0]
+        v1tweetobj = convertv2tov1(v2tweetobj,cred)
 
     newest_id = ""
     #if "meta" in v2tweetobj.keys():
