@@ -1653,10 +1653,10 @@ def get_feed():
         # Try to fetch card for all non-twitter URLs, stop at first URL that returns successfully
         if "urls" in entities_keys and not hasEmbed:
             found_card = False
+            urls_list = [_['url'] for _ in all_urls]
             for each_url in all_urls:
                 if re.match("^https://twitter.com/.*", each_url["expanded_url"]) is not None:
                     continue # skip twitter.com URLs
-
                 card_data = CardInfo.getCardData(each_url['expanded_url'])
                 if "image" in card_data.keys():
                     image_raw = card_data['image']
