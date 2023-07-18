@@ -99,6 +99,9 @@ function Tweet(props) {
               {localTweet.picture !== '' ?
                 <img className="TweetImage" src={localTweet.picture} alt='Article' />
                 : localTweet.urls}
+              {localTweet.picture === '' ?
+                <img className="TweetImage" src="/no-image.png" alt='Article' />
+                : localTweet.urls}
             </a>
             {localTweet.picture_heading !== '' ?
               <div style={{ marginTop: '1%', marginBottom: '1%',fontWeight:'bold' }}>{localTweet.picture_heading}</div>
