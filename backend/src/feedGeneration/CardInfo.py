@@ -5,6 +5,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from configparser import ConfigParser
+from urllib.parse import urlparse
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/114.0"
 
@@ -136,7 +137,9 @@ def getCardData(url, maxretries=3, timeout=0.5):
             meta.get("twitter:image:src") or \
             meta.get("og:image")
         title = meta.get("twitter:title") or meta.get("og:title")
-        description = meta.get("twitter:description") or meta.get("og:description") or ""
+        description = meta.get("twitter:description") or \
+            meta.get("og:description") or \
+            urlparse(url).netloc
         if any([image is None, title is None, description is None]):
             logging.error(f"No card data: {url}")
             return {}
