@@ -94,6 +94,14 @@ def get_hoaxy_engagement(user_id,hoaxy_config):
             conn.close()
     return res,err_message
 
+def contains_video(tweet):
+    if tweet.get("entities"):
+        if tweet.get("entities").get("media"):
+            for media in tweet.get("entities")["media"]:
+                if media.get("type") == "video":
+                    return True
+    return False
+
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -941,17 +949,162 @@ def like_post():
         print(e)
         return jsonify({"success":0}) # Retweet failed
 
-
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
     worker_id = request.args.get('worker_id').strip()
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
-    num_tweets_cap = 100
-    try:
-        num_tweets_cap = request.args.get('num_tweets_cap').strip()
-    except:
+    num_tweets_cap = request.args.get('num_tweets_cap').strip()
+    if not num_tweets_cap:
+        num_tweets_cap = 1
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
+    db_response = db_response.json()['data']
+    access_token = db_response[0][0]
+    access_token_secret = db_response[0][1]
+    screenname = db_response[0][2]
+    userid = db_response[0][3]
+    participant_id = db_response[0][4]
+    assignment_id = db_response[0][5]
+    project_id = db_response[0][6]
+    v2tweetobj = {}
+    v1tweetobj = {}
+
+    errormessage = "NA"
+
+    cred = config('../configuration/config.ini','twitterapp')
+    cred['token'] = access_token.strip()
+    cred['token_secret'] = access_token_secret.strip()
+    oauth = OAuth1Session(cred['key'],
+                        client_secret=cred['key_secret'],
+                        resource_owner_key=cred['token'],
+                        resource_owner_secret=cred['token_secret'])
+    timeline_params_cap = {}
+    for kk in timeline_params:
+        timeline_params_cap[kk] = timeline_params[kk]
+    timeline_params_cap["max_results"] = num_tweets_cap
+    response = oauth.get("https://api.twitter.com/2/users/{}/timelines/reverse_chronological".format(userid), params = timeline_params_cap)
+    if response.text == '{"errors":[{"code":89,"message":"Invalid or expired token."}]}':
+        errormessage = "Invalid Token"
+
+    if response.text == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
+        errormessage = "Rate Limit Exceeded"
+
+    if errormessage == "NA":
+
+        v2tweetobj_loaded = json.loads(response.text)
+
+        if max_id != "INITIAL":
+            for section in v2tweetobj_loaded.keys():
+                if section == "data":
+                    v2tweetobj["data"] = []
+                    for v2tweet in v2tweetobj_loaded["data"]:
+                        if int(v2tweet["id"]) > int(max_id):
+                            v2tweetobj["data"].append(v2tweet)
+                else:
+                    v2tweetobj[section] = v2tweetobj_loaded[section]
+        else:
+            v2tweetobj = v2tweetobj_loaded
+
+        v1tweetobj = convertv2tov1(v2tweetobj,cred)
+
+
+    now_session_start = datetime.datetime.now()
+    session_start = now_session_start.strftime('%Y-%m-%dT%H:%M:%S')
+
+    collection_started_store = collection_started
+    if collection_started == "INITIAL":
+        collection_started_store = session_start
+
+    newest_id = ""
+    if "meta" in v2tweetobj.keys():
+        newest_id = v2tweetobj["meta"]["newest_id"]
+
+    userobj = {
+        "screen_name" : screenname,
+        "twitter_id" : userid
+    }
+
+    writeObj = {
+        "MTurkId" : participant_id,
+        "MTurkHitId" : assignment_id,
+        "MTurkAssignmentId" : project_id,
+        "collectionStarted" : collection_started_store,
+        "timestamp" : session_start,
+        "source": "pilot3",
+        "accessToken": access_token,
+        "accessTokenSecret": access_token_secret,
+        "latestTweetId": newest_id,
+        "worker_id": worker_id,
+        "userObject": userobj,
+        "homeTweets" : v1tweetobj,
+        "errorMessage" : errormessage
+    }
+
+    with gzip.open("hometimeline_data/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
+        outfile.write(json.dumps(writeObj).encode('utf-8'))
+
+    with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
+        outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
+
+    if "data" in v2tweetobj.keys():
+        feed_tweets,feed_tweets_v2 = filter_tweets(v1tweetobj,v2tweetobj["data"])
+        db_tweet_payload = []
+        for (i,tweet) in enumerate(feed_tweets):
+            db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet, 'tweet_json_v2':feed_tweets_v2[i]}
+            db_tweet_payload.append(db_tweet)
+        db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page=NA&feedtype=S")
+        if db_response.json()['data'] != "NEW":
+            existing_tweets = [response[6] for response in db_response.json()['data']]
+            feed_tweets.extend(existing_tweets)
+        feed_tweets = feed_tweets[0:len(feed_tweets)-10]
+        absent_tweets = feed_tweets[-10:]
+        feed_tweets_chronological = []
+        feed_tweets_chronological_score = []
+        for tweet in feed_tweets:
+            feed_tweets_chronological.append(tweet)
+            feed_tweets_chronological_score.append(-100)
+        db_tweet_chronological_payload = []
+        db_tweet_chronological_attn_payload = []
+        rankk = 0
+        for (i,tweet) in enumerate(feed_tweets_chronological):
+            if type(tweet) == float:
+                continue
+            page = int(rankk/10)
+            rank_in_page = (rankk%10) + 1
+            db_tweet = {
+                'fav_before':str(tweet['favorited']),
+                'tid':str(tweet["id"]),
+                'rtbefore':str(tweet['retweeted']),
+                'page':page,
+                'rank':rank_in_page,
+                'predicted_score':public_tweets_score[i]
+            }
+            db_tweet_payload.append(db_tweet)
+            rankk = rankk + 1
+        finalJson = []
+        finalJson.append(db_tweet_payload)
+        finalJson.append(db_tweet_chronological_payload)
+        finalJson.append(db_tweet_chronological_attn_payload)
+        finalJson.append(worker_id)
+        finalJson.append(screenname)
+        requests.post('http://127.0.0.1:5052/insert_timelines_attention_chronological',json=finalJson)
+
+    else:
+        errormessage = errormessage + " No data in v2 tweet object"
+
+    return jsonify({"errorMessage" : errormessage})
+
+
+
+@app.route('/hometimeline_pages', methods=['GET'])
+def get_hometimeline_pages():
+    worker_id = request.args.get('worker_id').strip()
+    file_number = request.args.get('file_number').strip()
+    max_id = request.args.get('max_id').strip()
+    collection_started = request.args.get('collection_started').strip()
+    num_tweets_cap = request.args.get('num_tweets_cap').strip()
+    if not num_tweets_cap:
         num_tweets_cap = 100
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
@@ -1060,7 +1213,11 @@ def get_hometimeline():
             feed_tweets_chronological.append(tweet)
             feed_tweets_chronological_score.append(-100)
         max_pages = min([len(feed_tweets),5])
-        db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(feed_tweets_chronological,feed_tweets_chronological_score,absent_tweets,max_pages)
+        if absent_tweets:
+            db_tweet_chronological_payload,db_tweet_chronological_attn_payload = break_timeline_attention(feed_tweets_chronological,feed_tweets_chronological_score,absent_tweets,max_pages)
+        else:
+            db_tweet_chronological_payload = feed_tweets_chronological
+            db_tweet_chronological_attn_payload = []
         finalJson = []
         finalJson.append(db_tweet_payload)
         finalJson.append(db_tweet_chronological_payload)
@@ -1327,6 +1484,9 @@ def get_feed():
 
         # Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
         tweet_v2 = public_tweets_v2[tweet_en]
+        if contains_video(tweet_v2):
+            print("Skipped Video for tweet id : "+str(tweet_v2["id"]))
+            continue
         actor_name = tweet["user"]["name"]
         full_text = tweet["full_text"]
         url_start = []
