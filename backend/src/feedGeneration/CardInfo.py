@@ -130,8 +130,6 @@ def getCardData(url, maxretries=3, timeout=0.5):
     try: 
         soup = BeautifulSoup(resp.text, "html.parser")
         meta = meta2dict(soup)
-        import pprint
-        print(pprint.pprint(meta))
         image = \
             meta.get("twitter:image") or \
             meta.get("twitter:image:src") or \
@@ -140,7 +138,7 @@ def getCardData(url, maxretries=3, timeout=0.5):
         description = meta.get("twitter:description") or \
             meta.get("og:description") or \
             urlparse(url).netloc
-        if any([image is None, title is None, description is None]):
+        if all([image is None, title is None, description is None]):
             logging.error(f"No card data: {url}")
             return {}
         return {
