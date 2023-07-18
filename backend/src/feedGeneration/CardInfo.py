@@ -110,6 +110,8 @@ def getCardData(url, maxretries=3, timeout=0.5):
                     resp = session.get(url, 
                                        timeout=timeout, 
                                        headers={"User-Agent": USER_AGENT})
+                    if resp.ok:
+                        break
                 except requests.Timeout:
                     logging.error(f"Time out after {timeout}s: {url}")
                     timeout *= 2
@@ -127,12 +129,14 @@ def getCardData(url, maxretries=3, timeout=0.5):
     try: 
         soup = BeautifulSoup(resp.text, "html.parser")
         meta = meta2dict(soup)
+        import pprint
+        print(pprint.pprint(meta))
         image = \
             meta.get("twitter:image") or \
             meta.get("twitter:image:src") or \
             meta.get("og:image")
         title = meta.get("twitter:title") or meta.get("og:title")
-        description = meta.get("twitter:description") or meta.get("og:description")
+        description = meta.get("twitter:description") or meta.get("og:description") or ""
         if any([image is None, title is None, description is None]):
             logging.error(f"No card data: {url}")
             return {}
