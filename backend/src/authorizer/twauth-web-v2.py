@@ -1495,8 +1495,11 @@ def get_feed():
             for each_url in all_urls:
                 urls_list.append(each_url["url"])
                 expanded_urls_list.append(each_url["expanded_url"])
-            urls = ",".join(urls_list)
-            expanded_urls = ",".join(expanded_urls_list)
+            # XXX show first URL
+            # urls = ",".join(urls_list)
+            # expanded_urls = ",".join(expanded_urls_list)
+            urls = urls_list[0]
+            expanded_urls = expanded_urls_list[0]
         if len(expanded_urls_list) > 0 and not isQuote and not hasEmbed: # not isQuote is to save time in the case of a quote. no card needed
             card_url = expanded_urls_list[0]
             card_data = CardInfo.getCardData(card_url)
