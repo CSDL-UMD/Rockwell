@@ -1667,8 +1667,8 @@ def get_feed():
                     found_card = True
                     break
             if not found_card:
-                urls = ""
-                expanded_urls = ""
+                urls = all_urls[0]['url']
+                expanded_urls = all_urls[0]['expanded_url']
 
         #if isRetweet:
             #print("Is a retweet.")
