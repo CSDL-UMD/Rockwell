@@ -135,7 +135,7 @@ def getCardData(url, maxretries=3, timeout=0.5):
         image = \
             meta.get("twitter:image") or \
             meta.get("twitter:image:src") or \
-            meta.get("og:image")
+            meta.get("og:image") or ""
         title = meta.get("twitter:title") or meta.get("og:title")
         description = meta.get("twitter:description") or \
             meta.get("og:description") or \
