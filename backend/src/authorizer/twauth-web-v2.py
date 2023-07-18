@@ -1763,16 +1763,23 @@ def get_feed():
 @app.route('/completedstatuschange', methods=['GET','POST'])
 def completed_status_change():
     worker_id = str(request.args.get('worker_id')).strip()
-    completed_survey[worker_id] = True
+    try:
+        completed_survey[worker_id] = True
+    except KeyError:
+        print(f"No such worker: {worker_id}")
     return "Done!"
 
 @app.route('/completedcheck', methods=['GET','POST'])
 def completed_check():
     worker_id = str(request.args.get('worker_id')).strip()
-    print(completed_survey[worker_id])
-    if not completed_survey[worker_id]:
+    try:
+        print(completed_survey[worker_id])
+        if not completed_survey[worker_id]:
+            return "NO"
+        return "YES"
+    except KeyError:
+        print(f"No such worker: {worker_id}")
         return "NO"
-    return "YES"
 
 @app.errorhandler(500)
 def internal_server_error(e):
