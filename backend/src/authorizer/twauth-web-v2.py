@@ -1650,24 +1650,26 @@ def get_feed():
             eimage[0] = ""
 
 
-            # Redesigned block to retrieve the CardInfo data.
+        # Try to fetch card for all non-twitter URLs, stop at first URL that returns successfully
         if "urls" in entities_keys and not hasEmbed:
+            found_card = False
             for each_url in all_urls:
-                urls_list.append(each_url["url"])
-                expanded_urls_list.append(each_url["expanded_url"])
-            # XXX show first URL
-            # urls = ",".join(urls_list)
-            # expanded_urls = ",".join(expanded_urls_list)
-            urls = urls_list[0]
-            expanded_urls = expanded_urls_list[0]
-        if len(expanded_urls_list) > 0 and not isQuote and not hasEmbed: # not isQuote is to save time in the case of a quote. no card needed
-            card_url = expanded_urls_list[0]
-            card_data = CardInfo.getCardData(card_url)
-            if card_data:
+                if re.match("^https://twitter.com/.*", each_url["expanded_url"]) is not None:
+                    continue # skip twitter.com URLs
+
+                card_data = CardInfo.getCardData(each_url['expanded_url'])
                 if "image" in card_data.keys():
                     image_raw = card_data['image']
                     picture_heading = card_data["title"]
                     picture_description = card_data["description"]
+                    urls = each_url['url']
+                    expanded_urls = each_url['expanded_url']
+                    found_card = True
+                    break
+            if not found_card:
+                urls = ""
+                expanded_urls = ""
+
         #if isRetweet:
             #print("Is a retweet.")
 
