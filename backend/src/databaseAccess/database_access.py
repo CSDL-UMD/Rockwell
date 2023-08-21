@@ -313,14 +313,14 @@ def insert_timelines_attention_in_session():
                 conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,predicted_score,))
             connection.commit()
 
-            for obj in payload[3]: # Take care of tweet in attention here.
-                tweet_id = obj['tweet_id']
-                page = str(obj['page'])
-                rank = str(obj['rank'])
-                present = obj['present']
-                sql = """INSERT INTO user_tweet_attn_session(tweet_id,session_id,page,rank,correct_ans,feedtype) VALUES(%s,%s,%s,%s,%s,%s);"""
-                conn_cur.execute(sql,(tweet_id,session_id,page,rank,present,feedtype,))
-            connection.commit()
+            #for obj in payload[3]: # Take care of tweet in attention here.
+            #    tweet_id = obj['tweet_id']
+            #    page = str(obj['page'])
+            #    rank = str(obj['rank'])
+            #    present = obj['present']
+            #    sql = """INSERT INTO user_tweet_attn_session(tweet_id,session_id,page,rank,correct_ans,feedtype) VALUES(%s,%s,%s,%s,%s,%s);"""
+            #    conn_cur.execute(sql,(tweet_id,session_id,page,rank,present,feedtype,))
+            #connection.commit()
 
             conn_cur.close()
             accessPool.putconn(connection) #closing the connection
@@ -823,12 +823,15 @@ def get_worker_attention_tweet():
 
 @app.route('/engagements_save_endless', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new_endless():
+    print("ENGAGEMENTS SAVE ENDLESS CALLED!!!!")
     tries = 5
     connection = None
     worker_id = 0
     page = 0
     try:
         session_id = request.args.get('session_id')
+        print("SESSION IDDDD:")
+        print(session_id)
         #worker_id = int(request.args.get('worker_id'))
         page = int(request.args.get('page'))
         tweetRetweets = request.args.get('tweetRetweets')
@@ -859,13 +862,15 @@ def save_all_engagements_new_endless():
         sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id) values(%s,%s,%s,%s,%s);"""
         if len(tweetRetweets) > 0:
             for tweet_rank in tweetRetweets.split(','):
-                page_local = int(int(tweet_rank)/10)
-                rankk_local = int(int(tweet_rank)%10)
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
                 conn_cur.execute(sql_retweet,(True,session_id,page_local,rankk_local))
         if len(tweetLikes) > 0:
             for tweet_rank in tweetLikes.split(','):
-                page_local = int(int(tweet_rank)/10)
-                rankk_local = int(int(tweet_rank)%10)
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
                 conn_cur.execute(sql_like,(True,session_id,page_local,rankk_local))
         if len(tweetViewTimeStamps) > 0:
             timeStampsMap = tweetViewTimeStamps.split(',')
@@ -875,14 +880,17 @@ def save_all_engagements_new_endless():
             for i in range(0,len(timeStampsMap),2):
                 if timeStampsMap[i] == '-1':
                     tab_inactive.append(int(timeStampsMap[i+1]))
-                if timeStampsMap[i] == '-2':
+                elif timeStampsMap[i] == '-2':
                     tab_active.append(int(timeStampsMap[i+1]))
-                rankk_glob = int(timeStampsMap[i])
-                timeStampsDict[rankk_glob].append(timeStampsMap[i+1])
+                else:
+                    rankk_glob = int(timeStampsMap[i]) - 1
+                    timeStampsDict[rankk_glob].append(timeStampsMap[i+1])
+            print("Timestamps Dict : ")
+            print(timeStampsDict)
             for rr in timeStampsDict.keys():
                 timestamp_str = ','.join(timeStampsDict[rr])
                 page_local = int(rr/10)
-                rankk_local = int(rr%10)
+                rankk_local = int(rr%10) + 1
                 conn_cur.execute(sql_telemetry,(timestamp_str,session_id,page_local,rankk_local))
                 #conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
             if len(tab_inactive) > 0:
@@ -895,6 +903,7 @@ def save_all_engagements_new_endless():
                 conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],session_id))
         connection.commit()
         conn_cur.close()
+        print('Yahan ayyaa????')
         accessPool.putconn(connection) #closing the connection
     except Exception as error:
         print(str(error) + " Something inside of the insertion failed.") # Log this.
@@ -1249,7 +1258,7 @@ def insert_user():
             cursor.close()
             connection.commit()
             accessPool.putconn(connection)
-            return jsonify(data=random_identifier)
+            return jsonify(data=worker_id)
     except (Exception, psycopg2.DatabaseError) as error:
         print("ERROR!!!!",error)
     return retVal123

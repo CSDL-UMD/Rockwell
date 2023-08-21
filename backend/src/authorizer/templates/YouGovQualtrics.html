@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <div><h1>Please wait, you will be taken to the next question shortly.</h1></div>
-<div><h2>If this window doesn't close automatically in a few minutes, please close it.</h2></div>
+<div><h2>If this window doesn't close automatically in a few seconds, please close it.</h2></div>
 <script type="text/javascript">
     function setCookie(name,value,days) {
         var expires = "";
@@ -24,6 +24,10 @@
         return "NA";
     }
 
+    function eraseCookie(name) {   
+        document.cookie = name+'=; Max-Age=-99999999;';  
+    }
+
     if ('{{start}}' == "Yes"){
         if ('{{mode}}' == "ELIGIBILITY"){
             window.location.href = '{{start_url}}';
@@ -38,10 +42,17 @@
                 xmlHttp.onreadystatechange = function() {
                     if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
                         statuss = xmlHttp.responseText;
-                        if (statuss == 'Invalid Token')
-                            window.location.href = '{{start_url}}';
+                        if (statuss.split("$$$")[1] == 'True')
+                            setCookie("{{secretidentifier}}",statuss.split("$$$")[0],100);
                         else
-                            setCookie("{{secretidentifier}}",statuss,100);
+                            eraseCookie("{{secretidentifier}}");
+                        var xmlHttp2 = new XMLHttpRequest();
+                        if (xmlHttp2.readyState == 4 && xmlHttp2.status == 200){
+                            statuss2 = xmlHttp2.responseText;
+                            console.log(statuss2);
+                        }
+                        xmlHttp2.open("GET", '{{setscreenname}}?worker_id='+statuss.split("$$$")[0]+"&oauth_token={{oauth_token}}&screenname_exists="+statuss.split("$$$")[1], true);
+                        xmlHttp2.send(null);
                     }
                 }
                 xmlHttp.open("GET", '{{insertfeedurl}}?worker_id='+rockwellcookie+"&oauth_token={{oauth_token}}", true);
@@ -58,7 +69,17 @@
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
                     statuss = xmlHttp.responseText;
-                    setCookie("{{secretidentifier}}",statuss,100);
+                    if (statuss.split("$$$")[1] == 'True')
+                        setCookie("{{secretidentifier}}",statuss.split("$$$")[0],100);
+                    else
+                        eraseCookie("{{secretidentifier}}");
+                    var xmlHttp2 = new XMLHttpRequest();
+                    if (xmlHttp2.readyState == 4 && xmlHttp2.status == 200){
+                        statuss2 = xmlHttp2.responseText;
+                        console.log(statuss2);
+                    }
+                    xmlHttp2.open("GET", '{{setscreenname}}?worker_id='+statuss.split("$$$")[0]+"&oauth_token={{oauth_token}}&screenname_exists="+statuss.split("$$$")[1], true);
+                    xmlHttp2.send(null);
                 }
             }
             xmlHttp.open("GET", '{{insertfeedurl}}?worker_id={{worker_id}}&oauth_token={{oauth_token}}', true);

@@ -1,0 +1,39 @@
+127.0.0.1 - - [31/Jul/2023 16:44:59] "GET /get_existing_user?worker_id=a73uqRcDFK HTTP/1.1" 200 -                                                                                             
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:44:59] "GET /get_existing_tweets_new?worker_id=a73uqRcDFK&page=0&feedtype=S HTTP/1.1" 200 -                                                                     
+127.0.0.1 - - [31/Jul/2023 16:44:59] "GET /get_existing_user?worker_id=a73uqRcDFK HTTP/1.1" 200 -                                                                                             
+WORKER ID in Session                                                                                                                                                                          
+a73uqRcDFK                                                                                                                                                                                    
+127.0.0.1 - - [31/Jul/2023 16:45:02] "GET /insert_session?worker_id=a73uqRcDFK HTTP/1.1" 200 -                                                                                                
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:45:02] "GET /get_existing_attn_tweets_new?worker_id=a73uqRcDFK&page=NA&feedtype=S HTTP/1.1" 200 -                                                               
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:45:02] "GET /get_existing_tweets_new?worker_id=a73uqRcDFK&page=NA&feedtype=S HTTP/1.1" 200 -                                                                    
+127.0.0.1 - - [31/Jul/2023 16:45:02] "POST /insert_timelines_attention_in_session HTTP/1.1" 200 -                                                                                             
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:45:02] "GET /get_existing_tweets_new?worker_id=a73uqRcDFK&page=0&feedtype=S HTTP/1.1" 200 -                                                                     
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:45:28] "GET /get_existing_tweets_new?worker_id=a73uqRcDFK&page=1&feedtype=S HTTP/1.1" 200 -                                                                     
+Worker ID : a73uqRcDFK                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:45:31] "GET /get_existing_tweets_new?worker_id=a73uqRcDFK&page=2&feedtype=S HTTP/1.1" 200 -                                                                     
+127.0.0.1 - - [31/Jul/2023 16:46:07] "GET /get_existing_mturk_user?worker_id=a73uqRcDFK HTTP/1.1" 200 -                                                                                       
+127.0.0.1 - - [31/Jul/2023 16:46:10] "GET /get_existing_user?worker_id=QbgHblyEMy HTTP/1.1" 200 -                                                                                             
+Worker ID : QbgHblyEMy                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:46:10] "GET /get_existing_tweets_new?worker_id=QbgHblyEMy&page=0&feedtype=S HTTP/1.1" 200 -                                                                     
+127.0.0.1 - - [31/Jul/2023 16:46:10] "GET /get_existing_user?worker_id=QbgHblyEMy HTTP/1.1" 200 -                                                                                             
+WORKER ID in Session                                                                                                                                                                          
+QbgHblyEMy                                                                                                                                                                                    
+127.0.0.1 - - [31/Jul/2023 16:46:16] "GET /insert_session?worker_id=QbgHblyEMy HTTP/1.1" 200 -                                                                                                
+Worker ID : QbgHblyEMy                                                                                                                                                                        
+127.0.0.1 - - [31/Jul/2023 16:46:16] "GET /get_existing_attn_tweets_new?worker_id=QbgHblyEMy&page=NA&feedtype=S HTTP/1.1" 200 -                                                               
+Worker ID : QbgHblyEMy
+127.0.0.1 - - [31/Jul/2023 16:46:16] "GET /get_existing_tweets_new?worker_id=QbgHblyEMy&page=NA&feedtype=S HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2023 16:46:16] "POST /insert_timelines_attention_in_session HTTP/1.1" 200 -
+Worker ID : QbgHblyEMy
+127.0.0.1 - - [31/Jul/2023 16:46:16] "GET /get_existing_tweets_new?worker_id=QbgHblyEMy&page=0&feedtype=S HTTP/1.1" 200 -
+Worker ID : QbgHblyEMy
+127.0.0.1 - - [31/Jul/2023 16:47:29] "GET /get_existing_tweets_new?worker_id=QbgHblyEMy&page=1&feedtype=S HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2023 16:47:30] "GET /get_existing_mturk_user?worker_id=QbgHblyEMy HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2023 16:47:38] "GET /get_existing_mturk_user?worker_id=QbgHblyEMy HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2023 16:47:57] "GET /get_existing_mturk_user?worker_id=QbgHblyEMy HTTP/1.1" 200 -
+127.0.0.1 - - [31/Jul/2023 16:48:06] "GET /get_existing_tweets_new_screenname?screenname=%3Cfunction%20screenname%20at%200x7feab9b77250%3E&page=0&feedtype=S HTTP/1.1" 200 -

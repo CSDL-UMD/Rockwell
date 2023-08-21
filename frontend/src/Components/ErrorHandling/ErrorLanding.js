@@ -17,10 +17,10 @@ function ErrorLanding(props) {
     const errorMessageSelector = (errorCode) => {
       switch (Number(errorCode)) {
         case config.error_codes.no_tweets_main_feed:
-          setErrorMessage("Sorry we were unable to find tweets for this account.");
+          setErrorMessage("Dang! There was an error loading the simulated feed, please go back to the Qualtrics tab and try again. If this error persists, please complete the suvery manually and let us know in the feedback on Connect.Thank you and sorry for the inconvenience.");
           break;
         case (config.error_codes.tweet_fetch_error_main_feed):
-          setErrorMessage("Unfortunately there was an error trying to fetch tweets at this time.");
+          setErrorMessage("Dang! There was an error loading the simulated feed, please go back to the Qualtrics tab and try again. If this error persists, please complete the suvery manually and let us know in the feedback on Connect.Thank you and sorry for the inconvenience.");
           break;
         case config.error_codes.no_tweets_attn_check:
           setErrorMessage("Sorry no attention tweets existed for your account.");
@@ -29,7 +29,7 @@ function ErrorLanding(props) {
           setErrorMessage("We were unable to retrieve your attention check at this time.");
           break
         default:
-          setErrorMessage("Something went wrong...");
+          setErrorMessage("Dang! There was an error loading the simulated feed, please go back to the Qualtrics tab and try again. If this error persists, please complete the suvery manually and let us know in the feedback on Connect.Thank you and sorry for the inconvenience.");
       }
     };
     errorMessageSelector(getUrlArgs().error);
@@ -37,8 +37,6 @@ function ErrorLanding(props) {
   return (
     <div>
       {errorMessage ? errorMessage : ''}
-      <br />
-      <Link to={'/'}><button>Login Again</button></Link>
     </div>
   )
 }

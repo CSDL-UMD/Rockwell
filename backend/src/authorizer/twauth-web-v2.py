@@ -24,8 +24,11 @@ app = Flask(__name__)
 
 app.debug = True
 
-#log_level = logging.DEBUG
-#logging.basicConfig(filename='authorizer.log', level=log_level)
+#LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
+#LOG_PATH_DEFAULT="/home/rockwell/Rockwell/backend/src/authorizer/authorizer.log"
+
+log_level = logging.DEBUG
+logging.basicConfig(filename='authorizer.log', level=log_level)
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser
@@ -101,7 +104,6 @@ def contains_video(tweet):
                 if media.get("type") == "video":
                     return True
     return False
-
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -467,7 +469,7 @@ def qualrender():
     assignment_id_store[oauth_token_qualtrics] = assignment_id
     project_id_store[oauth_token_qualtrics] = project_id
     start_url = start_url_store[oauth_token_qualtrics]
-    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="Yes", start_url=start_url, oauth_token=oauth_token_qualtrics, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics", setscreenname=webInformation['url']+"/auth/setscreenname"))
     return res
 
 @app.route('/callback')
@@ -623,15 +625,16 @@ def qualcallback():
     resp_worker_id = requests.get('http://' + webInformation['localhost'] + ':5052/insert_user',params=insert_user_payload)
     #worker_id = resp_worker_id.json()["data"]
     
-    screenname_store[oauth_token] = screen_name
-    userid_store[oauth_token] = user_id
-    worker_id_store[oauth_token] = str(worker_id)
-    access_token_store[oauth_token] = real_oauth_token
-    access_token_secret_store[oauth_token] = real_oauth_token_secret
-    completed_survey[worker_id] = False
+    if mode == "ELIGIBILITY":
+        screenname_store[oauth_token] = screen_name
+        userid_store[oauth_token] = user_id
+        worker_id_store[oauth_token] = str(worker_id)
+        access_token_store[oauth_token] = real_oauth_token
+        access_token_secret_store[oauth_token] = real_oauth_token_secret
+        completed_survey[worker_id] = False
     del oauth_store[oauth_token]
 
-    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics"))
+    res = make_response(render_template('YouGovQualtrics.html', start="No", worker_id=worker_id, oauth_token=oauth_token, mode=mode ,secretidentifier="_rockwellidentifierv2_", insertfeedurl=webInformation['url']+"/insertfeedqualtrics", setscreenname=webInformation['url']+"/auth/setscreenname"))
     return res
 
     #return "<script>window.onload = window.close();</script>"
@@ -666,6 +669,8 @@ def insert_feed_qualtrics():
     access_token_secret = db_response[0][1]
     screenname = db_response[0][2]
     userid = db_response[0][3]
+    print("Screenname in insertfeedqualtrics")
+    print(screenname)
     db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_new?worker_id='+str(worker_id)+"&page="+str(0)+"&feedtype=S")
     need_to_fetch_screenname = False
     need_to_fetch_tweets = False
@@ -676,14 +681,13 @@ def insert_feed_qualtrics():
         if db_response_screenname.json()['data'] == "NEW":
             need_to_fetch_tweets = True
         else:
-            worker_id = db_response_screenname.json()['data'][0][-1].strip()
-    screenname_store[oauth_token] = screenname
-    userid_store[oauth_token] = userid
-    worker_id_store[oauth_token] = str(worker_id)
-    access_token_store[oauth_token] = access_token
-    access_token_secret_store[oauth_token] = access_token_secret
-    completed_survey[worker_id] = False
-    return worker_id
+            worker_id = db_response_screenname.json()['data'][0][-2].strip()
+    screenname_exists_return = "True"
+    if need_to_fetch_tweets:
+        screenname_exists_return = "False"
+    print("Worker ID in insertfeedqualtrics 2")
+    print(worker_id)
+    return worker_id+"$$$"+screenname_exists_return
 
 @app.route('/insertfeedqualtrics_prev', methods=['GET','POST'])
 def insert_feed_qualtrics_prev():
@@ -875,7 +879,31 @@ def insert_feed_qualtrics_prev():
     """
     return worker_id
 
-@app.route('/auth/getscreenname')
+@app.route('/auth/setscreenname',methods=['GET','POST'])
+def set_screenname():
+    oauth_token = request.args.get('oauth_token')
+    worker_id = request.args.get('worker_id')
+    screenname_exists = request.args.get('screenname_exists')
+    print("IN SET SCREENNAME:::")
+    print(screenname_exists)
+    db_response = requests.get('http://127.0.0.1:5052/get_existing_user?worker_id='+str(worker_id))
+    db_response = db_response.json()['data']
+    access_token = db_response[0][0]
+    access_token_secret = db_response[0][1]
+    screenname = db_response[0][2]
+    userid = db_response[0][3]
+    if screenname_exists == "False":
+        screenname_store[oauth_token] = "#NOTEXIST#"
+    else:
+        screenname_store[oauth_token] = screenname
+    userid_store[oauth_token] = userid
+    worker_id_store[oauth_token] = str(worker_id)
+    access_token_store[oauth_token] = access_token
+    access_token_secret_store[oauth_token] = access_token_secret
+    completed_survey[worker_id] = False
+    return "Done!"
+
+@app.route('/auth/getscreenname',methods=['GET','POST'])
 def screenname():
     #print("GET SCEEN NAME CALLED!!!")
     oauth_token_qualtrics = request.args.get('oauth_token')
@@ -883,6 +911,8 @@ def screenname():
     print("SCREEN NAME CALLED!!!!!!!!")
     print(screen_name_return)
     if screen_name_return == "####":
+        return screen_name_return
+    if screen_name_return == '#NOTEXIST#':
         return screen_name_return
     random_identifier_len = random.randint(15, 26)    
     random_identifier = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(random_identifier_len))
@@ -907,6 +937,8 @@ def retweet_post():
     access_token_secret = db_response[0][1]
     userid = db_response[0][3]
 
+    logging.info(f"Retweet request started for : {userid=}")
+
     cred = config('../configuration/config.ini','twitterapp')
     cred['token'] = access_token.strip()
     cred['token_secret'] = access_token_secret.strip()
@@ -918,9 +950,15 @@ def retweet_post():
     try:
         payload = {"tweet_id" : tweet_id}
         response_retweet = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(userid), json=payload)
+        print(response_retweet.text)
+        response_text = response_retweet.text
+        logging.info(f"Retweet returned from Twitter : {userid=} {response_text=}")
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
+        print("Retweet Exception")
         print(e)
+        error = e
+        logging.info(f"Retweet exception : {userid=} {error=}")
         return jsonify({"success":0}) # Retweet failed
 
 @app.route('/like_post', methods=['GET','POST'])
@@ -944,20 +982,24 @@ def like_post():
     try:
         payload = {"tweet_id" : tweet_id}
         response_likes = oauth.post("https://api.twitter.com/2/users/{}/likes".format(userid), json=payload)
+        response_text = response_retweet.text
+        logging.info(f"Likes returned from Twitter : {userid=} {response_text=}")
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
         print(e)
+        error = e
+        logging.info(f"Likes exception : {userid=} {error=}")
         return jsonify({"success":0}) # Retweet failed
 
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
+    #logger = make_logger(LOG_PATH_DEFAULT)
     worker_id = request.args.get('worker_id').strip()
+    logging.info(f"Hometimeline endpoint started for : {worker_id=}")
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
-    num_tweets_cap = request.args.get('num_tweets_cap').strip()
-    if not num_tweets_cap:
-        num_tweets_cap = 1
+    num_tweets_cap = 100
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
@@ -967,6 +1009,8 @@ def get_hometimeline():
     participant_id = db_response[0][4]
     assignment_id = db_response[0][5]
     project_id = db_response[0][6]
+    logging.info(f"Participant information : {worker_id=} {screenname=} {userid=} {participant_id=} {assignment_id=} {project_id=}")
+    logging.info(f"Twitter information : {worker_id=} {access_token=} {access_token_secret=}")
     v2tweetobj = {}
     v1tweetobj = {}
 
@@ -979,16 +1023,22 @@ def get_hometimeline():
                         client_secret=cred['key_secret'],
                         resource_owner_key=cred['token'],
                         resource_owner_secret=cred['token_secret'])
+    logging.info(f"Create OAuth session : {worker_id=}")
     timeline_params_cap = {}
     for kk in timeline_params:
         timeline_params_cap[kk] = timeline_params[kk]
     timeline_params_cap["max_results"] = num_tweets_cap
     response = oauth.get("https://api.twitter.com/2/users/{}/timelines/reverse_chronological".format(userid), params = timeline_params_cap)
+    logging.info(f"Got response from Twitter API : {worker_id=}")
+    print("RESPONSE TEXT!!!")
+    print(response.text)
     if response.text == '{"errors":[{"code":89,"message":"Invalid or expired token."}]}':
         errormessage = "Invalid Token"
+        logging.info(f"Invalid Token error : {worker_id=}")
 
     if response.text == "{'errors': [{'message': 'Rate limit exceeded', 'code': 88}]}":
         errormessage = "Rate Limit Exceeded"
+        logging.info(f"Rate limit exceeded error : {worker_id=}")
 
     if errormessage == "NA":
 
@@ -1007,6 +1057,7 @@ def get_hometimeline():
             v2tweetobj = v2tweetobj_loaded
 
         v1tweetobj = convertv2tov1(v2tweetobj,cred)
+        logging.info(f"Converted Version 2 Twitter JSON object to Version 1 : {worker_id=}")
 
 
     now_session_start = datetime.datetime.now()
@@ -1018,7 +1069,8 @@ def get_hometimeline():
 
     newest_id = ""
     if "meta" in v2tweetobj.keys():
-        newest_id = v2tweetobj["meta"]["newest_id"]
+        if "newest_id" in v2tweetobj["meta"]:
+            newest_id = v2tweetobj["meta"]["newest_id"]
 
     userobj = {
         "screen_name" : screenname,
@@ -1040,6 +1092,7 @@ def get_hometimeline():
         "homeTweets" : v1tweetobj,
         "errorMessage" : errormessage
     }
+    logging.info(f"Created object for writing to file : {worker_id=}")
 
     with gzip.open("hometimeline_data/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
@@ -1047,8 +1100,12 @@ def get_hometimeline():
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
 
+    logging.info(f"Wrote object to file : {worker_id=}")
+
     if "data" in v2tweetobj.keys():
+        logging.info(f"Started steps for database insertion : {worker_id=}")
         feed_tweets,feed_tweets_v2 = filter_tweets(v1tweetobj,v2tweetobj["data"])
+        logging.info(f"Filtered Tweets to remove duplicates : {worker_id=}")
         db_tweet_payload = []
         for (i,tweet) in enumerate(feed_tweets):
             db_tweet = {'tweet_id':tweet["id"],'tweet_json':tweet, 'tweet_json_v2':feed_tweets_v2[i]}
@@ -1057,6 +1114,7 @@ def get_hometimeline():
         if db_response.json()['data'] != "NEW":
             existing_tweets = [response[6] for response in db_response.json()['data']]
             feed_tweets.extend(existing_tweets)
+        logging.info(f"Got existing tweets : {worker_id=}")
         feed_tweets = feed_tweets[0:len(feed_tweets)-10]
         absent_tweets = feed_tweets[-10:]
         feed_tweets_chronological = []
@@ -1078,9 +1136,9 @@ def get_hometimeline():
                 'rtbefore':str(tweet['retweeted']),
                 'page':page,
                 'rank':rank_in_page,
-                'predicted_score':public_tweets_score[i]
+                'predicted_score':feed_tweets_chronological_score[i]
             }
-            db_tweet_payload.append(db_tweet)
+            db_tweet_chronological_payload.append(db_tweet)
             rankk = rankk + 1
         finalJson = []
         finalJson.append(db_tweet_payload)
@@ -1088,7 +1146,9 @@ def get_hometimeline():
         finalJson.append(db_tweet_chronological_attn_payload)
         finalJson.append(worker_id)
         finalJson.append(screenname)
+        logging.info(f"Created finalJSON for insertion : {worker_id=}")
         requests.post('http://127.0.0.1:5052/insert_timelines_attention_chronological',json=finalJson)
+        logging.info(f"Completed database insertion : {worker_id=}")
 
     else:
         errormessage = errormessage + " No data in v2 tweet object"
@@ -1428,17 +1488,17 @@ def get_feed():
         db_response_timeline = db_response_timeline.json()['data']
         attn_payload = []
         attn_pages = []
-        print(db_response_attn)
-        for attn_tweet in db_response_attn:
-            db_tweet = {
-                'tweet_id': attn_tweet[0],
-                'page' : attn_tweet[2],
-                'rank' : attn_tweet[3],
-                'present' : attn_tweet[1]
-            }
-            attn_payload.append(db_tweet)
-            attn_pages.append(int(attn_tweet[2]))
-        max_page_store[worker_id] = max(attn_pages)
+        #for attn_tweet in db_response_attn:
+        #    db_tweet = {
+        #        'tweet_id': attn_tweet[0],
+        #        'page' : attn_tweet[2],
+        #        'rank' : attn_tweet[3],
+        #        'present' : attn_tweet[1]
+        #    }
+        #    attn_payload.append(db_tweet)
+        #    attn_pages.append(int(attn_tweet[2]))
+        #max_page_store[worker_id] = max(attn_pages)
+        max_page_store[worker_id] = 1
         timeline_payload = []
         for timeline_tweet in db_response_timeline:
             db_tweet = {
@@ -1483,10 +1543,10 @@ def get_feed():
     for (tweet_en,tweet) in enumerate(public_tweets): # Modify what tweet is for this loop in order to change the logic ot use our data or twitters.
 
         # Checking for an image in the tweet. Adds all the links of any media type to the eimage list.
-        tweet_v2 = public_tweets_v2[tweet_en]
-        if contains_video(tweet_v2):
-            print("Skipped Video for tweet id : "+str(tweet_v2["id"]))
-            continue
+        #tweet_v2 = public_tweets_v2[tweet_en]
+        #if contains_video(tweet_v2):
+        #    print("Skipped Video for tweet id : "+str(tweet_v2["id"]))
+        #    continue
         actor_name = tweet["user"]["name"]
         full_text = tweet["full_text"]
         url_start = []
@@ -1793,3 +1853,4 @@ def add_headers(response):
   
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
+
