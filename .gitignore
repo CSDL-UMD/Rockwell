@@ -45,6 +45,14 @@ backend/src/eligibility/User_Data/*.json.gz
 backend/src/authorizer/UserData/*.json.gz
 backend/src/authorizer/UserDatav2/*.json.gz
 backend/src/authorizer/engagement_data/*.json.gz
+backend/src/authorizer/favorites_data/*.json.gz
+backend/src/authorizer/hometimeline_data/*.json.gz
+backend/src/authorizer/usertimeline_data/*.json.gz
+backend/src/authorizer/pilot3_testing/UserData/*.json.gz
+backend/src/authorizer/pilot3_testing/UserDatav2/*.json.gz
+backend/src/authorizer/pilot3_testing/favorites_data/*.json.gz
+backend/src/authorizer/pilot3_testing/hometimeline_data/*.json.gz
+backend/src/authorizer/pilot3_testing/usertimeline_data/*.json.gz
 
 # data, model and newsguard domains from recsys
 backend/src/recsys/data/*
