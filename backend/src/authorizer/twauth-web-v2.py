@@ -29,6 +29,7 @@ app.debug = True
 
 log_level = logging.DEBUG
 logging.basicConfig(filename='authorizer.log', level=log_level)
+NG_FILE_LOCATION="/home/rockwell/Rockwell/backend/src/recsys/NewsGuardIffy/label-2022101916.json"
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser
@@ -104,6 +105,72 @@ def contains_video(tweet):
                 if media.get("type") == "video":
                     return True
     return False
+
+def compose_queries_512_chars (username:str) -> list:
+    """
+        This function compose the queries and makes sure the length does not surpass 512
+
+        Agrs:
+            username: this is the user name of the current user
+            filename: this is the json file containing the urls of the news domains
+
+        Retunrns:
+            a list of the queries
+    """
+
+    queries = []
+    count = 0
+
+    file = open(NG_FILE_LOCATION)
+    data = json.load(file)
+
+    #print(data[0])
+    query = 'from:'+ username + ' (url:".' +data[0]['identifier'] + '/"' + ' url:"//' + data[0]['identifier'] + '/"'
+    #query += 'OR url: .' + data[0]['identifierAlt'] +'OR url: //' + data[0]['identifierAlt']
+
+    for i in range(1, len(data) - 1):
+        domain_alt = ""
+        domain = data[i]['identifier']
+        try:
+            domain_alt =  data[i]['identifierAlt']
+        except:
+            count += 1
+
+        if len(query) + (len(domain) + 13) < 512:
+            query += ' OR url:".' + domain + '/"'
+        else:
+            queries.append(query + ")")
+            query = 'from:'+ username +' (url:".' + domain + '/"'
+
+        if len(query) + (len(domain) + 14) < 512:
+            query += ' OR url:"//' + domain + '/"'
+        else:
+            queries.append(query + ")")
+            query = 'from:'+ username +' (url:"//' + domain + '/"'
+
+        if len(domain_alt) > 1:
+            if len(query) + (len(domain_alt) + 13) < 512:
+                query += ' OR url:".' + domain_alt + '/"'
+            else:
+                queries.append(query + ")")
+                query = 'from:'+ username +' (url:".' + domain_alt + '/"'
+
+            if len(query) + (len(domain_alt) + 14) < 512:
+                query += ' OR url:"//' + domain_alt + '/"'
+            else:
+                queries.append(query + ")")
+                query = 'from:'+ username +' (url:"//' + domain_alt + '/"'
+
+    file.close()
+
+    queries_test = []
+    for i in range(200):
+        queries_test.append(queries[i])
+
+    for qq in queries:
+        if "abcnews" in qq:
+            queries_test.append(qq)
+    return queries_test
 
 webInformation = config('../configuration/config.ini','webconfiguration')
 
@@ -999,7 +1066,7 @@ def get_hometimeline():
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
-    num_tweets_cap = 100
+    num_tweets_cap = 1
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
@@ -1077,6 +1144,13 @@ def get_hometimeline():
         "twitter_id" : userid
     }
 
+    queries = compose_queries_512_chars(screenname)
+    user_eng_queries = []
+    for qq in queries:
+        user_eng_queries.append({'query':qq,'since_id':'0','next_token':'##START##'})
+
+    logging.info(f"Generated queries for pulling engagement data : {worker_id=}")
+
     writeObj = {
         "MTurkId" : participant_id,
         "MTurkHitId" : assignment_id,
@@ -1092,13 +1166,48 @@ def get_hometimeline():
         "homeTweets" : v1tweetobj,
         "errorMessage" : errormessage
     }
+
+    writeObjv2 = {
+        "MTurkId" : participant_id,
+        "MTurkHitId" : assignment_id,
+        "MTurkAssignmentId" : project_id,
+        "collectionStarted" : collection_started_store,
+        "timestamp" : session_start,
+        "source": "pilot3",
+        "accessToken": access_token,
+        "accessTokenSecret": access_token_secret,
+        "latestTweetId": newest_id,
+        "worker_id": worker_id,
+        "userObject": userobj,
+        "homeTweets" : v2tweetobj,
+        "errorMessage" : errormessage
+    }
+
+    writeObjeng = {
+        'accessToken' : access_token,
+        'accessTokenSecret' : access_token_secret,
+        'collectionStarted' : collection_started_store,
+        'userObject' : userobj,
+        'MTurkId' : participant_id,
+        'MTurkHitId' : assignment_id,
+        'MTurkAssignmentId' : project_id,
+        'worker_id' : worker_id,
+        'tweets_collected' : 0,
+        'engTweets' : [],
+        'user_queries' : user_eng_queries,
+        'idx_start' : 0 
+    }
+
     logging.info(f"Created object for writing to file : {worker_id=}")
 
     with gzip.open("hometimeline_data/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(writeObj).encode('utf-8'))
 
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
-        outfile.write(json.dumps(v2tweetobj).encode('utf-8'))
+        outfile.write(json.dumps(writeObjv2).encode('utf-8'))
+
+    with gzip.open("engagement_data/{}_eng.json.gz".format(userid),"w") as outfile:
+        outfile.write(json.dumps(writeObjeng).encode('utf-8'))
 
     logging.info(f"Wrote object to file : {worker_id=}")
 
