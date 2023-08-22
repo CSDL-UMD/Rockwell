@@ -44,6 +44,7 @@ backend/src/eligibility/Resources/domains.json
 backend/src/eligibility/User_Data/*.json.gz
 backend/src/authorizer/UserData/*.json.gz
 backend/src/authorizer/UserDatav2/*.json.gz
+backend/src/authorizer/engagement_data/*.json.gz
 
 # data, model and newsguard domains from recsys
 backend/src/recsys/data/*
