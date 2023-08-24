@@ -1066,6 +1066,9 @@ def get_hometimeline():
     file_number = request.args.get('file_number').strip()
     max_id = request.args.get('max_id').strip()
     collection_started = request.args.get('collection_started').strip()
+    participant_id = request.args.get('participant_id').strip()
+    assignment_id = request.args.get('assignment_id').strip()
+    project_id = request.args.get('project_id').strip()
     num_tweets_cap = 1
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
@@ -1073,9 +1076,9 @@ def get_hometimeline():
     access_token_secret = db_response[0][1]
     screenname = db_response[0][2]
     userid = db_response[0][3]
-    participant_id = db_response[0][4]
-    assignment_id = db_response[0][5]
-    project_id = db_response[0][6]
+    #participant_id = db_response[0][4]
+    #assignment_id = db_response[0][5]
+    #project_id = db_response[0][6]
     logging.info(f"Participant information : {worker_id=} {screenname=} {userid=} {participant_id=} {assignment_id=} {project_id=}")
     logging.info(f"Twitter information : {worker_id=} {access_token=} {access_token_secret=}")
     v2tweetobj = {}
