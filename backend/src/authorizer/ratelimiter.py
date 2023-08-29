@@ -1,60 +1,77 @@
 import time
 import heapq
 import schedule
-import random
+import threading
 
-# users = {'1': [time.time() + 100, 1, [11, 12, 13, 14], 0], '2': [time.time(), 0, [21, 22, 23, 24], 0], '3': [time.time(), 0, [31, 32, 33, 34], 0], '4': [time.time(), 0, [41, 42, 43, 44], 0]}
-# users is a dictionary in the form user_id: [reset_time, number_of_retweets_in_time_window, all_pending_requests, number_of_likes_in_time_window]
+# users is a dictionary in the form user_id: [reset_time, number_of_retweets_in_time_window, number_of_likes_in_time_window, oauth]
 users = {}
-requests = [('1', 'like', 1)]
 # this is the shared user dictionary for retweets
-limit = 2  # this is the current implemented limit
+limit = 1  # this is the current implemented limit
 
 
 class Producer:
     def __init__(self):
         self.pq = []
+        self.counter = 0
 
-    def push(self, user_id: str, request_id: int, reset_time: float, request_type: str, request) -> None:
+    def push(self, user_id: str, request_type: str, tweet_id, users: dict = users, request_id: int = 0) -> None:
         """
             this is the only function that is allowed to push to the queue
             the priotiry is calculated using the diff between the reset time and now
             and id is saved for futher sorting and other data for consumer use
         """
-        now = time.time() - 10  # the real one will be just the current time
-        heapq.heappush(self.pq, (int(reset_time - now), request_id, reset_time, user_id, request, request_type))
+        # print('producer push')
+        reset_time = 0
+        if user_id in users:
+            reset_time = users[user_id][0]
+        else:
+            users[user_id] = [time.time(), 0, 0, None]
 
-    def update(self, requests):
+        if request_id == 0:
+            request_id = self.counter
+            self.counter += 1
+
+        heapq.heappush(self.pq, (reset_time, request_id, user_id, tweet_id, request_type))
+
+    def update(self, requests) -> None:
         """
             this function updates the queue with the requests that failed to be processed
             Args:
                 requests: this is the list of request that are ready to be processed regarless of rate limit
         """
+        # print('updating')
+        # print('^^^^^^^^^^^', requests)
         for ele in requests:
-            user_id = ele[3]
-            request = ele[4]
-            request_type = ele[5]
+            user_id = ele[2]
+            request = ele[3]
+            request_type = ele[4]
             user = users[user_id]
-            reset_time = user[0]
-            id = user[2].index(request)
-            user[1] = 0
-            self.push(user_id, id, reset_time, request_type, request)
 
-    def get_ready_requests(self):
+            if request_type == 'retweet':
+                user[1] = 0
+            elif request_type == 'like':
+                user[2] = 0
+            else:
+                print('houston we have a problem!')
+            self.push(user_id, request_type, request, request_id=ele[1])
+
+        # print('after update', self.pq)
+        # pq gets updated to some value that is the implement, the ids did not disapear they just spawned back where they did not need to be
+    def get_ready_requests(self) -> list:
         """
             This function is used to get all the requests from the queue that are ready to go right now.
             It does it by continuisly popping from the queue until the queue is empty or until the element popped out is not ready to be processed
             Returns:
-                a list of ready requests 
+                a list of ready requests
         """
         now = time.time()
         ready = []  # collecting the requests here
 
         while True and len(self.pq):
             item = heapq.heappop(self.pq)  # get the item off the queue
-            if item[2] <= now:  # check if the item is ready to go
-                ready.append(item) 
-            else:  
+            if item[0] <= now:  # check if the item is ready to go
+                ready.append(item)
+            else:
                 heapq.heappush(self.pq, item)
                 break
         return ready
@@ -65,18 +82,19 @@ class Consumer:
         this the consumer class to consume the requests
     """
 
-
-    def wake_up(self):
+    def wake_up(self, producer):
         lst = producer.get_ready_requests()
         if len(lst):
-            rest = self.consume(lst)
-            producer.update(rest)
+            rest = self.consume(lst, users)
+
+            if len(rest):
+                producer.update(rest)
         else:
             print('nothing ready')
 
-    def consume(self, requests):
+    def consume(self, requests, users):
         """
-            the consumer takes the requests and takes care of the requests that are ready to be 
+            the consumer takes the requests and takes care of the requests that are ready to be
             processed until the limit and returns the ones that are left.
 
             Args:
@@ -87,24 +105,28 @@ class Consumer:
         """
 
         rest = []
-
+        # print('consuming from ratelimiter')
+        # print('**********************',requests, '******************************')
         for ele in requests:
-            user_id = ele[3]
+            user_id = ele[2]
             user = users[user_id]
-            count = 0
-            if ele[5] == 'like':
-                count = user[3]
-            if count < limit:
+            if ele[4] == 'like' and user[2] < limit:
+                # if user has an oauth use it else oauth them
                 reset_time = process(ele)
-                user[1] += 1
+                user[2] += 1 # counter like requests in the window
+                user[0] = reset_time # reset time
+            elif ele[4] == 'retweet' and user[1] < limit:
+                reset_time = process(ele)
+                user[1] += 1 # counter of retweets requests in the window
                 user[0] = reset_time
-                user[2].pop(0)
             else:
                 rest.append(ele)
+        # print('++++++', rest, '++++++')
         return rest
 
-
+# use the logging module to document the process see cardinfo.py in feed generation
 def process(request):
+    print('processing')
     print(request)
     return time.time()
 
@@ -116,41 +138,36 @@ producer = Producer()
 consumer = Consumer()
 
 
+def push_like(tweet_id, user_id) -> None:
+    """
+        when the user likes a post this function is used to send the like request to a producer class that takes care of the rest
 
-def make_request(request_type: str, request, user_id: str) -> None:
-    print('same thing')
-    request_id = 0
-    if user_id in users:
-        request_id = len(users[user_id][3])
-        users[user_id][3].append(request)
-        
-    else:
-        users[user_id] = [time.time(), 0, [request], 0]
-    
-    producer.push(user_id,request_id, time.time(), request_type, request)
+        Args:
+        tweet_id: is the id of the tweeet that was liked
+        user_id: is the id of the user that liked the post
+    """
+    producer.push(user_id, 'like', tweet_id)
 
-def make_requests() -> None:
-    print("here")
-    for ele in requests:
-        user_id = ele[0]
-        request_type = ele[1]
-        request = ele[2]
-        
-        request_id = 0
-        if user_id in users:
-            request_id = len(users[user_id][2])
-            users[user_id][2].append(request)
-        
-        else:
-            users[user_id] = [time.time(), 0, [request], 0]
-    
-        producer.push(user_id,request_id, time.time(), request_type, request)
 
-    requests = []
+def push_retweet(tweet_id, user_id) -> None:
+    """
+        when the user retweets a post this function is used to send the retweet request to a producer class that takes care of thr rest
 
-schedule.every(2).seconds.do(consumer.wake_up)
-schedule.every(1).seconds.do(make_requests)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+        Args:
+        tweet_id: is the id the tweet that was retweeted
+        user_id: is the id of the user performing the action
+    """
+    producer.push(user_id, 'retweet', tweet_id)
+
+
+schedule.every(2).seconds.do(consumer.wake_up, producer)
+
+def main():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+thread_2 = threading.Thread(target=main)
+thread_2.start()
 
