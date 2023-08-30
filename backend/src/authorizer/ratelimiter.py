@@ -15,6 +15,7 @@ users = {}
 # this is the shared user dictionary for retweets
 limit = 6  # this is the current implemented limit
 
+
 def config(filename='database.ini', section='postgresql'):
     # create a parser
     parser = ConfigParser()
@@ -30,6 +31,7 @@ def config(filename='database.ini', section='postgresql'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
+
 
 class Producer:
     def __init__(self):
@@ -49,14 +51,13 @@ class Producer:
         # else:
         #    users[user_id] = [time.time(), 0, 0, None]
 
-
         if request_type == 'retweet':
             reset_time = users[user_id][3]
 
         else:
             reset_time = users[user_id][4]
-        
-        logging.info(f'pushing a {request_type} from {user_id} at {datetime.now()}')
+
+        logging.info(f'Pushing a {request_type} from {user_id} at {datetime.now()}')
         if request_id == 0:
             request_id = self.counter
             self.counter += 1
@@ -71,7 +72,6 @@ class Producer:
         """
         # print('updating')
         # print('^^^^^^^^^^^', requests)
-        logging.info('Updating priority queue')
         for ele in requests:
             user_id = ele[2]
             request = ele[3]
@@ -85,8 +85,10 @@ class Producer:
                 logging.error(f"request type is not a like or retweet but instead {request_type}")
             self.push(user_id, request_type, request, request_id=ele[1])
 
+        logging.info(f'Updated priority queue {self.pq}')
         # print('after update', self.pq)
         # pq gets updated to some value that is the implement, the ids did not disapear they just spawned back where they did not need to be
+
     def get_ready_requests(self) -> list:
         """
             This function is used to get all the requests from the queue that are ready to go right now.
@@ -96,8 +98,6 @@ class Producer:
         """
         now = time.time()
         ready = []  # collecting the requests here
-        
-        logging.info('Getting all ready requests')
 
         while True and len(self.pq):
             item = heapq.heappop(self.pq)  # get the item off the queue
@@ -114,7 +114,7 @@ class Consumer:
         this the consumer class to consume the requests
     """
 
-    def wake_up(self, producer):
+    def wake_up(self, producer: Producer):
         lst = producer.get_ready_requests()
         if len(lst):
             rest = self.consume(lst, users)
@@ -122,7 +122,7 @@ class Consumer:
             if len(rest):
                 producer.update(rest)
         else:
-            print('nothing ready')
+            logging.info('Consumer woke up but nothing is ready yet')
 
     def consume(self, requests, users):
         """
@@ -138,7 +138,7 @@ class Consumer:
 
         rest = []
         # print('consuming from ratelimiter')
-        # print('**********************',requests, '******************************')
+        logging.debug(f'Consuming {requests}')
         for ele in requests:
             user_id = ele[2]
             user = users[user_id]
@@ -160,13 +160,14 @@ class Consumer:
         # print('++++++', rest, '++++++')
         return rest
 
+
 # use the logging module to document the process see cardinfo.py in feed generation
 def process(request):
     user_id = request[2]
     tweet_id = request[3]
     request_type = request[4]
     oauth = users[user_id][0]
-    payload = {"tweet_id" : tweet_id}
+    payload = {"tweet_id": tweet_id}
     successfull = False
     rate_limit = False
     response = None
@@ -224,7 +225,7 @@ def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
         user_id: is the id of the user that liked the post
     """
     if user_id not in users.keys():
-        cred = config('../configuration/config.ini','twitterapp')
+        cred = config('../configuration/config.ini', 'twitterapp')
         cred['token'] = access_token.strip()
         cred['token_secret'] = access_token_secret.strip()
         oauth = OAuth1Session(cred['key'],
