@@ -4,6 +4,8 @@ import schedule
 import threading
 import logging
 from configparser import ConfigParser
+from requests_oauthlib import OAuth1Session
+from datetime import datetime
 
 log_level = logging.DEBUG
 logging.basicConfig(filename='ratelimiter.log', level=log_level)
@@ -41,18 +43,20 @@ class Producer:
             and id is saved for futher sorting and other data for consumer use
         """
         # print('producer push')
-        #reset_time = 0
-        #if user_id in users:
+        # reset_time = 0
+        # if user_id in users:
         #    reset_time = users[user_id][0]
-        #else:
+        # else:
         #    users[user_id] = [time.time(), 0, 0, None]
+
 
         if request_type == 'retweet':
             reset_time = users[user_id][3]
 
         else:
             reset_time = users[user_id][4]
-
+        
+        logging.info(f'pushing a {request_type} from {user_id} at {datetime.now()}')
         if request_id == 0:
             request_id = self.counter
             self.counter += 1
@@ -67,6 +71,7 @@ class Producer:
         """
         # print('updating')
         # print('^^^^^^^^^^^', requests)
+        logging.info('Updating priority queue')
         for ele in requests:
             user_id = ele[2]
             request = ele[3]
@@ -77,7 +82,7 @@ class Producer:
             elif request_type == 'like':
                 user[2] = 5
             else:
-                print('houston we have a problem!')
+                logging.error(f"request type is not a like or retweet but instead {request_type}")
             self.push(user_id, request_type, request, request_id=ele[1])
 
         # print('after update', self.pq)
@@ -91,6 +96,8 @@ class Producer:
         """
         now = time.time()
         ready = []  # collecting the requests here
+        
+        logging.info('Getting all ready requests')
 
         while True and len(self.pq):
             item = heapq.heappop(self.pq)  # get the item off the queue
@@ -140,14 +147,14 @@ class Consumer:
                 is_rate_limit = process(ele)
                 if is_rate_limit:
                     rest.append(ele)
-                #user[2] += 1 # counter like requests in the window
-                #user[0] = reset_time # reset time
+                # user[2] += 1 # counter like requests in the window
+                # user[0] = reset_time # reset time
             elif ele[4] == 'retweet' and user[1] > 0:
                 is_rate_limit = process(ele)
                 if is_rate_limit:
                     rest.append(ele)
-                #user[1] += 1 # counter of retweets requests in the window
-                #user[0] = reset_time
+                # user[1] += 1 # counter of retweets requests in the window
+                # user[0] = reset_time
             else:
                 rest.append(ele)
         # print('++++++', rest, '++++++')
@@ -196,9 +203,9 @@ def process(request):
         logging.info(f"EXCEPTION MANUAL CHECK : {user_id=} {tweet_id=} {request_type=} {response_text=}")
     return False
 
-    #print('processing')
-    #print(request)
-    #return time.time()
+    # print('processing')
+    # print(request)
+    # return time.time()
 
 
 # if it wakes up often and nothing happens maybe sleep for a while and wait for new push
@@ -224,7 +231,7 @@ def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
                             client_secret=cred['key_secret'],
                             resource_owner_key=cred['token'],
                             resource_owner_secret=cred['token_secret'])
-        users[user_id] = [oauth,5,5,time.time(),time.time()]
+        users[user_id] = [oauth, 5, 5, time.time(), time.time()]
     producer.push(user_id, 'like', tweet_id)
 
 
@@ -237,18 +244,19 @@ def push_retweet(tweet_id, user_id, access_token, access_token_secret) -> None:
         user_id: is the id of the user performing the action
     """
     if user_id not in users.keys():
-        cred = config('../configuration/config.ini','twitterapp')
+        cred = config('../configuration/config.ini', 'twitterapp')
         cred['token'] = access_token.strip()
         cred['token_secret'] = access_token_secret.strip()
         oauth = OAuth1Session(cred['key'],
                             client_secret=cred['key_secret'],
                             resource_owner_key=cred['token'],
                             resource_owner_secret=cred['token_secret'])
-        users[user_id] = [oauth,5,5,time.time(),time.time()]
+        users[user_id] = [oauth, 5, 5, time.time(), time.time()]
     producer.push(user_id, 'retweet', tweet_id)
 
 
 schedule.every(2).seconds.do(consumer.wake_up, producer)
+
 
 def main():
     while True:
