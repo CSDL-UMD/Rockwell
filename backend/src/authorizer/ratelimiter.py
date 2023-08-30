@@ -2,12 +2,32 @@ import time
 import heapq
 import schedule
 import threading
+import logging
+from configparser import ConfigParser
+
+log_level = logging.DEBUG
+logging.basicConfig(filename='ratelimiter.log', level=log_level)
 
 # users is a dictionary in the form user_id: [reset_time, number_of_retweets_in_time_window, number_of_likes_in_time_window, oauth]
 users = {}
 # this is the shared user dictionary for retweets
-limit = 1  # this is the current implemented limit
+limit = 6  # this is the current implemented limit
 
+def config(filename='database.ini', section='postgresql'):
+    # create a parser
+    parser = ConfigParser()
+    # read config file
+    parser.read(filename)
+    # get section, default to postgresql
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
 
 class Producer:
     def __init__(self):
@@ -21,11 +41,17 @@ class Producer:
             and id is saved for futher sorting and other data for consumer use
         """
         # print('producer push')
-        reset_time = 0
-        if user_id in users:
-            reset_time = users[user_id][0]
+        #reset_time = 0
+        #if user_id in users:
+        #    reset_time = users[user_id][0]
+        #else:
+        #    users[user_id] = [time.time(), 0, 0, None]
+
+        if request_type == 'retweet':
+            reset_time = users[user_id][3]
+
         else:
-            users[user_id] = [time.time(), 0, 0, None]
+            reset_time = users[user_id][4]
 
         if request_id == 0:
             request_id = self.counter
@@ -46,11 +72,10 @@ class Producer:
             request = ele[3]
             request_type = ele[4]
             user = users[user_id]
-
             if request_type == 'retweet':
-                user[1] = 0
+                user[1] = 5
             elif request_type == 'like':
-                user[2] = 0
+                user[2] = 5
             else:
                 print('houston we have a problem!')
             self.push(user_id, request_type, request, request_id=ele[1])
@@ -110,15 +135,19 @@ class Consumer:
         for ele in requests:
             user_id = ele[2]
             user = users[user_id]
-            if ele[4] == 'like' and user[2] < limit:
+            if ele[4] == 'like' and user[2] > 0:
                 # if user has an oauth use it else oauth them
-                reset_time = process(ele)
-                user[2] += 1 # counter like requests in the window
-                user[0] = reset_time # reset time
-            elif ele[4] == 'retweet' and user[1] < limit:
-                reset_time = process(ele)
-                user[1] += 1 # counter of retweets requests in the window
-                user[0] = reset_time
+                is_rate_limit = process(ele)
+                if is_rate_limit:
+                    rest.append(ele)
+                #user[2] += 1 # counter like requests in the window
+                #user[0] = reset_time # reset time
+            elif ele[4] == 'retweet' and user[1] > 0:
+                is_rate_limit = process(ele)
+                if is_rate_limit:
+                    rest.append(ele)
+                #user[1] += 1 # counter of retweets requests in the window
+                #user[0] = reset_time
             else:
                 rest.append(ele)
         # print('++++++', rest, '++++++')
@@ -126,9 +155,50 @@ class Consumer:
 
 # use the logging module to document the process see cardinfo.py in feed generation
 def process(request):
-    print('processing')
-    print(request)
-    return time.time()
+    user_id = request[2]
+    tweet_id = request[3]
+    request_type = request[4]
+    oauth = users[user_id][0]
+    payload = {"tweet_id" : tweet_id}
+    successfull = False
+    rate_limit = False
+    response = None
+    if request_type == 'retweet':
+        response = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(user_id), json=payload)
+        if 'data' in response.json().keys():
+            if 'retweeted' in response.json()['data'].keys():
+                if response.json()['data']['retweeted']:
+                    users[user_id][1] = int(response.headers['x-rate-limit-remaining'])
+                    users[user_id][3] = response.headers['x-rate-limit-reset']
+                    successfull = True
+        elif 'status' in response.json().keys():
+            if response.json()['status'] == 429:
+                users[user_id][1] = int(response.headers['x-rate-limit-remaining'])
+                users[user_id][3] = response.headers['x-rate-limit-reset']
+                rate_limit = True
+    else:
+        response = oauth.post("https://api.twitter.com/2/users/{}/likes".format(user_id), json=payload)
+        if 'data' in response.json().keys():
+            if 'liked' in response.json()['data'].keys():
+                if response.json()['data']['liked']:
+                    users[user_id][2] = int(response.headers['x-rate-limit-remaining'])
+                    users[user_id][4] = response.headers['x-rate-limit-reset']
+                    successfull = True
+        elif 'status' in response.json().keys():
+            if response.json()['status'] == 429:
+                users[user_id][2] = int(response.headers['x-rate-limit-remaining'])
+                users[user_id][4] = response.headers['x-rate-limit-reset']
+                rate_limit = True
+    if rate_limit:
+        return True
+    if not successfull:
+        response_text = response.text
+        logging.info(f"EXCEPTION MANUAL CHECK : {user_id=} {tweet_id=} {request_type=} {response_text=}")
+    return False
+
+    #print('processing')
+    #print(request)
+    #return time.time()
 
 
 # if it wakes up often and nothing happens maybe sleep for a while and wait for new push
@@ -138,7 +208,7 @@ producer = Producer()
 consumer = Consumer()
 
 
-def push_like(tweet_id, user_id) -> None:
+def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
     """
         when the user likes a post this function is used to send the like request to a producer class that takes care of the rest
 
@@ -146,10 +216,19 @@ def push_like(tweet_id, user_id) -> None:
         tweet_id: is the id of the tweeet that was liked
         user_id: is the id of the user that liked the post
     """
+    if user_id not in users.keys():
+        cred = config('../configuration/config.ini','twitterapp')
+        cred['token'] = access_token.strip()
+        cred['token_secret'] = access_token_secret.strip()
+        oauth = OAuth1Session(cred['key'],
+                            client_secret=cred['key_secret'],
+                            resource_owner_key=cred['token'],
+                            resource_owner_secret=cred['token_secret'])
+        users[user_id] = [oauth,5,5,time.time(),time.time()]
     producer.push(user_id, 'like', tweet_id)
 
 
-def push_retweet(tweet_id, user_id) -> None:
+def push_retweet(tweet_id, user_id, access_token, access_token_secret) -> None:
     """
         when the user retweets a post this function is used to send the retweet request to a producer class that takes care of thr rest
 
@@ -157,6 +236,15 @@ def push_retweet(tweet_id, user_id) -> None:
         tweet_id: is the id the tweet that was retweeted
         user_id: is the id of the user performing the action
     """
+    if user_id not in users.keys():
+        cred = config('../configuration/config.ini','twitterapp')
+        cred['token'] = access_token.strip()
+        cred['token_secret'] = access_token_secret.strip()
+        oauth = OAuth1Session(cred['key'],
+                            client_secret=cred['key_secret'],
+                            resource_owner_key=cred['token'],
+                            resource_owner_secret=cred['token_secret'])
+        users[user_id] = [oauth,5,5,time.time(),time.time()]
     producer.push(user_id, 'retweet', tweet_id)
 
 
@@ -170,4 +258,3 @@ def main():
 
 thread_2 = threading.Thread(target=main)
 thread_2.start()
-

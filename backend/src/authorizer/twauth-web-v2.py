@@ -14,6 +14,7 @@ from configparser import ConfigParser
 from collections import defaultdict
 import src.feedGeneration.CardInfo as CardInfo
 import logging
+import time
 import psycopg2
 import json
 import glob
@@ -1049,7 +1050,11 @@ def like_post():
     try:
         payload = {"tweet_id" : tweet_id}
         response_likes = oauth.post("https://api.twitter.com/2/users/{}/likes".format(userid), json=payload)
-        response_text = response_retweet.text
+        print(response_likes.json().keys())
+        response_text = response_likes.text
+        print(response_text)
+        print(time.time())
+        print(response_likes.headers['x-rate-limit-reset'])
         logging.info(f"Likes returned from Twitter : {userid=} {response_text=}")
         return jsonify({"success":1}) # Retweet successful
     except Exception as e:
@@ -1069,7 +1074,7 @@ def get_hometimeline():
     participant_id = request.args.get('participant_id').strip()
     assignment_id = request.args.get('assignment_id').strip()
     project_id = request.args.get('project_id').strip()
-    num_tweets_cap = 1
+    num_tweets_cap = 100
     db_response = requests.get('http://127.0.0.1:5052/get_existing_mturk_user?worker_id='+str(worker_id))
     db_response = db_response.json()['data']
     access_token = db_response[0][0]
@@ -1613,6 +1618,7 @@ def get_feed():
         max_page_store[worker_id] = 1
         timeline_payload = []
         for timeline_tweet in db_response_timeline:
+            print(timeline_tweet)
             db_tweet = {
                 'fav_before': timeline_tweet[2],
                 'tid' : timeline_tweet[0],
