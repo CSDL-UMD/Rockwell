@@ -57,7 +57,7 @@ class Producer:
         else:
             reset_time = users[user_id][4]
 
-        logging.info(f'Pushing a {request_type} from {user_id} at {datetime.now()}')
+        logging.info(f'Pushing a {request_type} from {user_id} at {datetime.now()} the queue {self.pq}')
         if request_id == 0:
             request_id = self.counter
             self.counter += 1
@@ -98,10 +98,9 @@ class Producer:
         """
         now = time.time()
         ready = []  # collecting the requests here
-
         while True and len(self.pq):
             item = heapq.heappop(self.pq)  # get the item off the queue
-            if item[0] <= now:  # check if the item is ready to go
+            if float(item[0]) <= now:  # check if the item is ready to go
                 ready.append(item)
             else:
                 heapq.heappush(self.pq, item)
@@ -163,7 +162,9 @@ class Consumer:
 
 # use the logging module to document the process see cardinfo.py in feed generation
 def process(request):
+    print("PROCESSING ::: ")
     user_id = request[2]
+    print(user_id)
     tweet_id = request[3]
     request_type = request[4]
     oauth = users[user_id][0]
@@ -173,11 +174,16 @@ def process(request):
     response = None
     if request_type == 'retweet':
         response = oauth.post("https://api.twitter.com/2/users/{}/retweets".format(user_id), json=payload)
+        response_text = response.text
+        print("RETWEETED!!!")
+        print(response.text)
+        logging.info(f"Retweet API called for : {user_id=} {tweet_id=} {response_text=}")
         if 'data' in response.json().keys():
             if 'retweeted' in response.json()['data'].keys():
                 if response.json()['data']['retweeted']:
                     users[user_id][1] = int(response.headers['x-rate-limit-remaining'])
-                    users[user_id][3] = response.headers['x-rate-limit-reset']
+                    if users[user_id][1] == 0:
+                        users[user_id][3] = response.headers['x-rate-limit-reset']
                     successfull = True
         elif 'status' in response.json().keys():
             if response.json()['status'] == 429:
@@ -186,11 +192,16 @@ def process(request):
                 rate_limit = True
     else:
         response = oauth.post("https://api.twitter.com/2/users/{}/likes".format(user_id), json=payload)
+        print("LIKED!!!")
+        print(response.text)
+        response_text = response.text
+        logging.info(f"Like API called for : {user_id=} {tweet_id=} {response_text=}")
         if 'data' in response.json().keys():
             if 'liked' in response.json()['data'].keys():
                 if response.json()['data']['liked']:
                     users[user_id][2] = int(response.headers['x-rate-limit-remaining'])
-                    users[user_id][4] = response.headers['x-rate-limit-reset']
+                    if users[user_id][2] == 0:
+                        users[user_id][4] = response.headers['x-rate-limit-reset']
                     successfull = True
         elif 'status' in response.json().keys():
             if response.json()['status'] == 429:
@@ -201,7 +212,7 @@ def process(request):
         return True
     if not successfull:
         response_text = response.text
-        logging.info(f"EXCEPTION MANUAL CHECK : {user_id=} {tweet_id=} {request_type=} {response_text=}")
+        logging.error(f"EXCEPTION MANUAL CHECK : {user_id=} {tweet_id=} {request_type=} {response_text=}")
     return False
 
     # print('processing')
@@ -216,7 +227,7 @@ producer = Producer()
 consumer = Consumer()
 
 
-def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
+def push_like(tweet_id, user_id, access_token, access_token_secret):
     """
         when the user likes a post this function is used to send the like request to a producer class that takes care of the rest
 
@@ -224,6 +235,7 @@ def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
         tweet_id: is the id of the tweeet that was liked
         user_id: is the id of the user that liked the post
     """
+    logging.info(f"Like requested for : {user_id=} {tweet_id=}")
     if user_id not in users.keys():
         cred = config('../configuration/config.ini', 'twitterapp')
         cred['token'] = access_token.strip()
@@ -233,10 +245,12 @@ def push_like(tweet_id, user_id, access_token, access_token_secret) -> None:
                             resource_owner_key=cred['token'],
                             resource_owner_secret=cred['token_secret'])
         users[user_id] = [oauth, 5, 5, time.time(), time.time()]
+    print("Push Like Called")
     producer.push(user_id, 'like', tweet_id)
+    return "Done!"
 
 
-def push_retweet(tweet_id, user_id, access_token, access_token_secret) -> None:
+def push_retweet(tweet_id, user_id, access_token, access_token_secret):
     """
         when the user retweets a post this function is used to send the retweet request to a producer class that takes care of thr rest
 
@@ -244,6 +258,7 @@ def push_retweet(tweet_id, user_id, access_token, access_token_secret) -> None:
         tweet_id: is the id the tweet that was retweeted
         user_id: is the id of the user performing the action
     """
+    logging.info(f"Retweet requested for : {user_id=} {tweet_id=}")
     if user_id not in users.keys():
         cred = config('../configuration/config.ini', 'twitterapp')
         cred['token'] = access_token.strip()
@@ -253,7 +268,9 @@ def push_retweet(tweet_id, user_id, access_token, access_token_secret) -> None:
                             resource_owner_key=cred['token'],
                             resource_owner_secret=cred['token_secret'])
         users[user_id] = [oauth, 5, 5, time.time(), time.time()]
+    print("Push Retweet Called")
     producer.push(user_id, 'retweet', tweet_id)
+    return "Done!"
 
 
 schedule.every(2).seconds.do(consumer.wake_up, producer)
@@ -267,3 +284,4 @@ def main():
 
 thread_2 = threading.Thread(target=main)
 thread_2.start()
+

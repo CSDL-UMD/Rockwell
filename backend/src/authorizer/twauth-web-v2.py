@@ -13,6 +13,7 @@ from requests_oauthlib import OAuth1Session
 from configparser import ConfigParser
 from collections import defaultdict
 import src.feedGeneration.CardInfo as CardInfo
+import src.authorizer.ratelimiter as ratelimiter
 import logging
 import time
 import psycopg2
@@ -1007,6 +1008,12 @@ def retweet_post():
 
     logging.info(f"Retweet request started for : {userid=}")
 
+    ratelimiter.push_retweet(tweet_id,userid,access_token,access_token_secret)
+
+    return jsonify({"success":1}) # Retweet successful
+
+    """
+
     cred = config('../configuration/config.ini','twitterapp')
     cred['token'] = access_token.strip()
     cred['token_secret'] = access_token_secret.strip()
@@ -1028,6 +1035,7 @@ def retweet_post():
         error = e
         logging.info(f"Retweet exception : {userid=} {error=}")
         return jsonify({"success":0}) # Retweet failed
+    """
 
 @app.route('/like_post', methods=['GET','POST'])
 def like_post():
@@ -1039,6 +1047,10 @@ def like_post():
     access_token_secret = db_response[0][1]
     userid = db_response[0][3]
 
+    ratelimiter.push_like(tweet_id,userid,access_token,access_token_secret)
+    return jsonify({"success":1}) # Like successful
+
+    """
     cred = config('../configuration/config.ini','twitterapp')
     cred['token'] = access_token.strip()
     cred['token_secret'] = access_token_secret.strip()
@@ -1062,6 +1074,7 @@ def like_post():
         error = e
         logging.info(f"Likes exception : {userid=} {error=}")
         return jsonify({"success":0}) # Retweet failed
+    """
 
 @app.route('/hometimeline', methods=['GET'])
 def get_hometimeline():
