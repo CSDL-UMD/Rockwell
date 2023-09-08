@@ -23,6 +23,7 @@ app = Flask(__name__)
 app.debug = False
 
 worker_id_store = {}
+session_id_store = {}
 
 # Is full Universal to check when function calls, if is full is true our buffer is being used (push package immediately), if not continue as normal
 # WINNER:::I should make it normal where we can call them all but on overflow it is pushed to queue here and then the loop function is called, now on empty terminate. (if it keeps being added to it keeps going)
@@ -829,7 +830,13 @@ def save_all_engagements_new_endless():
     worker_id = 0
     page = 0
     try:
-        session_id = request.args.get('session_id')
+        worker_id = request.args.get('worker_id')
+        print("WORKER ID IN SAVE ENGAGEMENTS")
+        print(worker_id)
+        if worker_id in session_id_store.keys():
+            session_id = session_id_store[worker_id]
+        else:
+            session_id = -1
         print("SESSION IDDDD:")
         print(session_id)
         #worker_id = int(request.args.get('worker_id'))
@@ -1202,6 +1209,7 @@ def insert_session():
             cursor.close()
             connection.commit()
             accessPool.putconn(connection)
+            session_id_store[worker_id] = retVal123
             return jsonify(data=retVal123)
     except (Exception, psycopg2.DatabaseError) as error:
         print("ERROR!!!!",error)

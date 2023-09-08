@@ -1204,21 +1204,6 @@ def get_hometimeline():
         "errorMessage" : errormessage
     }
 
-    writeObjeng = {
-        'accessToken' : access_token,
-        'accessTokenSecret' : access_token_secret,
-        'collectionStarted' : collection_started_store,
-        'userObject' : userobj,
-        'MTurkId' : participant_id,
-        'MTurkHitId' : assignment_id,
-        'MTurkAssignmentId' : project_id,
-        'worker_id' : worker_id,
-        'tweets_collected' : 0,
-        'engTweets' : [],
-        'user_queries' : user_eng_queries,
-        'idx_start' : 0 
-    }
-
     logging.info(f"Created object for writing to file : {worker_id=}")
 
     with gzip.open("hometimeline_data/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
@@ -1226,9 +1211,6 @@ def get_hometimeline():
 
     with gzip.open("UserDatav2/{}_home_{}.json.gz".format(userid,file_number),"w") as outfile:
         outfile.write(json.dumps(writeObjv2).encode('utf-8'))
-
-    with gzip.open("engagement_data/{}_eng.json.gz".format(userid),"w") as outfile:
-        outfile.write(json.dumps(writeObjeng).encode('utf-8'))
 
     logging.info(f"Wrote object to file : {worker_id=}")
 
@@ -1631,7 +1613,6 @@ def get_feed():
         max_page_store[worker_id] = 1
         timeline_payload = []
         for timeline_tweet in db_response_timeline:
-            print(timeline_tweet)
             db_tweet = {
                 'fav_before': timeline_tweet[2],
                 'tid' : timeline_tweet[0],
@@ -1964,7 +1945,6 @@ def completed_status_change():
 def completed_check():
     worker_id = str(request.args.get('worker_id')).strip()
     try:
-        print(completed_survey[worker_id])
         if not completed_survey[worker_id]:
             return "NO"
         return "YES"
