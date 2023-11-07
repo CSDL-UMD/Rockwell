@@ -84,7 +84,12 @@ function Tweet(props) {
           : null
       }
       <div style={{display: 'flex'}} className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
-        <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
+        <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'}
+	  onError= {({ currentTarget }) => {
+		  currentTarget.onerror = null; // prevents looping
+		  currentTarget.src=`/3925572_1_10.png`;
+	}}
+	/>
         <div style={{ marginLeft: '5%'}}>
           <b>{localTweet.actor_name /* Line this up with actor photo */}</b>
           {' @' + localTweet.actor_username}
@@ -100,7 +105,11 @@ function Tweet(props) {
                 localTweet.picture !== '' ? (
                     <img className="TweetImage" src={localTweet.picture} alt='Article' />
                 ) : (
-                    <img className="TweetImage" src={`/no-image.png`} alt='Article' />
+			localTweet.embedded_image !== '' ? (
+				<img className="TweetImage" src={localTweet.embedded_image} alt='User posted' />
+			) 
+			:
+                    	<img className="TweetImage" src={`/no-image.png`} alt='Article' />
                 )
             }
             </a>

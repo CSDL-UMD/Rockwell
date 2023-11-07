@@ -191,8 +191,8 @@ function MainFeed(props) {
       tweetViewTimeStamps_global.push([feedIndex, time - startTimeGlobal]);
       setTweetViewTimeStamps(tweetViewTimeStamps_global);
       //console.log(tweetViewTimeStamps);
-      console.log(feedIndex);
-      console.log(time - startTimeGlobal);
+      //console.log(feedIndex);
+      //console.log(time - startTimeGlobal);
       return [feedIndex, time - startTime];
     };
 
@@ -206,9 +206,12 @@ function MainFeed(props) {
       //console.log(res);
       if (res !== null) {
         currentTweet = res;
+	console.log(res);
         //console.log('Current Tweet: ' + res[0], ' Time: ' + res[1]);
-        if (res[0] === (page_set*10 + 2) && res[0] > page_set*10) {
+        if (res[0] > (page_set*10 + 2)) {
           page_set = page_set + 1;
+	  console.log(page_set);
+	  console.log("FETCHING TWEETS!!!!");
           fetchTweets();
           //hasReachedEndOfFeed = true;
           //setEndOfFeedCondition(true);
@@ -227,7 +230,6 @@ function MainFeed(props) {
         //  fetchTweets();
         //}
       }
-      
     }, 1);
 
     const urlArgs = getUrlArgs();
@@ -272,14 +274,16 @@ function MainFeed(props) {
   };
 
   const handleRetweet = (feedIndex) => {
+    const time = Date.now();
     let tempObject = Object.assign([], tweetRetweets);
-    tempObject.push(parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10));
+    tempObject.push([parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10),(time - starTimeInformation)]);
     setTweetRetweets(tempObject);
   };
 
   const handleLike = (feedIndex) => {
+    const time = Date.now();
     let tempObject = Object.assign([], tweetLikes);
-    tempObject.push(parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10));
+    tempObject.push([parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10),(time - starTimeInformation)]);
     setTweetLikes(tempObject);
   };
 
@@ -296,7 +300,8 @@ function MainFeed(props) {
     //fetch(configuration.database_url + '?random_indentifier='+ givenArguments.randomtokenszzzz + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
     fetch(configuration.database_url + '?worker_id='+ workeridIdentifier + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
         //return resp.json();
-	window.location.href = '/complete';
+	//window.location.href = '/complete';
+	  window.location.href = window.location.href = '/attention?attn=1&page=' + givenArguments.page
       })
     //window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
     //window.location.href = '/attention?randomtokenszzzz=' + nextRandomIdentifier + '&attn=1&page=' + givenArguments.page

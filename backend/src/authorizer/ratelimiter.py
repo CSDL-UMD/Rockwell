@@ -183,12 +183,12 @@ def process(request):
                 if response.json()['data']['retweeted']:
                     users[user_id][1] = int(response.headers['x-rate-limit-remaining'])
                     if users[user_id][1] == 0:
-                        users[user_id][3] = response.headers['x-rate-limit-reset']
+                        users[user_id][3] = float(response.headers['x-rate-limit-reset'])
                     successfull = True
         elif 'status' in response.json().keys():
             if response.json()['status'] == 429:
                 users[user_id][1] = int(response.headers['x-rate-limit-remaining'])
-                users[user_id][3] = response.headers['x-rate-limit-reset']
+                users[user_id][3] = float(response.headers['x-rate-limit-reset'])
                 rate_limit = True
     else:
         response = oauth.post("https://api.twitter.com/2/users/{}/likes".format(user_id), json=payload)
@@ -201,12 +201,12 @@ def process(request):
                 if response.json()['data']['liked']:
                     users[user_id][2] = int(response.headers['x-rate-limit-remaining'])
                     if users[user_id][2] == 0:
-                        users[user_id][4] = response.headers['x-rate-limit-reset']
+                        users[user_id][4] = float(response.headers['x-rate-limit-reset'])
                     successfull = True
         elif 'status' in response.json().keys():
             if response.json()['status'] == 429:
                 users[user_id][2] = int(response.headers['x-rate-limit-remaining'])
-                users[user_id][4] = response.headers['x-rate-limit-reset']
+                users[user_id][4] = float(response.headers['x-rate-limit-reset'])
                 rate_limit = True
     if rate_limit:
         return True

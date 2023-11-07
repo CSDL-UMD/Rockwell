@@ -29,7 +29,7 @@ function ErrorLanding(props) {
           setErrorMessage("We were unable to retrieve your attention check at this time.");
           break
         default:
-          setErrorMessage("Dang! There was an error loading the simulated feed, please go back to the Qualtrics tab and try again. If this error persists, please complete the suvery manually and let us know in the feedback on Connect.Thank you and sorry for the inconvenience.");
+          setErrorMessage("Dang! There was an error loading the simulated feed, please go back to the Qualtrics tab and try again. If this error persists, please complete the survery manually and let us know in the feedback on Connect.Thank you and sorry for the inconvenience.");
       }
     };
     errorMessageSelector(getUrlArgs().error);

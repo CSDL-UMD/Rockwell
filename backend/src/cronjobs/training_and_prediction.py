@@ -1,20 +1,16 @@
 import re
 import os
 import math
-import glob
 import gzip
 import json
 import requests
 import joblib
-import random
-import aiohttp
-import asyncio
 import numpy as np
 import pandas as pd
 import logging
-from itertools import groupby
 import threading
 import surprise
+import psycopg2
 from collections import Counter
 from collections import defaultdict
 from configparser import ConfigParser
@@ -242,8 +238,8 @@ def integrate_NG_iffy(ng_fn,iffyfile):
     return ng_domains
 
 def unshorten_and_tag_NG(all_urls,ng_domains):
-    ng_domain_values = ng_domains['domain'].unique()
-    ng_twitter_values = ng_domains['twitter'].unique()
+    ng_domain_values = ng_domains.loc[ng_domains['rank'].isin(['T','N'])]['domain'].unique()
+    ng_twitter_values = ng_domains.loc[ng_domains['rank'].isin(['T','N'])]['twitter'].unique()
     urls_unshorted = []
     outputs = unshorten(all_urls, threads=20, cachepath='/home/saumya/')
     for url in outputs:
@@ -280,6 +276,24 @@ def unshorten_and_tag_NG(all_urls,ng_domains):
             urls_tagged.append("NA")
     return urls_tagged
 
+def tag_NG_handles(all_handles,ng_domains):
+    ng_twitter_values = ng_domains['twitter'].unique()
+    handles_tagged = []
+    for handle in all_handles:
+        if handle in ng_twitter_values:
+            corrs_domain = ng_domains.loc[(ng_domains['twitter'] == handle)]['domain'].values.tolist()
+            actual_domain = 'NA'
+            for dd in corrs_domain:
+                if dd.count('.') == 1:
+                    actual_domain = dd
+                    break
+            if actual_domain == 'NA':
+                actual_domain = corrs_domain[0]
+            handles_tagged.append(actual_domain)
+        else:
+            handles_tagged.append("NA")
+    return handles_tagged
+
 def idf(values,tot_users=0):
     num_users = len(set(values))
     return math.log10(tot_users/num_users)
@@ -315,12 +329,15 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
 
     users = []
     engaged_urls = []
+    
+    users_handles = []
+    engaged_handles = []
 
     print("IN GET DATA!!!!")
     print(user_timeline_files)
     print(fave_timeline_files)
 
-    hoaxy_config = config('../configuration/config.ini','hoaxy_database')
+    #hoaxy_config = config('../configuration/config.ini','hoaxy_database')
     
     for fn in user_timeline_files:
         with gzip.open(fn, 'r') as fin:
@@ -332,17 +349,23 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                 for tweet in data['userTweets']:
                     tweets_covered.append(tweet['id'])
                     if 'retweeted_status' in tweet:
+                        users_handles.append(user_id)
+                        engaged_handles.append(tweet['retweeted_status']['user']['screen_name'])
                         urls_extracted = extractfromentities(tweet['retweeted_status'])
                         for url in urls_extracted:
                             users.append(user_id)
                             engaged_urls.append(url)
                         if 'quoted_status' in tweet['retweeted_status']:
+                            users_handles.append(user_id)
+                            engaged_handles.append(tweet['retweeted_status']['quoted_status']['user']['screen_name'])
                             urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
                                 engaged_urls.append(url)
                     else:
                         if 'quoted_status' in tweet:
+                            users_handles.append(user_id)
+                            engaged_handles.append(tweet['quoted_status']['user']['screen_name'])
                             urls_extracted = extractfromentities(tweet['quoted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
@@ -351,6 +374,7 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                         for url in urls_extracted:
                             users.append(user_id)
                             engaged_urls.append(url)
+                """
                 hoaxy_tweets,err_message = get_hoaxy_engagement(user_twitter_id,hoaxy_config)
                 if err_message != "NA":
                     logger.info(f"Error in getting hoaxy tweets for {user_twitter_id=}")
@@ -359,17 +383,23 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                         if tweet['id'] in tweets_covered:
                             continue
                         if 'retweeted_status' in tweet:
+                            users_handles.append(user_id)
+                            engaged_handles.append(tweet['retweeted_status']['user']['screen_name'])
                             urls_extracted = extractfromentities(tweet['retweeted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
                                 engaged_urls.append(url)
                             if 'quoted_status' in tweet['retweeted_status']:
+                                users_handles.append(user_id)
+                                engaged_handles.append(tweet['retweeted_status']['quoted_status']['user']['screen_name'])
                                 urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
                                 for url in urls_extracted:
                                     users.append(user_id)
                                     engaged_urls.append(url)
                         else:
                             if 'quoted_status' in tweet:
+                                users_handles.append(user_id)
+                                engaged_handles.append(tweet['quoted_status']['user']['screen_name'])
                                 urls_extracted = extractfromentities(tweet['quoted_status'])
                                 for url in urls_extracted:
                                     users.append(user_id)
@@ -378,6 +408,7 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                             for url in urls_extracted:
                                 users.append(user_id)
                                 engaged_urls.append(url)
+                """
                             
     for fn in fave_timeline_files:
         with gzip.open(fn, 'r') as fin:
@@ -386,11 +417,15 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                 user_id = data["userObject"]["screen_name"]
                 for tweet in data['likedTweets']:
                     if 'retweeted_status' in tweet:
+                        users_handles.append(user_id)
+                        engaged_handles.append(tweet['retweeted_status']['user']['screen_name'])
                         urls_extracted = extractfromentities(tweet['retweeted_status'])
                         for url in urls_extracted:
                             users.append(user_id)
                             engaged_urls.append(url)
                         if 'quoted_status' in tweet['retweeted_status']:
+                            users_handles.append(user_id)
+                            engaged_handles.append(tweet['retweeted_status']['quoted_status']['user']['screen_name'])
                             urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
@@ -401,6 +436,8 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
                             users.append(user_id)
                             engaged_urls.append(url)
                         if 'quoted_status' in tweet:
+                            users_handles.append(user_id)
+                            engaged_handles.append(tweet['quoted_status']['user']['screen_name'])
                             urls_extracted = extractfromentities(tweet['quoted_status'])
                             for url in urls_extracted:
                                 users.append(user_id)
@@ -408,6 +445,7 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
     
     print(len(engaged_urls))
     engaged_urls_tagged = unshorten_and_tag_NG(engaged_urls,ng_domains)
+    engaged_handles_tagged = tag_NG_handles(engaged_handles,ng_domains)
     
     new_users_training = []
     new_domains_training = []
@@ -416,9 +454,55 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,l
         if engaged_urls_tagged[i] != 'NA':
             new_users_training.append(users[i])
             new_domains_training.append(engaged_urls_tagged[i])
+
+    for i in range(len(users_handles)):
+        if engaged_handles_tagged[i] != 'NA':
+            new_users_training.append(users_handles[i])
+            new_domains_training.append(engaged_handles_tagged[i])
+        else:
+            new_users_training.append(users_handles[i])
+            new_domains_training.append(engaged_handles[i])
     
-    pd_new_users = pd.concat([pd.DataFrame(new_users_training),pd.DataFrame(new_domains_training)],axis=1)
+    pd_new_users = pd.concat([pd.DataFrame(new_users_training,columns=['Users']),pd.DataFrame(new_domains_training,columns=['Items'])],axis=1)
     return pd_new_users
+
+def get_handles_from_new_users(user_timeline_files,fave_timeline_files,ng_domains,logger):
+    users_handle = []
+    handles = []
+    
+    for fn in user_timeline_files:
+        with gzip.open(fn, 'r') as fin:
+            data = json.loads(fin.read().decode('utf-8'))
+            if data['userTweets']:
+                for tweet in data['userTweets']:
+                    if 'retweeted_status' in tweet:
+                        users_handle.append(data["userObject"]["screen_name"])
+                        handles.append(tweet['retweeted_status']['user']['screen_name'])
+                            
+    for fn in fave_timeline_files:
+        with gzip.open(fn, 'r') as fin:
+            data = json.loads(fin.read().decode('utf-8'))
+            relevantkey = 'favTweets'
+            if 'likedTweets' in data.keys():
+                relevantkey = 'likedTweets'
+            if data[relevantkey]:
+                for tweet in data[relevantkey]:
+                    if 'retweeted_status' in tweet:
+                        users_handle.append(data["userObject"]["screen_name"])
+                        handles.append(tweet['retweeted_status']['user']['screen_name'])
+    
+    handles_tagged = tag_NG_handles(handles, ng_domains)
+    
+    users_filtered = []
+    handles_filtered = []
+    
+    for i in range(len(users_handle)):
+        if handles_tagged[i] == 'NA':
+            users_filtered.append(users_handle[i])
+            handles_filtered.append(handles[i])
+    
+    pd_new_users_handles = pd.concat([pd.DataFrame(users_filtered),pd.DataFrame(handles_filtered)],axis=1)
+    return pd_new_users_handles
 
 def filter_tweets(feedtweets):
     level_1_tweets = []
@@ -437,7 +521,7 @@ def filter_tweets(feedtweets):
                 level_1_tweets.append(tweet["id_str"])
                 unique = True
         if tweet["in_reply_to_status_id_str"]:
-            reply = False
+            no_reply = False
         if unique and no_reply:
             filtered_feedtweets.append(tweet)
     return filtered_feedtweets
@@ -496,18 +580,35 @@ def break_timeline_attention(public_tweets,public_tweets_score,absent_tweets,max
 def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
     logger = make_logger(log_path)
     logger.info(f"Training Cron job started: {proj_dir=} {data_dir=}")
+    print("Training Job Starting")
     try:
         ng_fn = proj_dir + "/recsys/NewsGuardIffy/label-2022101916.json"
         iffyfile = proj_dir + "/recsys/NewsGuardIffy/iffy.csv"
         ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
+        print("Read NewsGuard")
 
-        recsys_engagement = pd.read_csv(proj_dir + '/recsys/data/hoaxy_dataset.csv')
-        if 'Unnamed: 0' in recsys_engagement.columns:
-            recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
-        recsys_engagement = recsys_engagement.reset_index(drop=True)
+        #recsys_engagement = pd.read_csv(proj_dir + '/recsys/data/hoaxy_dataset.csv')
+        #if 'Unnamed: 0' in recsys_engagement.columns:
+        #    recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
+        #recsys_engagement = recsys_engagement.reset_index(drop=True)
+        
+        hoaxy_URLS = pd.read_csv('/home/rockwell/hoaxy_data_all/hoaxy_dataset_URLS_tagged.csv')
+        hoaxy_URLS = hoaxy_URLS.drop(columns=['Unnamed: 0'])
+        hoaxy_URLS = hoaxy_URLS.drop(columns=['index'])
+        hoaxy_URLS.columns = ['Users','Items']
+        hoaxy_handles = pd.read_csv('/home/rockwell/hoaxy_data_all/hoaxy_handles_screennames.csv')
+        hoaxy_handles = hoaxy_handles.drop(columns=['Unnamed: 0'])
+        hoaxy_handles = hoaxy_handles.dropna()
+        hoaxy_handles.columns = ['Users','Items']
+        pilot1_pilot2_URLS = pd.read_csv('/home/rockwell/hoaxy_data_all/pilot1_pilot2_URLS.csv')
+        pilot1_pilot2_URLS = pilot1_pilot2_URLS.drop(columns=['Unnamed: 0','TweetID','Age'])
+        pilot1_pilot2_authors = pd.read_csv('/home/rockwell/hoaxy_data_all/pilot1_pilot2_URLS.csv')
+        pilot1_pilot2_authors = pilot1_pilot2_authors.drop(columns=['Unnamed: 0'])
+        pd_training = pd.concat([hoaxy_URLS,hoaxy_handles,pilot1_pilot2_URLS,pilot1_pilot2_authors],ignore_index=True)
+        print(pd_training.isnull().values.any())
+        print("Built Training Data")
 
         new_user_timeline_files = []
-        new_user_timeline_hoaxy_files = []
         new_fav_timeline_files = []
 
         for root, dirs, files in os.walk(os.path.abspath(data_dir+"usertimeline_data/")):
@@ -520,17 +621,25 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
 
         pd_new_users = get_data_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains, logger)
         pd_new_users = pd_new_users.reset_index(drop=True)
-        pd_new_users.columns = ['user','NG_domain']
-        recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
+        pd_new_users.columns = ['Users','Items']
+        pd_new_users_authors = get_handles_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains, logger)
+        pd_new_users_authors = pd_new_users_authors.reset_index(drop=True)
+        pd_new_users_authors.columns = ['Users','Items']
+        recsys_engagement = pd.concat([pd_training,pd_new_users,pd_new_users_authors],ignore_index=True)
+        print(recsys_engagement.head())
+        print(recsys_engagement.isnull().values.any())
+        
+        print("Appended pilot 3 users to training data")
 
-        tot_users = len(recsys_engagement['user'].unique())
-        domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
+        tot_users = len(recsys_engagement['Users'].unique())
+        domain_idf = recsys_engagement.groupby('Items').Users.agg(idf,tot_users=tot_users)
         domain_idf_dict = {}
         for kk in domain_idf.keys():
             domain_idf_dict[kk] = domain_idf[kk]
 
-        domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
-
+        domain_rating_json_column = recsys_engagement.groupby('Users').Items.agg(tfidf,idf_dict=domain_idf_dict)
+        
+        print("Built TF-IDF")
         #domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
 
         #all_users = []
@@ -576,14 +685,12 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
         logger.info(f"Training Cron job fininshed: {proj_dir=}")
 
     except Exception as e:
-        logger.error(f"Error in Training", exc_info=e)
-    
-
-    logger.info(f"Prediction Cron job started")
+        logger.error("Error in Training", exc_info=e)
+    """
+    logger.info("Prediction Cron job started")
 
     try:
         db_response = requests.get('http://127.0.0.1:5052/get_existing_tweets_all_screenname')
-        print(db_response.json().keys())
         screen_name_home = []
         tweets_home = []
         if db_response.json()['data'] != "NEW":
@@ -591,12 +698,45 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
             worker_id_home = [response[1] for response in db_response.json()['data']]
             tweets_home = [response[2] for response in db_response.json()['data']]
         else:
-            logger.info(f"Prediction Cron job NO DATA")
+            logger.info("Prediction Cron job NO DATA")
             return
+        pilot_3_screennames = ['karthik22041996',
+         'plzspeakeasy',
+         'bitcoin_kid16',
+         'julsfreebird',
+         'Risshoajk',
+         'dangerspock',
+         'ManuelMadeit1_1',
+         'MysteriousHatch',
+         'Gymaddict60',
+         'REH311',
+         'A60384974',
+         'AmuroGundam79',
+         'dto1984',
+         'jennifer_boring',
+         'steves_ik',
+         'ygooiny',
+         'Justin_Talley',
+         'NitsudHAI',
+         'BoyJoyyyy',
+         'LuciferBlackASU',
+         'ajqk10minus1',
+         'dcnj123',
+         'rosselkeine',
+         'sophistikaye',
+         'MxguelAP',
+         'AlliB777',
+         'sumilong4',
+         'NormanM96070433',
+         'fmd518',
+         'edlirapo20']
         all_screenname = list(set(screen_name_home))
         for screen_name in all_screenname:
+            if screen_name not in pilot_3_screennames:
+                continue
             try:
                 logger.info(f"Prediction Cron job Processing {screen_name}")
+                print(f"Prediction Cron job Processing {screen_name}")
                 feed_tweets = [tweets_home[i] for i in range(len(screen_name_home)) if screen_name_home[i] == screen_name]
                 worker_id = [worker_id_home[i] for i in range(len(screen_name_home)) if screen_name_home[i] == screen_name][0]
                 feed_tweets = feed_tweets[0:len(feed_tweets)-10]
@@ -605,6 +745,7 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
                 recsys_response = requests.get('http://127.0.0.1:5053/recsys_rerank',json=timeline_json)
                 if recsys_response.json()['data'] == "NOTPRESENT":
                     logger.info(f"Prediction Cron job screen_name not present {screen_name}")
+                    print(f"Prediction Cron job screen_name not present {screen_name}")
                     continue    
                 feed_tweets_control = recsys_response.json()['data'][0]
                 feed_tweets_control_score = recsys_response.json()['data'][1]
@@ -623,7 +764,8 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
             logger.info(f"Prediction Cron job Finished for {screen_name}")
 
     except Exception as e:
-        logger.error(f"Error in Prediction", exc_info=e)
+        logger.error("Error in Prediction", exc_info=e)
+    """
 
 if __name__ == '__main__':
     parser = make_parser()

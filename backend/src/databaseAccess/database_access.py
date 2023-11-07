@@ -179,6 +179,161 @@ def insert_timelines_attention_control():
     print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
     return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
 
+@app.route('/insert_timelines_attention_treatment', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_attention_treatment():
+    start_time = time.time()
+    payload = ""
+    tries = 5
+    connection = None
+    try:
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+            # We can also async all 3 of these 
+            worker_id = payload[2]
+            screenname = payload[3]
+
+            #DELETE ATTENTION TABLES
+            sql = """DELETE FROM user_home_timeline_treatment where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
+            for obj in payload[0]: # Take care of tweet in session here.
+                fav_before = obj['fav_before']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_home_timeline_treatment(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                now_session_start = datetime.datetime.now()
+                session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
+                #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+            connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
+@app.route('/insert_timelines_screen_2', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_screen_2():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+
+            worker_id = payload[1]
+            screenname = payload[2]
+
+            #DELETE
+            sql = """DELETE FROM user_screen_2_control where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
+            for obj in payload[0]: # Take care of tweet in session here.
+                fav_before = obj['fav_before']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_screen_2_control(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                now_session_start = datetime.datetime.now()
+                session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
+                #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+            connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
+@app.route('/insert_timelines_screen_2_treatment', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_screen_2_treatment():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+
+            worker_id = payload[1]
+            screenname = payload[2]
+
+            #DELETE
+            sql = """DELETE FROM user_screen_2_treatment where user_id = %s"""
+            conn_cur.execute(sql,(worker_id,))
+            connection.commit()
+
+            for obj in payload[0]: # Take care of tweet in session here.
+                fav_before = obj['fav_before']
+                tid = obj['tid']
+                rtbefore = obj['rtbefore']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_screen_2_treatment(tweet_id,user_id,screenname,is_favorited_before,has_retweet_before,rank,page,last_updated,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s);"""
+                now_session_start = datetime.datetime.now()
+                session_start = now_session_start.strftime('%Y-%m-%d %H:%M:%S')
+                #session_start = str(now_session_start.year) + '-' + str(now_session_start.month) + '-' + str(now_session_start.day) + ' ' + str(now_session_start.hour) + ':' + str(now_session_start.minute) + ':' + str(now_session_start.second)
+                conn_cur.execute(sql,(tid,worker_id,screenname,fav_before,rtbefore,rank,page,session_start,predicted_score,))
+            connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
 @app.route('/insert_timelines_attention', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
 def insert_timelines_attention():
     start_time = time.time()
@@ -312,6 +467,59 @@ def insert_timelines_attention_in_session():
                 sql = """INSERT INTO user_engagement_and_impression_session(tweet_id,session_id,is_favorited_before,has_retweet_before,rank,page,feedtype,predicted_score)
                 VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
                 conn_cur.execute(sql,(tid,session_id,fav_before,rtbefore,rank,page,feedtype,predicted_score,))
+            connection.commit()
+
+            #for obj in payload[3]: # Take care of tweet in attention here.
+            #    tweet_id = obj['tweet_id']
+            #    page = str(obj['page'])
+            #    rank = str(obj['rank'])
+            #    present = obj['present']
+            #    sql = """INSERT INTO user_tweet_attn_session(tweet_id,session_id,page,rank,correct_ans,feedtype) VALUES(%s,%s,%s,%s,%s,%s);"""
+            #    conn_cur.execute(sql,(tweet_id,session_id,page,rank,present,feedtype,))
+            #connection.commit()
+
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+            return jsonify(session_id=str(session_id))
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+            return "Fail"
+    print("TOTAL RUN TIME: SYNCRONUS: " +str(time.time() - start_time) )
+    return "Done" # make sure this doesnt have to be arbitrary text, none might cause an error?
+
+@app.route('/insert_timelines_attention_in_session_screen_2', methods=['GET','POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_timelines_attention_in_session_screen_2():
+    start_time = time.time()
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+
+            session_id = payload[0]
+            feedtype = payload[1]
+
+            for obj in payload[2]: # Take care of tweet in session here.
+                tid = obj['tid']
+                page = obj['page']
+                rank = str(obj['rank'])
+                predicted_score = obj['predicted_score']
+                sql = """INSERT INTO user_engagement_and_impression_session_screen_2(tweet_id,session_id,rank,page,feedtype,predicted_score)
+                VALUES(%s,%s,%s,%s,%s,%s);"""
+                conn_cur.execute(sql,(tid,session_id,rank,page,feedtype,predicted_score,))
             connection.commit()
 
             #for obj in payload[3]: # Take care of tweet in attention here.
@@ -579,7 +787,71 @@ def get_worker_tweet_chronological():
             else:
                 sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_control UA,tweet T 
                 WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
-                conn_cur.execute(sql, (worker_id,page))     
+                conn_cur.execute(sql, (worker_id,page))
+        elif feedtype == 'L':
+            if page == 'NA':
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_treatment UA,tweet T
+                WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
+                conn_cur.execute(sql, (worker_id,))
+            else:
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_home_timeline_treatment UA,tweet T
+                WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
+                conn_cur.execute(sql, (worker_id,page))
+        if conn_cur.rowcount > 0:
+            ret = conn_cur.fetchall()
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data=ret)
+        else:
+            conn_cur.close()
+            accessPool.putconn(connection)
+            return jsonify(data="NEW") #Meaning we need to fetch new tweets.
+    except Exception as error:
+        print(error)
+    return "Done!"
+
+@app.route('/get_existing_tweets_new_screen_2', methods=['GET','POST'])
+def get_existing_tweets_new_screen_2():
+    tries = 5
+    connection = None
+    worker_id = ''
+    page = ''
+    feedtype = ''
+    worker_id = request.args.get('worker_id').strip()
+    try:
+        #Getting connection from pool
+        worker_id = request.args.get('worker_id').strip()
+        page = request.args.get('page').strip()
+        feedtype = request.args.get('feedtype').strip()
+        print("Worker ID : "+worker_id)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    try:
+        conn_cur = connection.cursor()
+        if feedtype == 'S' or feedtype == 'M':
+            if page == 'NA':
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json,T.tweet_json_v2 FROM user_screen_2_control UA,tweet_screen_2 T WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
+                conn_cur.execute(sql, (worker_id,))
+            else:
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_screen_2_control UA,tweet_screen_2 T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
+                conn_cur.execute(sql, (worker_id,page))
+        elif feedtype == 'L':
+            if page == 'NA':
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,UA.page,UA.rank,UA.predicted_score,T.tweet_json,T.tweet_json_v2 FROM user_screen_2_treatment UA,tweet_screen_2 T WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s"""
+                conn_cur.execute(sql, (worker_id,))
+            else:
+                sql = """SELECT UA.tweet_id,UA.last_updated,UA.is_favorited_before,UA.has_retweet_before,T.tweet_json,T.tweet_json_v2 FROM user_screen_2_treatment UA,tweet_screen_2 T 
+                WHERE T.tweet_id = UA.tweet_id AND UA.user_id = %s AND UA.page = %s"""
+                conn_cur.execute(sql, (worker_id,page))
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
@@ -662,7 +934,7 @@ def get_existing_tweets_all_screenname():
         tries = -1
     try:
         conn_cur = connection.cursor()
-        sql = """SELECT UA.screenname,UA.user_id,T.tweet_json FROM user_home_timeline_chronological UA,tweet T WHERE T.tweet_id = UA.tweet_id"""
+        sql = """SELECT UA.screenname,UA.user_id,T.tweet_json,T.tweet_id FROM user_home_timeline_chronological UA,tweet T WHERE T.tweet_id = UA.tweet_id"""
         conn_cur.execute(sql)
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
@@ -820,7 +1092,68 @@ def get_worker_attention_tweet():
     #    print(error)
     return "Done!"    
 
+@app.route('/get_tweets_screen_2', methods=['GET','POST']) # Should the method be GET?
+def get_tweets_screen_2():
+    tries = 5
+    connection = None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+    conn_cur = connection.cursor()
+    sql = """SELECT tweet_id,tweet_json,tweet_json_v2 FROM tweet_screen_2"""
+    conn_cur.execute(sql)
+    if conn_cur.rowcount > 0:
+        ret = conn_cur.fetchall()
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data=ret)
+    else:
+        conn_cur.close()
+        accessPool.putconn(connection)
+        return jsonify(data="NEW")
+    return "Done!"
 
+@app.route('/insert_tweet_screen_2', methods=['POST']) # Making this async would help alot but require 3 connections instead of one. Should work.
+def insert_tweet_screen_2():
+    payload = ""
+    tries = 5 # perhaps move this to config file?
+    connection = None
+    try:
+        #Getting connection from pool
+        payload = request.json
+    except:
+        print("Failed to recieve the JSON package.") # Log this
+        return None
+    while(tries > 0):
+        connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+        if connection is None:
+            time.sleep(0.2)
+            tries = tries - 1
+            continue
+        tries = -1
+        try: # Can wrap all 3 of these loops in their own try catch perhaps for better error handling/retries
+            conn_cur = connection.cursor()
+            # We can also async all 3 of these
+            for obj in payload[0]:
+                tweet_id = obj['tweet_id']
+                tweet_json = json.dumps(obj['tweet_json'])
+                tweet_json_v2 = json.dumps(obj['tweet_json_v2'])
+                ng_source = obj['ng_sources']
+                ng_rank = obj['ng_rank']
+                ng_score = obj['ng_score']
+                location = obj['location']
+                sql = """INSERT INTO tweet_screen_2 VALUES(%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING;"""
+                conn_cur.execute(sql, (tweet_id,tweet_json,tweet_json_v2,ng_source,ng_rank,ng_score,location,))
+            connection.commit()
+            conn_cur.close()
+            accessPool.putconn(connection) #closing the connection
+        except Exception as error:
+            print(str(error) + " Something inside of the insertion failed.") # Log this.
+    return "Done"
 
 @app.route('/engagements_save_endless', methods=['GET','POST']) # Should the method be GET?
 def save_all_engagements_new_endless():
@@ -868,17 +1201,21 @@ def save_all_engagements_new_endless():
         sql_inactivity = """INSERT INTO user_inactivity(session_id,tab_inactive_timestamp,tab_active_timestamp,page) values(%s,%s,%s,%s);"""
         sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id) values(%s,%s,%s,%s,%s);"""
         if len(tweetRetweets) > 0:
-            for tweet_rank in tweetRetweets.split(','):
+            tweetRetweets_arr = tweetRetweets.split(',')
+            for i in range(0,len(tweetRetweets_arr),2):
+                tweet_rank = tweetRetweets_arr[i]
                 act_tweet_rank = int(tweet_rank) - 1
                 page_local = int(act_tweet_rank/10)
                 rankk_local = int(act_tweet_rank%10) + 1
-                conn_cur.execute(sql_retweet,(True,session_id,page_local,rankk_local))
+                conn_cur.execute(sql_retweet,(tweetRetweets_arr[i+1],session_id,page_local,rankk_local))
         if len(tweetLikes) > 0:
-            for tweet_rank in tweetLikes.split(','):
+            tweetLikes_arr = tweetLikes.split(',')
+            for i in range(0,len(tweetLikes_arr),2):
+                tweet_rank = tweetLikes_arr[i]
                 act_tweet_rank = int(tweet_rank) - 1
                 page_local = int(act_tweet_rank/10)
                 rankk_local = int(act_tweet_rank%10) + 1
-                conn_cur.execute(sql_like,(True,session_id,page_local,rankk_local))
+                conn_cur.execute(sql_like,(tweetLikes_arr[i+1],session_id,page_local,rankk_local))
         if len(tweetViewTimeStamps) > 0:
             timeStampsMap = tweetViewTimeStamps.split(',')
             timeStampsDict = defaultdict(list)
@@ -903,11 +1240,112 @@ def save_all_engagements_new_endless():
             if len(tab_inactive) > 0:
                 for i in range(len(tab_inactive)):
                     conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
+        print(tweetLinkClicks)
+        for i in range(0,len(tweetLinkClicks),4):
+            conn_cur.execute(sql_link_click,(int(tweetLinkClicks[i+1]),tweetLinkClicks[i],tweetLinkClicks[i+2],tweetLinkClicks[i+3],session_id))
+        connection.commit()
+        conn_cur.close()
+        print('Yahan ayyaa????')
+        accessPool.putconn(connection) #closing the connection
+    except Exception as error:
+        print(str(error) + " Something inside of the insertion failed.") # Log this.
+        return "Failed"
+    return "Done!"
+
+@app.route('/engagements_save_endless_screen_2', methods=['GET','POST']) # Should the method be GET?
+def save_all_engagements_new_endless_screen_2():
+    print("ENGAGEMENTS SAVE ENDLESS SCREEN 2 CALLED!!!!")
+    tries = 5
+    connection = None
+    worker_id = 0
+    page = 0
+    try:
+        worker_id = request.args.get('worker_id')
+        print("WORKER ID IN SAVE ENGAGEMENTS")
+        print(worker_id)
+        if worker_id in session_id_store.keys():
+            session_id = session_id_store[worker_id]
+        else:
+            session_id = -1
+        print("SESSION IDDDD:")
+        print(session_id)
+        #worker_id = int(request.args.get('worker_id'))
+        page = int(request.args.get('page'))
+        tweetRetweets = request.args.get('tweetRetweets')
+        tweetLikes = request.args.get('tweetLikes')
+        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+        tweetLinkClicks = request.args.get('tweetLinkClicks')
+        print("Tweet View Timestamps : ")
+        print(tweetViewTimeStamps)
+        print("Tweet Retweets : ")
+        print(tweetRetweets)
+    except:
+        print("Failed to recieve the worker id.") # Log this
+        return "Failed"
+    try:
+        while(tries > 0):
+            connection = accessPool.getconn() # I dont believe this can throw an error. Need confirmation, if it can, try catch wrap.
+            if connection is None:
+                time.sleep(0.2)
+                tries = tries - 1
+                continue
+            tries = -1
+        conn_cur = connection.cursor()
+        sql_retweet = """UPDATE user_engagement_and_impression_session_screen_2
+        SET tweet_retweeted = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_like = """UPDATE user_engagement_and_impression_session_screen_2
+        SET tweet_favorited = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_telemetry = """UPDATE user_engagement_and_impression_session_screen_2
+        SET seen_timestamp = %s WHERE session_id = %s and page = %s and rank = %s"""
+        #sql_inactivity = """INSERT INTO user_inactivity(session_id,tab_inactive_timestamp,tab_active_timestamp,page) values(%s,%s,%s,%s);"""
+        #sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id) values(%s,%s,%s,%s,%s);"""
+        if len(tweetRetweets) > 0:
+            tweetRetweets_arr = tweetRetweets.split(',')
+            for i in range(0,len(tweetRetweets_arr),2):
+                tweet_rank = tweetRetweets_arr[i]
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
+                conn_cur.execute(sql_retweet,(tweetRetweets_arr[i+1],session_id,page_local,rankk_local))
+        if len(tweetLikes) > 0:
+            tweetLikes_arr = tweetLikes.split(',')
+            for i in range(0,len(tweetLikes_arr),2):
+                tweet_rank = tweetLikes_arr[i]
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
+                conn_cur.execute(sql_like,(tweetLikes_arr[i+1],session_id,page_local,rankk_local))
+        if len(tweetViewTimeStamps) > 0:
+            timeStampsMap = tweetViewTimeStamps.split(',')
+            timeStampsDict = defaultdict(list)
+            tab_inactive = []
+            tab_active = []
+            for i in range(0,len(timeStampsMap),2):
+                if timeStampsMap[i] == '-1':
+                    tab_inactive.append(int(timeStampsMap[i+1]))
+                elif timeStampsMap[i] == '-2':
+                    tab_active.append(int(timeStampsMap[i+1]))
+                else:
+                    rankk_glob = int(timeStampsMap[i]) - 1
+                    timeStampsDict[rankk_glob].append(timeStampsMap[i+1])
+            print("Timestamps Dict : ")
+            print(timeStampsDict)
+            for rr in timeStampsDict.keys():
+                timestamp_str = ','.join(timeStampsDict[rr])
+                page_local = int(rr/10)
+                rankk_local = int(rr%10) + 1
+                conn_cur.execute(sql_telemetry,(timestamp_str,session_id,page_local,rankk_local))
+                #conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
+            #if len(tab_inactive) > 0:
+            #    for i in range(len(tab_inactive)):
+            #        conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
+        """
         if len(tweetLinkClicks) > 0:
             tweetLinkClickMap = tweetLinkClicks.split(',')
             print(tweetLinkClickMap)
             for i in range(0,len(tweetLinkClickMap),4):
                 conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],session_id))
+        """
         connection.commit()
         conn_cur.close()
         print('Yahan ayyaa????')
@@ -1057,13 +1495,31 @@ def save_all_engagements_new_old():
 
 @app.route('/attention_save', methods=['GET','POST']) # Should the method be GET?
 def save_all_attention_new():
+    print("ENGAGEMENTS SAVE ENDLESS SCREEN 2 CALLED!!!!")
     tries = 5
     connection = None
+    worker_id = 0
+    page = 0
     try:
-        session_id = request.args.get('session_id')
+        worker_id = request.args.get('worker_id')
+        print("WORKER ID IN SAVE ENGAGEMENTS")
+        print(worker_id)
+        if worker_id in session_id_store.keys():
+            session_id = session_id_store[worker_id]
+        else:
+            session_id = -1
+        print("SESSION IDDDD:")
+        print(session_id)
+        #worker_id = int(request.args.get('worker_id'))
         page = int(request.args.get('page'))
-        attnanswers = request.args.get('attnanswers')
-        print(attnanswers)
+        tweetRetweets = request.args.get('tweetRetweets')
+        tweetLikes = request.args.get('tweetLikes')
+        tweetViewTimeStamps = request.args.get('tweetViewTimeStamps')
+        tweetLinkClicks = request.args.get('tweetLinkClicks')
+        print("Tweet View Timestamps : ")
+        print(tweetViewTimeStamps)
+        print("Tweet Retweets : ")
+        print(tweetRetweets)
     except:
         print("Failed to recieve the worker id.") # Log this
         return "Failed"
@@ -1076,15 +1532,64 @@ def save_all_attention_new():
                 continue
             tries = -1
         conn_cur = connection.cursor()
-        sql_attn_answers = """UPDATE user_tweet_attn_session SET given_ans = %s where session_id = %s and page = %s and rank = %s"""
-        answers = attnanswers.split(',')
-        for (rankk,ans) in enumerate(answers):
-            bool_answer = False
-            if ans == '1':
-                bool_answer = True
-            conn_cur.execute(sql_attn_answers,(bool_answer,session_id,page,int(rankk)))
+        sql_retweet = """UPDATE user_engagement_and_impression_session_screen_2 
+        SET tweet_retweeted = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_like = """UPDATE user_engagement_and_impression_session_screen_2 
+        SET tweet_favorited = %s WHERE session_id = %s and page = %s and rank = %s"""
+        sql_telemetry = """UPDATE user_engagement_and_impression_session_screen_2 
+        SET seen_timestamp = %s WHERE session_id = %s and page = %s and rank = %s"""
+        #sql_inactivity = """INSERT INTO user_inactivity(session_id,tab_inactive_timestamp,tab_active_timestamp,page) values(%s,%s,%s,%s);"""
+        #sql_link_click = """INSERT INTO click(tweet_id,url,is_card,click_timestamp,session_id) values(%s,%s,%s,%s,%s);"""
+        if len(tweetRetweets) > 0:
+            tweetRetweets_arr = tweetRetweets.split(',')
+            for i in range(0,len(tweetRetweets_arr),2):
+                tweet_rank = tweetRetweets_arr[i]
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
+                conn_cur.execute(sql_retweet,(tweetRetweets_arr[i+1],session_id,page_local,rankk_local))
+        if len(tweetLikes) > 0:
+            tweetLikes_arr = tweetLikes.split(',')
+            for i in range(0,len(tweetLikes_arr),2):
+                tweet_rank = tweetLikes_arr[i]
+                act_tweet_rank = int(tweet_rank) - 1
+                page_local = int(act_tweet_rank/10)
+                rankk_local = int(act_tweet_rank%10) + 1
+                conn_cur.execute(sql_like,(tweetLikes_arr[i+1],session_id,page_local,rankk_local))
+        if len(tweetViewTimeStamps) > 0:
+            timeStampsMap = tweetViewTimeStamps.split(',')
+            timeStampsDict = defaultdict(list)
+            tab_inactive = []
+            tab_active = []
+            for i in range(0,len(timeStampsMap),2):
+                if timeStampsMap[i] == '-1':
+                    tab_inactive.append(int(timeStampsMap[i+1]))
+                elif timeStampsMap[i] == '-2':
+                    tab_active.append(int(timeStampsMap[i+1]))
+                else:
+                    rankk_glob = int(timeStampsMap[i]) - 1
+                    timeStampsDict[rankk_glob].append(timeStampsMap[i+1])
+            print("Timestamps Dict : ")
+            print(timeStampsDict)
+            for rr in timeStampsDict.keys():
+                timestamp_str = ','.join(timeStampsDict[rr])
+                page_local = int(rr/10)
+                rankk_local = int(rr%10) + 1
+                conn_cur.execute(sql_telemetry,(timestamp_str,session_id,page_local,rankk_local))
+                #conn_cur.execute(sql_telemetry,(int(timeStampsMap[i+1]),session_id,page,timeStampsMap[i]))
+            #if len(tab_inactive) > 0:
+            #    for i in range(len(tab_inactive)):
+            #        conn_cur.execute(sql_inactivity,(session_id,tab_inactive[i],tab_active[i],page))
+        """
+        if len(tweetLinkClicks) > 0:
+            tweetLinkClickMap = tweetLinkClicks.split(',')
+            print(tweetLinkClickMap)
+            for i in range(0,len(tweetLinkClickMap),4):
+                conn_cur.execute(sql_link_click,(int(tweetLinkClickMap[i+1]),tweetLinkClickMap[i],tweetLinkClickMap[i+2],tweetLinkClickMap[i+3],session_id))
+        """
         connection.commit()
         conn_cur.close()
+        print('Yahan ayyaa????')
         accessPool.putconn(connection) #closing the connection
     except Exception as error:
         print(str(error) + " Something inside of the insertion failed.") # Log this.
