@@ -21,6 +21,7 @@ import json
 import glob
 import xml
 import xml.sax.saxutils
+from sqlitedict import SqliteDict #to save session data
 
 app = Flask(__name__)
 
@@ -203,21 +204,64 @@ timeline_params_engagement = {
     "max_results" : 100
 }
 
-oauth_store = {}
-start_url_store = {}
-screenname_store = {}
-userid_store = {}
-worker_id_store = {}
-access_token_store = {}
-access_token_secret_store = {}
-max_page_store = {}
-session_id_store = {}
-twitterversion_store = {}
-mode_store = {}
-participant_id_store = {}
-assignment_id_store = {}
-project_id_store = {}
-completed_survey = {}
+# oauth_store = {}
+# start_url_store = {}
+# screenname_store = {}
+# userid_store = {}
+# worker_id_store = {}
+# access_token_store = {}
+# access_token_secret_store = {}
+# max_page_store = {}
+# session_id_store = {}
+# twitterversion_store = {}
+# mode_store = {}
+# participant_id_store = {}
+# assignment_id_store = {}
+# project_id_store = {}
+# completed_survey = {}
+
+# this the chosen database name
+db_name = "sessionData.sqlite"
+oauth_store = SqliteDict(db_name, tablename="oauth_store", autocommit=True)
+start_url_store = SqliteDict(db_name, tablename="start_url_store", autocommit=True)
+screenname_store = SqliteDict(db_name, tablename="screenname_store ", autocommit=True)
+userid_store = SqliteDict(db_name, tablename="userid_store ", autocommit=True)
+worker_id_store = SqliteDict(db_name, tablename="worker_id_store ", autocommit=True)
+access_token_store = SqliteDict(db_name, tablename="access_token_store ", autocommit=True)
+access_token_secret_store = SqliteDict(db_name, tablename="access_token_secret_store", autocommit=True)
+max_page_store = SqliteDict(db_name, tablename="max_page_store", autocommit=True)
+session_id_store = SqliteDict(db_name, tablename="session_id_store", autocommit=True)
+twitterversion_store = SqliteDict(db_name, tablename="twitterversion_store", autocommit=True)
+mode_store = SqliteDict(db_name, tablename="mode_store", autocommit=True)
+participant_id_store = SqliteDict(db_name, tablename="participant_id_store", autocommit=True)
+assignment_id_store = SqliteDict(db_name, tablename="assignment_id_store", autocommit=True)
+project_id_store = SqliteDict(db_name, tablename="project_id_store", autocommit=True)
+completed_survey = SqliteDict(db_name, tablename="completed_survey", autocommit=True)
+
+
+def close_database_connections() -> None:
+    """
+        This function closes all the tables connections to the sql database.
+    """
+    oauth_store.close()
+    start_url_store.close()
+    screenname_store.close()
+    userid_store.close()
+    worker_id_store.close()
+    access_token_store.close()
+    access_token_secret_store.close()
+    max_page_store.close()
+    session_id_store.close()
+    twitterversion_store.close()
+    mode_store.close()
+    participant_id_store.close()
+    assignment_id_store.close()
+    project_id_store.close()
+    completed_survey.close()
+
+
+def delete_single_user_data(user) -> None:
+    pass
 
 def filter_tweets(feedtweetsv1,feedtweetsv2):
     print(len(feedtweetsv1))
