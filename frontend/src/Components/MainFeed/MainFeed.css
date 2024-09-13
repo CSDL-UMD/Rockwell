@@ -37,7 +37,7 @@
   border-style: solid;
   border-radius: 1%;
   border-color: black;
-  text-align: center;
+  text-align: left;
   margin-bottom: 1%;
 }
 
@@ -45,7 +45,7 @@
   border-style: solid;
   border-radius: 1%;
   border-color: black;
-  text-align: center;
+  text-align: left;
   margin-bottom: 1%;
   display: none;
 }

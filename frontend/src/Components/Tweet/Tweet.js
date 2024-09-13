@@ -1,5 +1,6 @@
 import React from 'react';
 import './Tweet.css';
+import fallback from './3925572_1_10.png';
 import { useEffect, useState } from 'react';
 import configuration from '../../Configuration/config';
 import retUnclicked from '../MainFeed/Icons/retweet-unclicked.png';
@@ -36,7 +37,7 @@ function Tweet(props) {
           setRetweetEnabled(false);
         }
       }
-      props.handleRetweet(localTweet.rank);
+      props.handleRetweet(localTweet.rank,tweet.tweet_id);
     }
   };
 
@@ -57,7 +58,7 @@ function Tweet(props) {
           setLikeEnabled(false);
         }
       }
-      props.handleLike(localTweet.rank);
+      props.handleLike(localTweet.rank,tweet.tweet_id);
     }
   };
 
@@ -87,7 +88,8 @@ function Tweet(props) {
         <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'}
 	  onError= {({ currentTarget }) => {
 		  currentTarget.onerror = null; // prevents looping
-		  currentTarget.src=`/3925572_1_10.png`;
+		  //currentTarget.src=`/3925572_1_10.png`;
+		  currentTarget.src=fallback;
 	}}
 	/>
         <div style={{ marginLeft: '5%'}}>
@@ -113,6 +115,7 @@ function Tweet(props) {
                 )
             }
             </a>
+	    {localTweet.domain_present !== '' ? <div style={{ marginBottom: '1%', color:'#808080', fontWeight:'bold'}}>{localTweet.domain_present}</div> : null}
             {localTweet.picture_heading !== '' ?
               <div style={{ marginTop: '1%', marginBottom: '1%',fontWeight:'bold' }}>{localTweet.picture_heading}</div>
               : null}

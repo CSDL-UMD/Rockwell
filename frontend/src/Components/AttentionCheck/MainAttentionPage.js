@@ -6,10 +6,12 @@ import handleTotalResize from './handleTotalResize';
 import rightArrow from './Icons/arrow-right.png';
 import rightArrowEnabled from './Icons/Enabled_arrow.png';
 import config from '../../Configuration/config';
+import Modal from 'react-bootstrap/Modal';
 import './MainFeed.css';
 
 function MainFeed(props) {
   const [givenArguments, setGivenArguments] = useState({});
+  const [showEndModal, setShowEndModal] = useState(false);
   const [feedInformation, setFeedInformation] = useState({});
   const [workeridIdentifier, setWorkeridIdentifier] = useState('0');
   const [sessionIdentifier, setSessionIdentifier] = useState('0');
@@ -18,19 +20,21 @@ function MainFeed(props) {
   const [minimumFeedTimeCondition, setMinimumFeedTimeCondition] = useState(false);
   const [endOfFeedCondition, setEndOfFeedCondition] = useState(false);
   const [starTimeInformation, setStarTimeInformation] = useState(0);
+  const [starTimeGlobalInformation, setStarTimeGlobalInformation] = useState(0);
   const [tweetViewTimeStamps, setTweetViewTimeStamps] = useState([]);
   const [tweetRetweets, setTweetRetweets] = useState([]);
   const [tweetLikes, setTweetLikes] = useState([]);
   const [tweetLinkClicks, setTweetLinkClicks] = useState([]);
 
   async function beginTimer() {
-    await new Promise(r => setTimeout(r, 90000));
+    await new Promise(r => setTimeout(r, 9));
     setMinimumFeedTimeCondition(true)
   }
 
   useEffect(() => {
     let startTime = Date.now();
     let startTimeGlobal = Date.now();
+    setStarTimeGlobalInformation(startTimeGlobal);
     let feedSize = [];
     let currentTweet = [1, 0];
     let hasReachedEndOfFeed = false;
@@ -91,7 +95,7 @@ function MainFeed(props) {
           handleFirstRender(); // Add ifs for return size == 0 just in case 500 ms is not enough for firstRender.
         });
       }).catch(err => {
-        window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
+        //window.location.href = config.error + '?error=' + config.error_codes.tweet_fetch_error_main_feed;
       })
     }
 
@@ -261,22 +265,22 @@ function MainFeed(props) {
     return feedSizeArray;
   };
 
-  const handleRetweet = (feedIndex) => {
+  const handleRetweet = (feedIndex,tweet_id) => {
     const time = Date.now();
     let tempObject = Object.assign([], tweetRetweets);
-    tempObject.push([parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10),(time - starTimeInformation)]);
+    tempObject.push([tweet_id,(time - starTimeGlobalInformation)]);
     setTweetRetweets(tempObject);
   };
 
-  const handleLike = (feedIndex) => {
+  const handleLike = (feedIndex,tweet_id) => {
     const time = Date.now();
     let tempObject = Object.assign([], tweetLikes);
-    tempObject.push([parseInt(feedIndex)+(parseInt(currentPageIdentifier)*10),(time - starTimeInformation)]);
+    tempObject.push([tweet_id,(time - starTimeGlobalInformation)]);
     setTweetLikes(tempObject);
   };
 
   const handleLinkClicked = (url,tweet_id,is_card) => {
-    let startTimeLinkClicked = starTimeInformation;
+    let startTimeLinkClicked = starTimeGlobalInformation;
     const timeLinkClicked = Date.now();
     let tempObject = Object.assign([], tweetLinkClicks);
     tempObject.push([url, tweet_id, is_card, timeLinkClicked - startTimeLinkClicked]);
@@ -284,15 +288,17 @@ function MainFeed(props) {
   };  
 
   const nextButtonClicked = () => {
-    fetch(configuration.database_attn_url + '?worker_id='+ workeridIdentifier + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+    setShowEndModal(true);
+    //fetch(configuration.database_attn_url + '?worker_id='+ workeridIdentifier + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
     //fetch(configuration.database_url + '?random_indentifier='+ givenArguments.randomtokenszzzz + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
     //fetch(configuration.database_url + '?worker_id='+ workeridIdentifier + '&page=' + givenArguments.page + '&tweetRetweets=' + tweetRetweets + '&tweetLikes=' + tweetLikes + '&tweetLinkClicks=' + tweetLinkClicks + '&tweetViewTimeStamps=' + tweetViewTimeStamps).then(resp => {
+    fetch(configuration.database_attn_url,{method: 'post', headers: {'Content-Type':'application/json'}, body: JSON.stringify({"worker_id":workeridIdentifier,"page":givenArguments.page,"tweetRetweets":tweetRetweets,"tweetLikes":tweetLikes,"tweetLinkClicks":tweetLinkClicks,"tweetViewTimeStamps":tweetViewTimeStamps})}).then(resp => {
         //return resp.json();
         window.location.href = '/complete';
     })
     //window.location.href = '/attention?access_token=' + givenArguments.access_token + '&access_token_secret=' + givenArguments.access_token_secret + '&worker_id=' + givenArguments.worker_id + '&attn=1&page=' + givenArguments.page
     //window.location.href = '/attention?randomtokenszzzz=' + nextRandomIdentifier + '&attn=1&page=' + givenArguments.page
-    //window.location.href = '/complete'
+    //window.location.href = '/complete';
     //document.getElementById('root').style.filter = 'blur(5px)'
     //alert("Thank you for participating! Please close this window and return to the survey.")
   };
@@ -304,13 +310,13 @@ function MainFeed(props) {
       </div>
       {JSON.stringify(feedInformation) === '{}'
         ?
-        <div style={{ alignContent: 'center', textAlign: 'center' }}> Please wait while your feed is loading.</div>
+        <div style={{ alignContent: 'center', textAlign: 'center' }}> Please wait while your feed is loading. It might take a few seconds to load. Please do not reload the page.</div>
         :
         <React.Fragment>
           <div className="Feed">
             <div className="TopInstructions">
-              <p style={{ margin: '0.1em' }}><i>We would like to again ask you to look at some social media content. Please scroll through the content below and interact with it as if you were on Twitter --- for example, by reading as well as clicking on links, liking, and/or retweeting content of interest.</i></p>
-              <p style={{ margin: '0.1em' }}><i>Be sure to spend several minutes reading and interacting with content as you normally would. We will ask you questions about your actions later.</i></p>   
+	      <p style={{ margin: '3em 1em 1em 1em' }}><i>We would like to again ask you to look at some social media content.</i></p>
+              <p style={{ margin: '3em 1em 1em 1em' }}><i>Please scroll through the content below and interact with it as if you were on Twitter --- for example, by reading as well as clicking on links, liking, and/or retweeting content of interest. <strong>Be sure to spend several minutes reading and interacting with content as you normally would.</strong> We will ask you questions about your actions later.</i></p>   
             </div>
             {
               feedInformation.map(tweet => (
@@ -324,11 +330,16 @@ function MainFeed(props) {
           </div>
 
           <div className="BottomNavBar">
-            <input type="image" alt="right arrow, next page button" disabled={!minimumFeedTimeCondition ? 'disabled' : ''} src={!minimumFeedTimeCondition ? rightArrow : rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
+            <input type="image" alt="right arrow, next page button" src={rightArrowEnabled} className="rightImg" onClick={nextButtonClicked}/>
           </div>
 
         </React.Fragment>
       }
+      <Modal show={showEndModal} size='m'>
+        <Modal.Body>
+                <p> Please wait while your progress is being saved. This could take as long as 30 seconds or more. Please be patient and do not reload the page. </p>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 }

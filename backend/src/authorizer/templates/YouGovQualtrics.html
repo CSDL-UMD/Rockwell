@@ -44,8 +44,13 @@
                         statuss = xmlHttp.responseText;
                         if (statuss.split("$$$")[1] == 'True')
                             setCookie("{{secretidentifier}}",statuss.split("$$$")[0],100);
-                        else
+			else{
                             eraseCookie("{{secretidentifier}}");
+			    if (statuss.split("$$$")[0] == 'NA'){
+				console.log("Yahan Aaya?????")
+				window.location.href = '{{start_url}}';
+			    }
+			}
                         var xmlHttp2 = new XMLHttpRequest();
                         if (xmlHttp2.readyState == 4 && xmlHttp2.status == 200){
                             statuss2 = xmlHttp2.responseText;
