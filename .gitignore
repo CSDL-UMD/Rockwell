@@ -62,3 +62,10 @@ backend/src/authorizer/pilot3_first_phase/usertimeline_data/*.json.gz
 backend/src/recsys/data/*
 backend/src/recsys/model/*
 backend/src/recsys/NewsGuardIffy/*
+backend/src/recsys/NG_2024_March.csv
+
+# session data from authorizer
+backend/src/authorizer/sessionData*
+
+# screen 2 tweets from cronjob
+backend/src/cronjobs/screen_2_tweets*
