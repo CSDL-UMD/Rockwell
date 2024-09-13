@@ -26,7 +26,7 @@ expansions = "author_id,referenced_tweets.id,attachments.media_keys"
 
 search_url = "https://api.twitter.com/2/tweets/search/recent"
 
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAG1zMAEAAAAA3MKSCxkXn%2FB0dIZ3Zgq2dScBoZg%3DvFXgu6k3BOpWxc22eiuCFn7YETQck26gwSU20dhFHg5W2bYdiy"
+bearer_token = "INSERT_BEARER_TOKEN"
 
 def bearer_oauth(r):
     """

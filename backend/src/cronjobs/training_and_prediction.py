@@ -721,6 +721,7 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
     iffyfile = proj_dir + 'recsys/NewsGuardIffy/iffy.csv'
     ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
     print("Read NewsGuard")    
+    """
     print("Training Job Starting")
     try:
         hoaxy_URLS = pd.read_csv('/home/rockwell/hoaxy_data_all/hoaxy_dataset_URLS_tagged.csv')
@@ -801,7 +802,7 @@ def main(proj_dir,data_dir,log_path=LOG_PATH_DEFAULT):
 
     except Exception as e:
         logger.error("Error in Training", exc_info=e)
-
+    """
     print("Prediction Job Starting")
     logger.info("Prediction Cron job started")
 

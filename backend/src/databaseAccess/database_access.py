@@ -858,7 +858,7 @@ def get_training_worker_credentials():
     try:
         conn_cur = connection.cursor()
         sql = """SELECT user_id,screenname,twitter_id,creation_date from rockwell_user where status = %s"""
-        conn_cur.execute(sql, ('N',))
+        conn_cur.execute(sql, ('R',))
         if conn_cur.rowcount > 0:
             ret = conn_cur.fetchall()
             conn_cur.close()
