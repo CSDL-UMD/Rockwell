@@ -44,8 +44,28 @@ backend/src/eligibility/Resources/domains.json
 backend/src/eligibility/User_Data/*.json.gz
 backend/src/authorizer/UserData/*.json.gz
 backend/src/authorizer/UserDatav2/*.json.gz
+backend/src/authorizer/engagement_data/*.json.gz
+backend/src/authorizer/favorites_data/*.json.gz
+backend/src/authorizer/hometimeline_data/*.json.gz
+backend/src/authorizer/usertimeline_data/*.json.gz
+backend/src/authorizer/pilot3_testing/UserData/*.json.gz
+backend/src/authorizer/pilot3_testing/UserDatav2/*.json.gz
+backend/src/authorizer/pilot3_testing/favorites_data/*.json.gz
+backend/src/authorizer/pilot3_testing/hometimeline_data/*.json.gz
+backend/src/authorizer/pilot3_testing/usertimeline_data/*.json.gz
+backend/src/authorizer/pilot3_first_phase/UserDatav2/*.json.gz
+backend/src/authorizer/pilot3_first_phase/favorites_data/*.json.gz
+backend/src/authorizer/pilot3_first_phase/hometimeline_data/*.json.gz
+backend/src/authorizer/pilot3_first_phase/usertimeline_data/*.json.gz
 
 # data, model and newsguard domains from recsys
 backend/src/recsys/data/*
 backend/src/recsys/model/*
 backend/src/recsys/NewsGuardIffy/*
+backend/src/recsys/NG_2024_March.csv
+
+# session data from authorizer
+backend/src/authorizer/sessionData*
+
+# screen 2 tweets from cronjob
+backend/src/cronjobs/screen_2_tweets*

@@ -243,7 +243,6 @@ def pageArrangement(ng_tweets, ng_tweets_ratings, non_ng_tweets):
 
 @app.route('/recsys_rerank', methods=['GET'])
 def recsys_rerank():
-	print("HERE!!!!")
 	payload = request.json
 	hometimeline = payload[0]
 	screen_name = payload[1]

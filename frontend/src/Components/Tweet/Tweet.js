@@ -1,5 +1,6 @@
 import React from 'react';
 import './Tweet.css';
+import fallback from './3925572_1_10.png';
 import { useEffect, useState } from 'react';
 import configuration from '../../Configuration/config';
 import retUnclicked from '../MainFeed/Icons/retweet-unclicked.png';
@@ -21,7 +22,8 @@ function Tweet(props) {
 
   const handleRetweet = (tweet) => {
     if (retweetEnabled) {
-      fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      //fetch(configuration.retweet_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      fetch(configuration.retweet_tweet + '?worker_id='+ props.workerid + '&tweet_id=' + tweet.tweet_id, { method: 'POST' });
       if (localTweet.retweet_count.includes('k')) {
         setRetweetEnabled(false);
       } else {
@@ -35,13 +37,14 @@ function Tweet(props) {
           setRetweetEnabled(false);
         }
       }
-      props.handleRetweet(localTweet.rank);
+      props.handleRetweet(localTweet.rank,tweet.tweet_id);
     }
   };
 
   const handleLike = (tweet) => {
     if (likeEnabled) {
-      fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      //fetch(configuration.like_tweet + '?tweet_id=' + tweet.tweet_id + '&session_id=2&access_token=' + props.givenArguments.access_token + '&access_token_secret=' + props.givenArguments.access_token_secret, { method: 'POST' });
+      fetch(configuration.like_tweet + '?worker_id='+ props.workerid + '&tweet_id=' + tweet.tweet_id, { method: 'POST' });
       if (localTweet.likes.includes('k')) {
         setLikeEnabled(false);
       } else {
@@ -55,7 +58,7 @@ function Tweet(props) {
           setLikeEnabled(false);
         }
       }
-      props.handleLike(localTweet.rank);
+      props.handleLike(localTweet.rank,tweet.tweet_id);
     }
   };
 
@@ -82,7 +85,13 @@ function Tweet(props) {
           : null
       }
       <div style={{display: 'flex'}} className={localTweet.quoted_by === '' ? 'TweetContent' : 'QuotedTweetContent'}>
-        <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'} />
+        <img style={{alignItems: 'left'}} src={localTweet.actor_picture} alt={"User " + localTweet.actor_name + '\'s profile picture.'}
+	  onError= {({ currentTarget }) => {
+		  currentTarget.onerror = null; // prevents looping
+		  //currentTarget.src=`/3925572_1_10.png`;
+		  currentTarget.src=fallback;
+	}}
+	/>
         <div style={{ marginLeft: '5%'}}>
           <b>{localTweet.actor_name /* Line this up with actor photo */}</b>
           {' @' + localTweet.actor_username}
@@ -92,14 +101,24 @@ function Tweet(props) {
         <div style={{ marginBottom: '1%' }}>{localTweet.body}</div>
         {localTweet.urls !== ''
           ? <div className="TweetArticleContainer">
-            {localTweet.picture_heading !== '' ?
-              <div style={{ marginTop: '1%', marginBottom: '1%' }}>{localTweet.picture_heading}</div>
-              : null}
+
             <a href={localTweet.urls} rel="noopener noreferrer" target="_blank" onClick={() => handleLinkClicked(localTweet.urls,localTweet.tweet_id,'True')}>
-              {localTweet.picture !== '' ?
-                <img className="TweetImage" src={localTweet.picture} alt='Article' />
-                : localTweet.urls}
+            {
+                localTweet.picture !== '' ? (
+                    <img className="TweetImage" src={localTweet.picture} alt='Article' />
+                ) : (
+			localTweet.embedded_image !== '' ? (
+				<img className="TweetImage" src={localTweet.embedded_image} alt='User posted' />
+			) 
+			:
+                    	<img className="TweetImage" src={`/no-image.png`} alt='Article' />
+                )
+            }
             </a>
+	    {localTweet.domain_present !== '' ? <div style={{ marginBottom: '1%', color:'#808080', fontWeight:'bold'}}>{localTweet.domain_present}</div> : null}
+            {localTweet.picture_heading !== '' ?
+              <div style={{ marginTop: '1%', marginBottom: '1%',fontWeight:'bold' }}>{localTweet.picture_heading}</div>
+              : null}
             <div>{localTweet.picture_description}</div>
           </div>
           :

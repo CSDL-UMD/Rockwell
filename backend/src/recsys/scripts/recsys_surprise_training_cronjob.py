@@ -24,7 +24,7 @@ from multiprocessing.dummy import Pool
 from argparse import ArgumentParser
 
 LOG_FMT_DEFAULT='%(asctime)s:%(levelname)s:%(message)s'
-LOG_PATH_DEFAULT="./cronjob.log"
+LOG_PATH_DEFAULT="./training_cronjob.log"
 
 
 def make_logger(path=LOG_PATH_DEFAULT):
@@ -45,6 +45,11 @@ def make_logger(path=LOG_PATH_DEFAULT):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
     return logger
+
+def make_parser():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("proj_dir", help="directory with data files")
+    return parser
 
 def gettwitterhandle(url):
     try:
@@ -313,92 +318,99 @@ def get_data_from_new_users(user_timeline_files,fave_timeline_files,ng_domains):
     pd_new_users = pd.concat([pd.DataFrame(new_users_training),pd.DataFrame(new_domains_training)],axis=1)
     return pd_new_users
 
-def main():
-    ng_fn = "../NewsGuardIffy/label-2022101916.json"
-    iffyfile = "../NewsGuardIffy/iffy.csv"
-    ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
+def main(proj_dir,log_path=LOG_PATH_DEFAULT):
+    logger = make_logger(log_path)
+    logger.info(f"Training Cron job started: {proj_dir=}")
+    try:
+        ng_fn = proj_dir + "/recsys/NewsGuardIffy/label-2022101916.json"
+        iffyfile = proj_dir + "/recsys/NewsGuardIffy/iffy.csv"
+        ng_domains = integrate_NG_iffy(ng_fn,iffyfile)
 
-    recsys_engagement = pd.read_csv('../data/hoaxy_dataset.csv')
-    if 'Unnamed: 0' in recsys_engagement.columns:
-        recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
-    recsys_engagement = recsys_engagement.reset_index(drop=True)
+        recsys_engagement = pd.read_csv(proj_dir + '/recsys/data/hoaxy_dataset.csv')
+        if 'Unnamed: 0' in recsys_engagement.columns:
+            recsys_engagement = recsys_engagement.drop(columns=['Unnamed: 0'])
+        recsys_engagement = recsys_engagement.reset_index(drop=True)
 
 
-    unprocessed_json = {}
-    with open("../../configuration/unprocessed.json") as fin:
-        unprocessed_json = json.loads(fin.read())
-    unprocessed_user_files = unprocessed_json["usertimeline"]
-    unprocessed_fav_files = unprocessed_json["favorites"]
+        unprocessed_json = {}
+        with open(proj_dir + "/configuration/unprocessed.json") as fin:
+            unprocessed_json = json.loads(fin.read())
+        unprocessed_user_files = unprocessed_json["usertimeline"]
+        unprocessed_fav_files = unprocessed_json["favorites"]
 
-    processed_json = {}
-    with open("../../configuration/processed.json") as fin:
-        processed_json = json.loads(fin.read())
-    processed_user_files = processed_json["usertimeline"]
-    processed_fav_files = processed_json["favorites"]
+        processed_json = {}
+        with open(proj_dir + "/configuration/processed.json") as fin:
+            processed_json = json.loads(fin.read())
+        processed_user_files = processed_json["usertimeline"]
+        processed_fav_files = processed_json["favorites"]
 
-    new_user_timeline_files = [ff for ff in unprocessed_user_files if ff not in processed_user_files]
-    new_fav_timeline_files = [ff for ff in unprocessed_fav_files if ff not in processed_fav_files]
+        new_user_timeline_files = [ff for ff in unprocessed_user_files if ff not in processed_user_files]
+        new_fav_timeline_files = [ff for ff in unprocessed_fav_files if ff not in processed_fav_files]
 
-    pd_new_users = get_data_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains)
-    pd_new_users = pd_new_users.reset_index(drop=True)
-    pd_new_users.columns = ['user','NG_domain']
-    recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
+        pd_new_users = get_data_from_new_users(new_user_timeline_files, new_fav_timeline_files, ng_domains)
+        pd_new_users = pd_new_users.reset_index(drop=True)
+        pd_new_users.columns = ['user','NG_domain']
+        recsys_engagement = pd.concat([recsys_engagement,pd_new_users],ignore_index=True)
 
-    tot_users = len(recsys_engagement['user'].unique())
-    domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
-    domain_idf_dict = {}
-    for kk in domain_idf.keys():
-        domain_idf_dict[kk] = domain_idf[kk]
+        tot_users = len(recsys_engagement['user'].unique())
+        domain_idf = recsys_engagement.groupby('NG_domain').user.agg(idf,tot_users=tot_users)
+        domain_idf_dict = {}
+        for kk in domain_idf.keys():
+            domain_idf_dict[kk] = domain_idf[kk]
 
-    domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
+        domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(tfidf,idf_dict=domain_idf_dict)
 
-    #domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
+        #domain_rating_json_column = recsys_engagement.groupby('user').NG_domain.agg(rating_calculate)
 
-    #all_users = []
-    #for uu in domain_rating_json_column.index:
-    #    rating_json = json.loads(domain_rating_json_column[uu])
-    #    if 'domain' not in rating_json.keys():
-    #        all_users.append(uu)
+        #all_users = []
+        #for uu in domain_rating_json_column.index:
+        #    rating_json = json.loads(domain_rating_json_column[uu])
+        #    if 'domain' not in rating_json.keys():
+        #        all_users.append(uu)
 
-    users_training = []
-    domains_training = []
-    ratings_training = []
+        users_training = []
+        domains_training = []
+        ratings_training = []
 
-    #Full training set
-    for (i,uu) in enumerate(domain_rating_json_column.keys()):
-        if i % 10000 == 0:
-            print(i)
-        rating_json = json.loads(domain_rating_json_column[uu])
-        for dd in rating_json.keys():
-            users_training.append(uu)
-            domains_training.append(dd)
-            ratings_training.append(rating_json[dd])
+        #Full training set
+        for (i,uu) in enumerate(domain_rating_json_column.keys()):
+            if i % 10000 == 0:
+                print(i)
+            rating_json = json.loads(domain_rating_json_column[uu])
+            for dd in rating_json.keys():
+                users_training.append(uu)
+                domains_training.append(dd)
+                ratings_training.append(rating_json[dd])
 
-    pd_training = pd.concat([pd.DataFrame(users_training),pd.DataFrame(domains_training),pd.DataFrame(ratings_training)],axis=1)
-    pd_training.columns = ['Users','Domains','Ratings']
-    #pd_training_domains = pd.DataFrame(pd_training['Domains'].unique().tolist(),columns=['Domains'])
+        pd_training = pd.concat([pd.DataFrame(users_training),pd.DataFrame(domains_training),pd.DataFrame(ratings_training)],axis=1)
+        pd_training.columns = ['Users','Domains','Ratings']
+        #pd_training_domains = pd.DataFrame(pd_training['Domains'].unique().tolist(),columns=['Domains'])
 
-    pd_training.to_csv('../data/hoaxy_dataset_training_tfidf.csv')
-    #pd_training_domains.to_csv('../data/hoaxy_dataset_training_domains_2.csv')
+        pd_training.to_csv(proj_dir + '/recsys/data/hoaxy_dataset_training_tfidf.csv')
+        #pd_training_domains.to_csv('../data/hoaxy_dataset_training_domains_2.csv')
 
-    with open('../data/domain_idf.json','w') as fp:
-        json.dump(domain_idf_dict,fp)
+        with open(proj_dir + '/recsys/data/domain_idf.json','w') as fp:
+            json.dump(domain_idf_dict,fp)
 
-    reader = surprise.reader.Reader(rating_scale=(0, 1))
-    data = surprise.dataset.Dataset.load_from_df(pd_training, reader)
+        reader = surprise.reader.Reader(rating_scale=(0, 1))
+        data = surprise.dataset.Dataset.load_from_df(pd_training, reader)
 
-    algo = surprise.SVD()
-    trainset = data.build_full_trainset()
-    algo.fit(trainset)
+        algo = surprise.SVD()
+        trainset = data.build_full_trainset()
+        algo.fit(trainset)
 
-    model_filename = '../model/hoaxy_recsys_model_tfidf.sav'
-    joblib.dump(algo,model_filename)
+        model_filename = proj_dir + '/recsys/model/hoaxy_recsys_model_tfidf.sav'
+        joblib.dump(algo,model_filename)
 
-    processed_json["usertimeline"] = unprocessed_user_files
-    processed_json["favorites"] = unprocessed_fav_files
+        processed_json["usertimeline"] = unprocessed_user_files
+        processed_json["favorites"] = unprocessed_fav_files
 
-    with open("../../configuration/processed.json","w") as outfile:
-        outfile.write(json.dumps(processed_json))
+        with open(proj_dir + "/configuration/processed.json","w") as outfile:
+            outfile.write(json.dumps(processed_json))
+    except Exception as e:
+        logger.error(f"Error in Training", exc_info=e)
 
 if __name__ == '__main__':
-    main()
+    parser = make_parser()
+    args = parser.parse_args()
+    main(args.proj_dir)

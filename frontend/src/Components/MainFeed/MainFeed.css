@@ -37,8 +37,17 @@
   border-style: solid;
   border-radius: 1%;
   border-color: black;
-  text-align: center;
+  text-align: left;
   margin-bottom: 1%;
+}
+
+.TopInstructionsHidden {
+  border-style: solid;
+  border-radius: 1%;
+  border-color: black;
+  text-align: left;
+  margin-bottom: 1%;
+  display: none;
 }
 
 .BottomNavBar {
@@ -70,6 +79,40 @@
   position: absolute;
   left: 48%;
   top: 0%;
+}
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.loaderHidden {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: none;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media only screen and (min-width: 1500px) {

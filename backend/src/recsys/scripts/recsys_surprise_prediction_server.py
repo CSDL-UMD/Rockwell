@@ -6,9 +6,11 @@ import json
 import requests
 import joblib
 import random
+import datetime
 import asyncio
 import numpy as np
 import pandas as pd
+from dateutil import parser
 from urllib.parse import urlsplit
 from itertools import groupby
 from flask import Flask, render_template, request, url_for, jsonify
@@ -265,6 +267,26 @@ def unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains):
             urls_tagged.append("NA")
     return urls_tagged
 
+def tag_NG_handles(all_handles,ng_domains,training_ng_domains):
+    ng_twitter_values = ng_domains.loc[ng_domains['rank'].isin(['T','N'])]['twitter'].unique()
+    handles_tagged = []
+    for handle in all_handles:
+        if handle in ng_twitter_values:
+            corrs_domain = ng_domains.loc[(ng_domains['twitter'] == handle)]['domain'].values.tolist()
+            actual_domain = 'NA'
+            for dd in corrs_domain:
+                if dd in training_ng_domains:
+                    if dd.count('.') == 1:
+                        actual_domain = dd
+                        break
+            if actual_domain == 'NA':
+                if corrs_domain[0] in training_ng_domains:
+                    actual_domain = corrs_domain[0]
+            handles_tagged.append(actual_domain)
+        else:
+            handles_tagged.append("NA")
+    return handles_tagged
+
 def unshorten_and_tag_NG_async(all_urls,ng_domains,training_ng_domains):
     ng_domain_values = ng_domains['domain'].unique()
     ng_twitter_values = ng_domains['twitter'].unique()
@@ -415,6 +437,109 @@ def pageArrangementendless(ng_tweets, ng_tweets_ratings, non_ng_tweets):
 
 @app.route('/recsys_rerank', methods=['GET'])
 def recsys_rerank():
+    payload = request.json
+    hometimeline = payload[0]
+    screen_name = payload[1]
+
+    alpha_m = 0.9
+    alpha_t = 0.1
+
+    hometimeline_urls = []
+    hometimeline_authors = []
+    hometimeline_tweets = {}
+
+    for tweet in hometimeline:
+        tweet_id = tweet["id_str"]
+        tweet_id_int = int(tweet_id)
+        date_string_temp = tweet['created_at']
+        created_date_datetime = parser.parse(date_string_temp)
+        td = (datetime.datetime.now(datetime.timezone.utc) - created_date_datetime)
+        age_seconds = td.seconds
+        hometimeline_tweets[tweet_id] = tweet
+        if 'retweeted_status' in tweet:
+            hometimeline_authors.append({"tweet_id": tweet_id,"age": age_seconds,"author":tweet['retweeted_status']['user']['screen_name']})
+            urls_extracted = extractfromentities(tweet['retweeted_status'])
+            for url in urls_extracted:
+                hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
+            if 'quoted_status' in tweet['retweeted_status']:
+                hometimeline_authors.append({"tweet_id": tweet_id,"age": age_seconds,"author":tweet['retweeted_status']['quoted_status']['user']['screen_name']})
+                urls_extracted = extractfromentities(tweet['retweeted_status']['quoted_status'])
+                for url in urls_extracted:
+                    hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
+        else:
+            if 'quoted_status' in tweet:
+                hometimeline_authors.append({"tweet_id": tweet_id,"age": age_seconds,"author":tweet['quoted_status']['user']['screen_name']})
+                urls_extracted = extractfromentities(tweet['quoted_status'])
+                for url in urls_extracted:
+                    hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
+            hometimeline_authors.append({"tweet_id": tweet_id,"age": age_seconds,"author":tweet['user']['screen_name']})
+            urls_extracted = extractfromentities(tweet)
+            for url in urls_extracted:
+                hometimeline_urls.append({"tweet_id": tweet_id,"age": age_seconds,"url":url})
+
+    pd_hometimeline_urls = pd.DataFrame(hometimeline_urls)
+    pd_hometimeline_authors = pd.DataFrame(hometimeline_authors)
+
+    userintrain = True
+
+    try:
+        inner_uid = trainset.to_inner_uid(screen_name)
+    except:
+        userintrain = False
+
+    if userintrain:
+        print("YES PRESENT!!!!")
+        all_urls = pd_hometimeline_urls['url'].values.tolist()
+        hometimeline_urls_tagged = unshorten_and_tag_NG(all_urls,ng_domains,training_ng_domains)
+        pd_hometimeline_urls = pd.concat([pd_hometimeline_urls,pd.DataFrame(hometimeline_urls_tagged,columns=['tagged_urls'])],axis=1)
+        pd_hometimeline_urls['rating_age'] = np.exp(-1.0*pd_hometimeline_urls['age']/pd_hometimeline_urls['age'].mean())
+        predicted_rating = {}
+        for index,row in pd_hometimeline_urls.iterrows():
+            if row['tagged_urls'] != 'NA':
+                try:
+                    recsys_rating = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                    predicted_rating[row['tweet_id']] = alpha_m*recsys_rating + alpha_t*row['rating_age']
+                    #predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                except ValueError:
+                    continue
+        
+        all_authors = pd_hometimeline_authors['author'].values.tolist()
+        hometimeline_authors_tagged = tag_NG_handles(all_authors,ng_domains,training_ng_domains)
+        pd_hometimeline_authors = pd.concat([pd_hometimeline_authors,pd.DataFrame(hometimeline_authors_tagged,columns=['tagged_authors'])],axis=1)
+        pd_hometimeline_authors['rating_age'] = np.exp(-1.0*pd_hometimeline_authors['age']/pd_hometimeline_authors['age'].mean())
+        for index,row in pd_hometimeline_authors.iterrows():
+            if row['tweet_id'] in predicted_rating.keys():
+                continue
+            if row['tagged_authors'] != 'NA':
+                try:
+                    recsys_rating = algo.predict(uid=screen_name, iid=row['tagged_authors']).est
+                    predicted_rating[row['tweet_id']] = alpha_m*recsys_rating + alpha_t*row['rating_age']
+                    #predicted_rating[row['tweet_id']] = algo.predict(uid=screen_name, iid=row['tagged_urls']).est
+                except ValueError:
+                    continue
+
+        predicted_rating_tweets = predicted_rating.keys()
+        NG_tweets = []
+        NG_tweets_ratings = []
+        non_NG_tweets = []
+
+        for tweet_id in hometimeline_tweets.keys():
+            if tweet_id in predicted_rating_tweets:
+                NG_tweets.append(hometimeline_tweets[tweet_id])
+                NG_tweets_ratings.append(predicted_rating[tweet_id])
+            else:
+                non_NG_tweets.append(hometimeline_tweets[tweet_id])
+
+        resultant_feed,resultant_score = pageArrangementendless(NG_tweets,NG_tweets_ratings,non_NG_tweets)
+
+        return jsonify(data=[resultant_feed,resultant_score])
+
+    else:
+
+        return jsonify(data="NOTPRESENT")
+
+@app.route('/recsys_rerank_prev', methods=['GET'])
+def recsys_rerank_prev():
 	payload = request.json
 	hometimeline = payload[0]
 	usertimeline = payload[1]
