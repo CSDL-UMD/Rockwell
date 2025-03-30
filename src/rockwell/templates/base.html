@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rockwell</title>
+    <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+    <div class="max-w-3xl mx-auto mt-10 p-4">
+        <h1 class="text-4xl font-bold text-center border-b-4 border-black pb-2">Rockwell</h1>
+        <div class="mt-6 p-4 border border-gray-400 rounded-lg bg-gray-50 text-center text-gray-700">
+            <p>
+                Please scroll through the content below and interact with it as if you were on Twitter — 
+                for example, by reading as well as clicking on links, liking, and/or retweeting content of interest. 
+                <strong>Be sure to spend several minutes reading and interacting with content as you normally would.</strong> 
+                We will ask you questions about your actions later.
+            </p>
+        </div>
+        <div class="mt-6">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,13 @@
+<button 
+    hx-post="/like/{{ tweet.id }}" 
+    hx-target="#like-container-{{ tweet.id }}" 
+    hx-swap="outerHTML"
+    class="flex items-center space-x-1 group"
+    id="like-container-{{ tweet.id }}">
+    <span class="material-symbols-outlined text-2xl transition 
+        {% if tweet.engagements.liked %} text-red-500 {% else %} text-gray-600 group-hover:text-gray-800 {% endif %}">
+        favorite
+    </span>
+    <span class="text-gray-700">{{ tweet.engagements.likes }}</span>
+</button>
+

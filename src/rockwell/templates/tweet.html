@@ -1,0 +1,76 @@
+<div class="tweet bg-[#f5e6da] p-4 rounded-lg border border-gray-700 shadow-sm text-black" id={{tweet.id}}>
+    <!-- Retweeted Banner -->
+    {% if tweet.engagements.retweet_by %}
+        <div class="text-gray-500 text-sm">Retweeted by: <b>{{ tweet.engagements.retweet_by }}</b></div>
+    {% endif %}
+
+    <!-- Quoted Banner -->
+    {% if tweet.engagements.quoted_by %}
+        <div class="bg-gray-100 p-3 rounded-md">
+            <div class="flex items-center space-x-3">
+                <img src="{{ tweet.quoted_by_actor_picture }}" class="w-8 h-8 rounded-full">
+                <b>{{ tweet.engagements.quoted_by }}</b> @{{ tweet.quoted_by_actor_username }} Quoted:
+            </div>
+            <p class="text-gray-700">{{ tweet.quoted_by_text }}</p>
+        </div>
+    {% endif %}
+
+    <!-- Tweet Header -->
+    <div class="flex items-center space-x-3">
+        <img src="{{ tweet.actor_picture }}" class="w-10 h-10 rounded-full"
+             onerror="this.onerror=null; this.src='/static/fallback.png';">
+        <div>
+            <b>{{ tweet.actor_name }}</b>
+            <span class="text-gray-500">@{{ tweet.actor_username }}</span>
+        </div>
+    </div>
+
+    <!-- Tweet Content -->
+    <p class="mt-2 text-gray-800 tweetbody">{{ tweet.body }}</p>
+
+    <!-- Tweet Images add all of them in a grid but before that add the links up but make sure there are not the same as in media -->
+    {% if tweet.embeded_image %}
+        <img src="{{ tweet.embeded_image }}" class="mt-3 rounded-lg border border-gray-300">
+    {% endif %}
+
+    {% if tweet.embeded_images %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            {% for image_url in tweet.embeded_images %}
+                <img src="{{ image_url }}" class="rounded-lg border w-full h-auto object-cover">
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+
+    <!-- Tweet Footer (Like & Retweet) -->
+    <div class="mt-3 flex justify-between border-t border-gray-400 pt-3">
+        <!-- Retweet Button -->
+        <button 
+            hx-post="/retweet/{{ tweet.id }}" 
+            hx-target="#retweet-container-{{ tweet.id }}" 
+            hx-swap="outerHTML"
+            class="flex items-center space-x-1 group"
+            id="retweet-container-{{ tweet.id }}">
+            <span class="material-symbols-outlined text-2xl transition 
+                {% if tweet.retweeted %} text-blue-500 {% else %} text-gray-600 group-hover:text-gray-800 {% endif %}">
+                repeat
+            </span>
+            <span class="text-gray-700">{{ tweet.engagements.retweets }}</span>
+        </button>
+
+        <!-- Like Button -->
+        <button 
+            hx-post="/like/{{ tweet.id }}" 
+            hx-target="#like-container-{{ tweet.id }}" 
+            hx-swap="outerHTML"
+            class="flex items-center space-x-1 group"
+            id="like-container-{{ tweet.id }}">
+            <span class="material-symbols-outlined text-2xl transition 
+                {% if tweet.liked %} text-red-500 {% else %} text-gray-600 group-hover:text-gray-800 {% endif %}">
+                favorite
+            </span>
+            <span class="text-gray-700">{{ tweet.engagements.likes }}</span>
+        </button>
+    </div>
+</div>
