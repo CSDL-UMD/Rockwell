@@ -22,7 +22,7 @@ Pipfile.lock
 
 # Other Python
 *.pyc
-pyproject.toml
+# pyproject.toml
 __pycache__/
 .ipynb_checkpoints/
 
