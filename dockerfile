@@ -16,6 +16,7 @@ RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY src/ /app/src/
 COPY sample_posts.json /app/ 
+COPY schema.sql /app/ 
 
 ENV PYTHONPATH=/app/src
 
