@@ -6,16 +6,31 @@ Rockwell uses the twitter authentication workflow to render a twitter like feed 
 
 Rockwell uses a PostgreSQL database, a Python (FastAPI) backend managed with Poetry, and a Node/React.js frontend.
 
-# Installation
+# Local Installation
+
+## Clone the project
+```
+git clone https://github.com/CSDL-UMD/Rockwell.git & cd Rockwell
+```
+
+## Postgress Database 
+
+Make sure you have [PostgresSql](https://www.postgresql.org/) installed and running.
+
+Initialize the databse and update your path.
+```sh
+sudo -u postgres psql -f init.sql
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/rockwell"
+```
+
+## Rockwell App
 
 Make sure you have poetry installed
-
 ```bash
 pip3 install poetry
 poetry --version
 ```
-
-Navigate to the project root folder and run:
+and then
 ```bash
 pip install --no-root --no-interaction --no-ansi
 ```
@@ -32,13 +47,9 @@ tables in the DatabaseScript must be placed on a postgresql database.
 
 # Deployment Steps
 We deploy via docker, so make sure you have docker installed and that the docker daemon is running.
+Make sure you also have docker compose plugin installed
+Rockwell currently runs on port `8000`
 
-1. Build the image
-```bash
-docker build -t rockwell-app .
-```
-
-2. Run the container
-```bash
-docker run -p 8000:8000 rockwell-app
+```sh
+sudo docker compose up --build
 ```

@@ -1,0 +1,3 @@
+ALTER USER postgres WITH PASSWORD 'postgres';
+CREATE DATABASE rockwell;
+GRANT ALL PRIVILEGES ON DATABASE rockwell TO postgres;
