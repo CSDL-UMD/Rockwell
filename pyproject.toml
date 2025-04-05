@@ -42,7 +42,8 @@ dependencies = [
     "uvloop (==0.21.0)",
     "watchfiles (==1.0.4)",
     "websockets (==14.2)",
-    "aiohttp (>=3.11.14,<4.0.0)"
+    "aiohttp (>=3.11.14,<4.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)"
 ]
 
 [build-system]

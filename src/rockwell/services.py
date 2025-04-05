@@ -17,15 +17,15 @@ class TweetService:
         self.file_path = file_path
         self.tweets = []
 
-    async def init_service(self):
+    async def init_service(self, raw_tweets):
         """Initialize the service asynchronously."""
-        self.tweets = await self.load_tweets()
+        self.tweets = await self.load_tweets(raw_tweets)
 
-    async def load_tweets(self) -> List[dict]:
+    async def load_tweets(self, raw_tweets) -> List[dict]:
         """Load tweets from file into memory asynchronously."""
         try:
-            with open(self.file_path, "r", encoding="utf-8") as fp:
-                raw_tweets = json.load(fp)["data"][:50]
+            # with open(self.file_path, "r", encoding="utf-8") as fp:
+            #     raw_tweets = json.load(fp)["data"][:50]
 
             preprocessed_tweets = await process_data(raw_tweets)
 

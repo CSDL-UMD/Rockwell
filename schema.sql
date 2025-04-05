@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS tweets (
+    id BIGINT PRIMARY KEY,
+    data JSONB NOT NULL
+);
