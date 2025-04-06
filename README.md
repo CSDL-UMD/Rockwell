@@ -9,8 +9,9 @@ Rockwell uses a PostgreSQL database, a Python (FastAPI) backend managed with Poe
 # Local Installation
 
 ## Clone the project
-```
-git clone https://github.com/CSDL-UMD/Rockwell.git & cd Rockwell
+```sh
+git clone https://github.com/CSDL-UMD/Rockwell.git 
+cd Rockwell
 ```
 
 ## Postgress Database 
@@ -19,7 +20,7 @@ Make sure you have [PostgresSql](https://www.postgresql.org/) installed and runn
 
 Initialize the databse and update your path.
 ```sh
-sudo -u postgres psql -f init.sql
+sudo psql -d postgres -f init.sql
 export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/rockwell"
 ```
 
@@ -30,12 +31,18 @@ Make sure you have poetry installed
 pip3 install poetry
 poetry --version
 ```
-and then
-```bash
-pip install --no-root --no-interaction --no-ansi
+
+make sure your version of poetry is up to date
+```sh
+pip3 install poetry --upgrade
 ```
 
-Then run
+install the dependencies
+```bash
+poetry install --no-root --no-interaction --no-ansi
+```
+
+run the rockwell application
 
 ```bash
 PYTHONPATH=src poetry run uvicorn rockwell.main:app --reload
@@ -52,4 +59,9 @@ Rockwell currently runs on port `8000`
 
 ```sh
 sudo docker compose up --build
+```
+
+or 
+```sh
+docker compose up --build
 ```
