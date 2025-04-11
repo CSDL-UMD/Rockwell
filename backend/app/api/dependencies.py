@@ -10,7 +10,6 @@ from app.db.session import get_db
 from app.schemas.token import TokenPayload
 from app.services.user import UserService
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 async def get_current_user(
     db: AsyncSession = Depends(get_db),

@@ -5,11 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
+from app.web.web import web_router
 from app.api.api import api_router
 from app.core.config import settings
 from app.core.exceptions import AppException
-from app.db.session import engine
+from app.db.session import engine, close_stores
 from app.db.base import Base
+import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_URL = os.getenv("DATABASE_URL")
@@ -30,6 +32,7 @@ async def lifespan(app: FastAPI):
     yield  # This is where the application runs
     
     # Shutdown: Close connections, cleanup resources
+    await close_stores()
     print("Application shutdown")
 
 
@@ -94,6 +97,7 @@ async def root():
 
 # Include API router with all endpoints
 app.include_router(api_router, prefix="/api")
+app.include_router(web_router, prefix="/web")
 
 # Development server entry point
 if __name__ == "__main__":

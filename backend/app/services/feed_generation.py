@@ -12,9 +12,12 @@ class FeedGenerationService:
     
     async def generate_feed(self, user_id: str, count: int = 10, include_attention_checks: bool = True) -> List[Dict]:
         """Generate a personalized feed for a user"""
+
         # Get recommendations from the recommendation system
-        tweet_ids = await self.recsys_service.get_recommendations(user_id, count=count)
-        
+        # tweet_ids = await self.recsys_service.get_recommendations(user_id, count=count)
+
+        tweet_ids = []
+
         # Fetch the full tweet objects
         tweets = await self.tweet_repository.get_many_by_ids(ids=tweet_ids)
         
