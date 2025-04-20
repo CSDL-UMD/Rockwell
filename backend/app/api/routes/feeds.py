@@ -1,29 +1,35 @@
 import datetime
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Request
+from fastapi import APIRouter, Depends, Query, Request
 import requests
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Any, Dict
 
 from app.api.dependencies import get_current_active_user, get_recsys_service
-from app.db.session import get_db, get_store
+from app.db.session import get_store
 from app.schemas.tweet import FeedTweet
 from app.services.feed_generation import FeedGenerationService
 from app.services.recsys import RecsysService
 
+
 router = APIRouter()
 
-@router.get("/", response_model=List[FeedTweet])
+@router.get("/get_feed", response_model=List[FeedTweet])
 async def get_feed(
     request: Request,
     count: int = Query(10, description="Number of tweets to return", ge=1, le=50),
-    include_attention_checks: bool = Query(True, description="Whether to include attention checks"),
+    include_attention_checks: bool = Query(False, description="Whether to include attention checks"),
     current_user: Dict = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
     recsys: RecsysService = Depends(get_recsys_service),
 ) -> Any:
     """
     Get personalized feed for current user
     """
+
+    feed_service = FeedGenerationService(recsys)
+    # return await feed_service.generate_feed(
+    #     user_id= "testing_user", 
+    #     count=10,
+    #     include_attention_checks=include_attention_checks
+    # )
 
     worker_id = request.headers.get("worker_id")
     experimental_condition = get_store("experimental_condition")
@@ -43,8 +49,6 @@ async def get_feed(
     attn = int(request.args.get('attn'))
     page = int(request.args.get('page'))
     session_id = -1
-
-    feed_service = FeedGenerationService(db, recsys)
     
     return await feed_service.generate_feed(
         user_id=current_user["id"], 

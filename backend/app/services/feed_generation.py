@@ -1,14 +1,14 @@
-from typing import List, Dict, Any, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.repositories.tweet import TweetRepository
+import json
+from typing import List, Dict
 from app.services.recsys import RecsysService
+from app.services.tweet import TweetService
+from app.db.session import get_store
 import random
 
+
 class FeedGenerationService:
-    def __init__(self, db: AsyncSession, recsys_service: RecsysService):
-        self.db = db
+    def __init__(self,recsys_service: RecsysService):
         self.recsys_service = recsys_service
-        self.tweet_repository = TweetRepository(self.db)
     
     async def generate_feed(self, user_id: str, count: int = 10, include_attention_checks: bool = True) -> List[Dict]:
         """Generate a personalized feed for a user"""
@@ -16,28 +16,23 @@ class FeedGenerationService:
         # Get recommendations from the recommendation system
         # tweet_ids = await self.recsys_service.get_recommendations(user_id, count=count)
 
-        tweet_ids = []
+        # tweet_ids = []
+        tweets = await self.tweet_repository.get_tweets_by_ids(tweet_ids)
+        # Mocking the tweet repository call  
 
         # Fetch the full tweet objects
-        tweets = await self.tweet_repository.get_many_by_ids(ids=tweet_ids)
+        with open ('backend/app/db/tweets.json', 'r') as f:
+            tweets = json.load(f)["data"]
+
+        tweet_services_store = get_store("tweet_services_store")
+        if user_id in tweet_services_store.keys():
+            tweet_service = tweet_services_store[user_id]
+        else:
+            tweet_service = TweetService(tweets)
+            await tweet_service.init_service()
+            tweet_services_store[user_id] = tweet_service 
         
-        # Convert to dictionaries
-        feed_items = []
-        for tweet in tweets:
-            feed_item = {
-                "id": tweet.id,
-                "author_id": tweet.author_id,
-                "content": tweet.content,
-                "created_at": tweet.created_at,
-                "likes_count": tweet.likes_count,
-                "retweets_count": tweet.retweets_count,
-                "replies_count": tweet.replies_count,
-                "media_urls": tweet.media_urls,
-                "metadata": tweet.metadata,
-                "ranking_score": random.random(),  # Mock ranking score
-                "is_attention_check": False
-            }
-            feed_items.append(feed_item)
+        feed_items = tweet_service.get_tweets()
         
         # Add attention checks if needed
         if include_attention_checks and len(feed_items) >= 5:
@@ -61,7 +56,7 @@ class FeedGenerationService:
         return {
             "id": f"attention-{template.id}",
             "author_id": template.author_id,
-            "content": f"ATTENTION CHECK: Please retweet this post",
+            "content": "ATTENTION CHECK: Please retweet this post",
             "created_at": template.created_at,
             "likes_count": template.likes_count,
             "retweets_count": template.retweets_count,
@@ -77,7 +72,7 @@ class FeedGenerationService:
         from datetime import datetime
         
         return {
-            "id": f"attention-default",
+            "id": "attention-default",
             "author_id": "attention-system",
             "content": "ATTENTION CHECK: Please retweet this post to show you're paying attention",
             "created_at": datetime.now(),

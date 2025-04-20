@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
+import logging
 
 from app.core.config import settings
-from app.db.session import get_db, get_store
+from app.db.session import get_store
 
 from requests_oauthlib import OAuth1Session
 
@@ -26,10 +26,10 @@ async def twitter_login(
     try:
         request_token = OAuth1Session(client_key=settings.TWITTER_API_KEY,client_secret=settings.TWITTER_API_SECRET_KEY)
         content = request_token.post(settings.TWITTER_REQUEST_TOKEN_URL, data = {"oauth_callback": settings.TWITTER_CALLBACK_URL})
-        # logging.info('Twitter access successfull')
+        logging.info('Twitter access successfull')
     except Exception as error:
         print('Twitter access failed with error : '+str(error))
-        # logging.error('Twitter access failed with error : '+str(error))
+        logging.error('Twitter access failed with error : '+str(error))
 
     data_tokens = content.text.split("&")
     oauth_store = get_store("oauth_store")

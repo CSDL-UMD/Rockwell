@@ -7,38 +7,17 @@ from typing import Generator, Optional, Dict
 from app.core.config import settings
 from app.core.security import ALGORITHM
 from app.db.session import get_db
-from app.schemas.token import TokenPayload
 from app.services.user import UserService
 
 
 async def get_current_user(
-    db: AsyncSession = Depends(get_db),
-    token: str = Depends(oauth2_scheme)
 ) -> Dict:
     """
     Validate access token and return current user
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+
+
     
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[ALGORITHM]
-        )
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-        token_data = TokenPayload(user_id=user_id)
-    except JWTError:
-        raise credentials_exception
-    
-    user_service = UserService(db)
-    user = await user_service.get_by_id(user_id=token_data.user_id)
-    if user is None:
-        raise credentials_exception
     
     return user
 

@@ -47,6 +47,8 @@ project_id_store = SqliteDict(db_name, tablename="project_id_store", autocommit=
 hometimeline_pulled_store = SqliteDict(db_name, tablename="hometimeline_pulled_store", autocommit=True)
 completed_survey = SqliteDict(db_name, tablename="completed_survey", autocommit=True)
 experimental_condition = SqliteDict(db_name, tablename="experimental_condition", autocommit=True)
+tweet_services_store = SqliteDict(db_name, tablename="tweet_services_store", autocommit=True)
+
 
 def get_store(name) -> SqliteDict:
     """
@@ -69,7 +71,8 @@ def get_store(name) -> SqliteDict:
         "project_id_store": project_id_store,
         "hometimeline_pulled_store": hometimeline_pulled_store,
         "completed_survey": completed_survey,
-        "experimental_condition": experimental_condition
+        "experimental_condition": experimental_condition,
+        "tweet_services_store": tweet_services_store
     }
     if name in dbs:
         return dbs[name]
@@ -96,3 +99,4 @@ def close_stores() -> None:
     project_id_store.close()
     completed_survey.close()
     experimental_condition.close()
+    tweet_services_store.close()
