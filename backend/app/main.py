@@ -9,7 +9,9 @@ from app.web.web import web_router
 from app.api.api import api_router
 from app.core.config import settings
 from app.core.exceptions import AppException
-from app.db.session import close_stores
+from app.db.session import close_stores, engine
+from app.db.base import Base
+
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,11 +22,15 @@ APP_HOME = os.path.dirname(__file__) + "/../../"
 # Startup and shutdown events
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+
+    # Startup: Create database tables, initialize resources, etc.
+    if settings.AUTO_CREATE_TABLES:
+        async with engine.begin() as conn:
+            # In production, use Alembic for migrations instead
+            await conn.run_sync(Base.metadata.create_all)
+
     print("Application startup complete")
 
-    get_store("user")  # Initialize the OAuth store
-
-    
     yield  # This is where the application runs
     
     # Shutdown: Close connections, cleanup resources
