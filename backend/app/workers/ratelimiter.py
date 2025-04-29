@@ -1,11 +1,11 @@
 import time
 import heapq
 import schedule
-import threading
 import logging
 from configparser import ConfigParser
 from requests_oauthlib import OAuth1Session
 from datetime import datetime
+import asyncio
 
 log_level = logging.DEBUG
 logging.basicConfig(filename='ratelimiter.log', level=log_level)
@@ -249,13 +249,17 @@ def push_retweet(tweet_id, user_id, access_token, access_token_secret):
     return "Done!"
 
 
-schedule.every(2).seconds.do(consumer.wake_up, producer)
-
+# schedule.every(2).seconds.do(consumer.wake_up, producer)
 
 def main():
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-thread_2 = threading.Thread(target=main)
-thread_2.start()
+# thread_2 = threading.Thread(target=main)
+# thread_2.start()
+
+async def ratelimiter_periodic_worker():
+    while True:
+        consumer.wake_up(producer)
+        await asyncio.sleep(2)

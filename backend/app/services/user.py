@@ -7,6 +7,12 @@ from app.schemas.user import UserCreate, UserUpdate
 class UserService:
     def __init__(self, db: AsyncSession):
         self.repository = UserRepository(db)
+
+    async def get_by_username(self, *, username: str) -> Optional[Dict]:
+        user = await self.repository.get_by_username(username=username)
+        if user:
+            return self._map_to_dict(user)
+        return None
     
     async def get_by_email(self, *, email: str) -> Optional[Dict]:
         user = await self.repository.get_by_email(email=email)

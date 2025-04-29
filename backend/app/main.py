@@ -1,18 +1,20 @@
+import asyncio
+import os
 import time
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 
-from app.web.web import web_router
-from app.api.api import api_router
+from app.api import api_router
 from app.core.config import settings
 from app.core.exceptions import AppException
-from app.db.session import close_stores, engine
 from app.db.base import Base
-
-import os
+from app.db.session import close_stores, engine
+# from app.web import web_router
+from app.workers import import_sample_posts, ratelimiter_periodic_worker
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_URL = os.getenv("DATABASE_URL")
@@ -22,6 +24,9 @@ APP_HOME = os.path.dirname(__file__) + "/../../"
 # Startup and shutdown events
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Start ratelimiting background task
+    await import_sample_posts() 
+    task = asyncio.create_task(ratelimiter_periodic_worker())
 
     # Startup: Create database tables, initialize resources, etc.
     if settings.AUTO_CREATE_TABLES:
@@ -32,6 +37,15 @@ async def lifespan(app: FastAPI):
     print("Application startup complete")
 
     yield  # This is where the application runs
+
+    # task cleanup
+    task.cancel()
+    
+    try:
+        await task
+    except asyncio.CancelledError:
+        # Task was cancelled, nothing else to do
+        pass
     
     # Shutdown: Close connections, cleanup resources
     await close_stores()
@@ -99,7 +113,7 @@ async def root():
 
 # Include API router with all endpoints
 app.include_router(api_router, prefix="/api")
-app.include_router(web_router, prefix="/web")
+# app.include_router(web_router, prefix="/web")
 
 # Development server entry point
 if __name__ == "__main__":

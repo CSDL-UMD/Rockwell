@@ -3,9 +3,21 @@ from typing import Any, Union, Optional
 from jose import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
+from uuid import uuid4
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], default="argon2")
 ALGORITHM = "HS256"
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_session_token() -> str:
+    return uuid4().hex
+
+def session_expiry(hours: int = 24):
+    return datetime.utcnow() + timedelta(hours=hours)
+
 
 def create_access_token(
     subject: Union[str, Any], expires_delta: Optional[timedelta] = None
@@ -35,3 +47,6 @@ def get_password_hash(password: str) -> str:
     Hash a password
     """
     return pwd_context.hash(password)
+
+
+

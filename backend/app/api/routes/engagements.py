@@ -2,14 +2,15 @@ from fastapi import APIRouter, Request
 import requests
 
 from app.services.recsys import RecsysService
-import app.services.ratelimiter as ratelimiter 
+import app.workers.ratelimiter as ratelimiter 
 import logging
 
 # from app.db.repositories.tweet import TweetRepository
 
 router = APIRouter()
 
-router('/retweet_post', methods=['GET','POST'])
+# router('/retweet_post', methods=['GET','POST'])
+@router.get('/retweet_post')
 def retweet_post(request: Request):
     worker_id = request.args.get('worker_id').strip()
     tweet_id = request.args.get('tweet_id').strip()
@@ -24,7 +25,7 @@ def retweet_post(request: Request):
     ratelimiter.push_retweet(tweet_id,userid,access_token,access_token_secret)
     return {"success":1} # Retweet successful
 
-router('/like_post', methods=['GET','POST'])
+@router.get('/like_post')
 def like_post(request: Request):
     worker_id = request.args.get('worker_id').strip()  
     tweet_id = request.args.get('tweet_id').strip()  

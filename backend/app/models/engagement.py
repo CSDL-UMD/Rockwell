@@ -1,16 +1,40 @@
-from typing import Optional
-from pydantic import BaseModel, Field, NonNegativeInt  
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Boolean
+)
 
-class TwitterEngagements(BaseModel):
-    """Engagement counts from Twitter"""
+from app.db.base import Base
 
-    retweets: NonNegativeInt = 0
-    likes: NonNegativeInt = 0
-    comments: NonNegativeInt = 0
-    shares: NonNegativeInt = 0  
 
-    liked: bool = Field(default=False, description="Whether the user has liked this tweet")
-    retweeted: bool = Field(default=False, description="Whether the user has retweeted this tweet")
+# class TwitterEngagements(Base):
+#     __tablename__ = "engagements"
+#     
+#     tweet_id = Column(String, primary_key=True, index=True)
+#     user_id = Column(Integer, ForeignKey("tweets.id"))
+#     retweets = Column(Integer, default=0)
+#     likes = Column(Integer, default=0)
+#     comments = Column(Integer, default=0)
+#     shares = Column(Integer, default=0)
+#     liked = Column(Boolean, default=False)
+#     retweeted = Column(Boolean, default=False)
+#     liked_by = Column(String, default="")
+#     retweeted_by = Column(String, default="")
+#     tweet = relationship("Tweet")
+
+
+class Engagement(Base):
+    __tablename__ = "engagements"
     
-    retweet_by: Optional[str] = None
-    quoted_by: Optional[str] = None
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(String, ForeignKey("social_posts.id"), nullable=False)
+    user_id = Column(String, nullable=False, index=True)
+    
+    engagement_type = Column(String, nullable=False)  # like, share, comment
+    content = Column(String, nullable=True)  # For comments
+
+    liked_by_user = Column(Boolean, default=False)
+    shared_by_user = Column(Boolean, default=False)
+    commens_by_yser = Column(Boolean, default=False)

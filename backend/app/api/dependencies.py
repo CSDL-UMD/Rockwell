@@ -1,81 +1,66 @@
-from typing import Annotated
+from datetime import datetime
+from typing import Annotated, Dict
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+from fastapi import Cookie, Depends, HTTPException, Request, status
+from fastapi.security import (
+    HTTPBearer,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Generator, Optional, Dict
+from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.core.security import ALGORITHM
 from app.db.session import get_db
 from app.services.user import UserService
-from app.schemas.token import TokenPayload
-from app.models import User
+from app.services.session import SessionService
 
+security = HTTPBearer()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+async def get_session_service(db: AsyncSession = Depends(get_db)):
+    """
+    Get session service instance
+    """
+    from app.services.session import SessionService
 
+    return SessionService(db)
+
+async def get_user_service(db: AsyncSession = Depends(get_db)):
+    """
+    Get user service instance
+    """
+    from app.services.user import UserService
+
+    return UserService(db)
 
 async def get_current_user(
-    db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)
+    request: Request,
+    session_token: Annotated[str | None, Cookie()] = None,
+    db: Session = Depends(get_db), 
+    userService: UserService = Depends(get_user_service),
+    sessionService: SessionService = Depends(get_session_service)
 ) -> Dict:
-    """
-    Validate access token and return current user
-    """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    if not session_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
+    session = await sessionService.get_by_token(token=session_token)
 
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-        token_data = TokenPayload(user_id=user_id)
-    except JWTError:
-        raise credentials_exception
-
-
-# async def get_current_user() -> Dict:
-#     """
-#     Validate access token and return current user
-#     """
-#
-#     return user
-
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    user = fake_decode_token(token)
+    if not session or session["expiry"]< datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session expired or invalid"
+        )
+    
+    user = await userService.get_by_id(user_id = session["user_id"])
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="User not found"
         )
+    
+    # Return user for use in route handlers
     return user
-
-
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)],
-):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-
-async def get_current_active_user(
-    current_user: Dict = Depends(get_current_user),
-) -> Dict:
-    """
-    Validate that the user is active
-    """
-    if not current_user["is_active"]:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
 
 async def get_current_admin_user(
     current_user: Dict = Depends(get_current_user),
@@ -88,7 +73,6 @@ async def get_current_admin_user(
             status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
         )
     return current_user
-
 
 async def get_recsys_service(db: AsyncSession = Depends(get_db)):
     """

@@ -1,18 +1,17 @@
-import json
 import asyncio
-import aiohttp
-
+import json
+import os
+from datetime import datetime
 from html import unescape
 from typing import Any, Dict, List, Optional
+
+import aiohttp
 from dateutil import parser
-from pydantic import HttpUrl
-from datetime import datetime
 from fastapi import HTTPException
+from pydantic import HttpUrl
 
+import app.workers.ratelimiter as ratelimiter
 from app.models import ContentItem, TwitterEngagements
-import app.services.ratelimiter as ratelimiter
-
-import os
 
 
 class TweetService:

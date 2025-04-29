@@ -3,8 +3,13 @@ from sqlalchemy import select
 from app.db.repositories.base import BaseRepository
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+from sqlalchemy.ext.asyncio import AsyncSession
 
 class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
+
+    def __init__(self, db: AsyncSession):
+            super().__init__(model=User, db=db)
+
     async def get_by_email(self, *, email: str) -> Optional[User]:
         statement = select(self.model).where(self.model.email == email)
         result = await self.db.execute(statement)

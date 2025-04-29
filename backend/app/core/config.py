@@ -1,6 +1,6 @@
-import secrets
 from typing import Any, Dict, List, Optional
-from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+import secrets
+from pydantic import AnyHttpUrl, AnyUrl, PostgresDsn, field_validator
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
 
     # Environment Settings
-    DEBUG: bool = False
+    DEBUG: bool = True
     SHOW_DOCS: bool = True
     AUTO_CREATE_TABLES: bool = False
 
@@ -33,7 +33,8 @@ class Settings(BaseSettings):
     POSTGRES_LOCAL_PASSWORD: str = "infodiversity"
 
     # DATABASE_URL (async DSN for SQLAlchemy)
-    DATABASE_URL: Optional[PostgresDsn] = None
+    # DATABASE_URL: Optional[PostgresDsn] = "sqlite+aiosqlite:///./test.db"
+    DATABASE_URL: Optional[str] = "sqlite+aiosqlite:///./test.db"
 
     # Hoaxy Database
     HOAXY_DB_HOST: str = "localhost"
@@ -64,18 +65,19 @@ class Settings(BaseSettings):
     TWITTER_ACCOUNT_SETTINGS_URL: AnyHttpUrl
     TWITTER_CREATION_DATE_URL: AnyHttpUrl
 
-    @field_validator("DATABASE_URL", mode="after")
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if v:
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            username=values.get("POSTGRES_LOCAL_USER"),
-            password=values.get("POSTGRES_LOCAL_PASSWORD"),
-            host=values.get("POSTGRES_LOCAL_HOST"),
-            port=str(values.get("POSTGRES_LOCAL_PORT")),
-            path=f"/{values.get('POSTGRES_LOCAL_DB') or ''}",
-        )
+    # @field_validator("DATABASE_URL", mode="after")
+    # def assemble_db_connection(cls, v: Optional[str], info):
+    #     values = info.data
+    #     if v:
+    #         return v
+    #     return PostgresDsn.build(
+    #         scheme="postgresql+asyncpg",
+    #         username=values.get("POSTGRES_LOCAL_USER"),
+    #         password=values.get("POSTGRES_LOCAL_PASSWORD"),
+    #         host=values.get("POSTGRES_LOCAL_HOST"),
+    #         port=values.get("POSTGRES_LOCAL_PORT"),
+    #         path=f"/{values.get('POSTGRES_LOCAL_DB') or ''}",
+    #     )
 
     class Config:
         case_sensitive = True

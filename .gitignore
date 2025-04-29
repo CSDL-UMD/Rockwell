@@ -1,3 +1,5 @@
+*.db
+*.log
 sample_posts.json
 # Never include live configuration file under version control!
 config.ini

@@ -5,12 +5,12 @@ from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
-from app.db.repositories.tweet import TweetRepository
+from app.db.repositories import PostRepository
 
 class RecsysService:
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.tweet_repository = TweetRepository(self.db)
+        self.tweet_repository = PostRepository(self.db)
         self.model = self._load_model()
         self.last_trained = datetime.now()
         
